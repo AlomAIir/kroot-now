@@ -55,6 +55,12 @@
   --toast-ink: #f5f5f7;
   --shadow-card: 0 34px 60px -18px rgba(28, 18, 60, .32), 0 14px 26px -14px rgba(28, 18, 60, .2);
   --shadow-sm: 0 4px 14px rgba(0, 0, 0, .06);
+  --glass: rgba(255, 255, 255, .58);
+  --glass-line: rgba(0, 0, 0, .08);
+  --glass-hi: rgba(255, 255, 255, .7);
+  --glass-tile: rgba(255, 255, 255, .62);
+  --glass-tile-hover: rgba(255, 255, 255, .85);
+  --glass-strong: rgba(250, 250, 252, .95);
   --f-sans: "Year of Handicrafts", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Arabic", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
   --ease: cubic-bezier(.25, .1, .25, 1);
   --ease-out: cubic-bezier(.16, 1, .3, 1);
@@ -69,6 +75,8 @@
     --gold: #d6b07a; --sage: #93b28e; --bad: #ff6b5e; --good: #4cd281; --stage: #1d1d1f;
     --apple-edge: #424245; --scrim: rgba(0, 0, 0, .86); --toast-bg: rgba(245, 245, 247, .94); --toast-ink: #1d1d1f;
     --shadow-card: 0 34px 60px -18px rgba(0, 0, 0, .8), 0 14px 26px -14px rgba(0, 0, 0, .6); --shadow-sm: 0 4px 14px rgba(0, 0, 0, .4);
+    --glass: rgba(29, 29, 31, .52); --glass-line: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .08);
+    --glass-tile: rgba(44, 44, 48, .5); --glass-tile-hover: rgba(58, 58, 63, .62); --glass-strong: rgba(28, 28, 30, .95);
     color-scheme: dark;
   }
 }
@@ -79,6 +87,8 @@
   --gold: #d6b07a; --sage: #93b28e; --bad: #ff6b5e; --good: #4cd281; --stage: #1d1d1f;
   --apple-edge: #424245; --scrim: rgba(0, 0, 0, .86); --toast-bg: rgba(245, 245, 247, .94); --toast-ink: #1d1d1f;
   --shadow-card: 0 34px 60px -18px rgba(0, 0, 0, .8), 0 14px 26px -14px rgba(0, 0, 0, .6); --shadow-sm: 0 4px 14px rgba(0, 0, 0, .4);
+  --glass: rgba(29, 29, 31, .52); --glass-line: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .08);
+  --glass-tile: rgba(44, 44, 48, .5); --glass-tile-hover: rgba(58, 58, 63, .62); --glass-strong: rgba(28, 28, 30, .95);
   color-scheme: dark;
 }
 [hidden] { display: none !important; }
@@ -130,16 +140,45 @@ button, input, textarea { font: inherit; color: inherit; }
 .nav-cta { appearance: none; border: 0; cursor: pointer; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 14px; border-radius: 980px; padding: 5px 14px; min-height: 30px; margin-inline-start: 4px; transition: background-color .2s; }
 .nav-cta:hover { background: var(--accent-hover); }
 
-/* progress */
-.prog { padding-block: 16px 0; }
-.prog-label { font-size: 13px; font-weight: 600; color: var(--muted); }
-.prog-track { height: 4px; background: var(--band); border-radius: 99px; overflow: hidden; margin-top: 8px; }
-.prog-fill { height: 100%; background: var(--accent); border-radius: inherit; transition: width .7s var(--ease-out); }
+/* progress: a floating liquid-glass capsule that stays with you; visited steps are buttons */
+.prog { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 58px); z-index: 15; padding-block: 10px 2px; pointer-events: none; }
+.pbar {
+  pointer-events: auto; display: flex; align-items: center; gap: 2px;
+  width: fit-content; max-width: 100%; margin-inline: auto; padding: 5px; border-radius: 999px;
+  background: var(--glass); border: 1px solid var(--glass-line);
+  -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 var(--glass-hi);
+  overflow-x: auto; scrollbar-width: none;
+}
+.pbar::-webkit-scrollbar { display: none; }
+.pstep {
+  appearance: none; border: 0; background: none; cursor: pointer; flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px; padding-inline-end: 10px; border-radius: 999px;
+  font: inherit; font-size: 12.5px; font-weight: 600; color: var(--muted);
+  transition: background .3s var(--ease), color .3s var(--ease), box-shadow .3s var(--ease);
+}
+.pstep:disabled { cursor: default; opacity: .45; padding-inline-end: 4px; }
+.pstep:disabled .pstep-name { display: none; }
+.pstep.is-done:not(.is-cur):hover { background: var(--band-hover); color: var(--ink); }
+.pstep.is-cur { cursor: default; background: var(--accent); color: var(--accent-ink); box-shadow: 0 4px 14px -3px rgba(80, 50, 170, .55); }
+.pstep-dot {
+  display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; flex: none;
+  font-size: 11px; font-weight: 700; background: var(--band); color: var(--muted);
+  transition: background .3s var(--ease), color .3s var(--ease);
+}
+.pstep.is-done .pstep-dot { background: var(--accent-soft); color: var(--accent-text); }
+.pstep.is-cur .pstep-dot { background: rgba(255, 255, 255, .26); color: var(--accent-ink); }
+.pstep-name { white-space: nowrap; }
+@media (max-width: 760px) {
+  .pstep { padding-inline-end: 4px; }
+  .pstep.is-cur { padding-inline-end: 11px; }
+  .pstep:not(.is-cur) .pstep-name { display: none; }
+}
 
-main { flex: 1; outline: none; }
+main { flex: 1; outline: none; overflow-x: clip; }
 #screen > .wrap.step { padding-block: 22px 44px; }
 #screen.enter > * { animation: stepIn .55s var(--ease-out) both; }
-#screen.enter.back > * { animation-name: stepBack; }
+#screen.enter.rev > * { animation-name: stepBack; }
 h1 { font-size: clamp(30px, 7vw, 44px); font-weight: 700; line-height: 1.22; margin: 0 0 8px; text-wrap: balance; }
 html[lang="en"] h1, html[lang="en"] .big { letter-spacing: -.02em; }
 .display { font-size: clamp(34px, 8vw, 52px); font-weight: 700; line-height: 1.2; margin: 0; text-wrap: balance; }
@@ -180,6 +219,44 @@ html[lang="en"] h1, html[lang="en"] .big { letter-spacing: -.02em; }
   border-top: 1px solid var(--nav-line); padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px));
 }
 .bar-in { display: flex; justify-content: flex-end; }
+
+/* ---------- AI assistant (liquid glass) ---------- */
+.asst-btn {
+  position: fixed; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); inset-inline-end: 18px; z-index: 30;
+  appearance: none; border: 1px solid var(--glass-line); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px; padding: 10px 16px; border-radius: 999px;
+  background: var(--glass); color: var(--accent-text); font-weight: 700; font-size: 14px;
+  -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 var(--glass-hi);
+  transition: transform .25s var(--ease-out);
+}
+.asst-btn:hover { transform: translateY(-2px); }
+.asst-btn svg { width: 18px; height: 18px; color: var(--gold); }
+.asst-panel {
+  position: fixed; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); inset-inline-end: 18px; z-index: 31;
+  width: 380px; max-height: min(560px, 72vh);
+  display: flex; flex-direction: column; border-radius: 24px; overflow: hidden;
+  background: var(--glass-strong); border: 1px solid var(--glass-line);
+  -webkit-backdrop-filter: saturate(200%) blur(28px); backdrop-filter: saturate(200%) blur(28px);
+  box-shadow: var(--shadow-card), inset 0 1px 0 var(--glass-hi);
+  animation: asstIn .4s var(--ease-out);
+}
+@keyframes asstIn { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+@media (max-width: 600px) {
+  .asst-panel { left: 10px; right: 10px; width: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); max-height: 70vh; }
+  body.asst-open .bar { visibility: hidden; }
+}
+.asst-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; font-size: 15px; border-bottom: 1px solid var(--glass-line); }
+.asst-x { appearance: none; border: 0; cursor: pointer; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--band); color: var(--muted); font-size: 15px; line-height: 1; }
+.asst-msgs { flex: 1; overflow-y: auto; padding: 14px; display: grid; gap: 8px; align-content: start; min-height: 170px; }
+.asst-m { max-width: 86%; padding: 9px 13px; border-radius: 18px; font-size: 14.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: break-word; }
+.asst-m.user { justify-self: end; background: var(--accent); color: var(--accent-ink); border-end-end-radius: 6px; }
+.asst-m.bot { justify-self: start; background: var(--tile); color: var(--ink); border: 1px solid var(--line); border-end-start-radius: 6px; }
+.asst-form { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--glass-line); }
+.asst-form input { flex: 1; min-width: 0; appearance: none; border: 1px solid var(--line); border-radius: 999px; background: var(--tile); padding: 9px 14px; font-size: 15px; }
+.asst-send { appearance: none; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 14px; padding: 0 16px; cursor: pointer; transition: background-color .2s; }
+.asst-send:hover { background: var(--accent-hover); }
+.asst-send:disabled { opacity: .5; }
 
 /* ---------- home ---------- */
 .band { padding-block: 84px; }
@@ -419,6 +496,11 @@ html[lang="ar"] .big { line-height: 1.3; }
 .font-sample { font-size: 32px; line-height: 1.6; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .font-tile-sm .font-sample { font-size: 21px; }
 .font-name { font-size: 12px; color: var(--muted); direction: ltr; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.combo-sec { margin-bottom: 10px; }
+.combo-sec .hint { margin: 0; }
+.combo-tile { flex-basis: 168px; min-height: 124px; gap: 2px; }
+.combo-tile .font-sample { font-size: 27px; line-height: 1.5; }
+.combo-tile .combo-body { font-size: 16px; color: var(--muted); }
 .ai-box { border-radius: 18px; padding: 18px; background: var(--accent-soft); display: grid; gap: 10px; }
 .ai-box h2 { font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px; color: var(--accent-text); }
 .ai-box h2 svg, .btn-ghost svg { width: 20px; height: 20px; color: var(--gold); }
@@ -485,8 +567,8 @@ html[lang="ar"] .big { line-height: 1.3; }
 .tick svg path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: draw .5s .15s var(--ease-out) forwards; }
 
 /* motion: entrances move content into place but never hide it */
-@keyframes stepIn { from { transform: translateX(calc(var(--fwd, 1) * 56px)); } }
-@keyframes stepBack { from { transform: translateX(calc(var(--fwd, 1) * -56px)); } }
+@keyframes stepIn { from { opacity: 0; transform: translateX(calc(var(--fwd, 1) * 40px)); } }
+@keyframes stepBack { from { opacity: 0; transform: translateX(calc(var(--fwd, 1) * -40px)); } }
 @keyframes rise { from { transform: translateY(24px); } }
 @keyframes heroIn { from { transform: translateY(80px) scale(.94); } }
 @keyframes pick { 45% { transform: scale(1.03); } }
@@ -532,6 +614,84 @@ html[lang="ar"] .big { line-height: 1.3; }
 @media (max-width: 859px) {
   .bar-in .btn { width: 100%; }
 }
+
+/* ---------- liquid glass for the order flow (steps 1-8, pay, done) ----------
+   A soft colour field sits behind the steps so the frosted surfaces have something to show through.
+   Real backdrop blur is kept to the few large or floating surfaces; tiles use translucency only, which keeps phones smooth. */
+body.in-flow::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(55% 45% at 88% 6%, color-mix(in srgb, var(--lilac) 30%, transparent), transparent 72%),
+    radial-gradient(45% 40% at 6% 92%, color-mix(in srgb, var(--gold) 20%, transparent), transparent 70%),
+    radial-gradient(40% 35% at 30% 30%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%);
+}
+body.in-flow :is(.cat, .occ, .font-tile, .choice, .check, .chip, .crumb) {
+  background: var(--glass-tile); border-color: var(--glass-line);
+  box-shadow: inset 0 1px 0 var(--glass-hi);
+}
+body.in-flow :is(.cat, .occ, .font-tile, .choice, .chip):hover { background: var(--glass-tile-hover); border-color: var(--glass-line); }
+body.in-flow .style-tile { background: var(--glass-tile); box-shadow: inset 0 0 0 1px var(--glass-line), inset 0 1px 0 var(--glass-hi); }
+body.in-flow .style-tile:hover { background: var(--glass-tile-hover); }
+body.in-flow :is(.cat, .occ, .font-tile)[aria-pressed="true"],
+body.in-flow :is(.choice, .check):has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent), 0 10px 28px -14px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+body.in-flow .style-tile[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--accent), 0 14px 32px -16px color-mix(in srgb, var(--accent) 75%, transparent); }
+body.in-flow .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+body.in-flow .crumb[aria-current="step"] { background: var(--accent-soft); border-color: var(--accent); }
+body.in-flow :is(.field input, .field textarea) { background: var(--glass-tile); border-color: var(--glass-line); box-shadow: inset 0 1px 0 var(--glass-hi); }
+body.in-flow :is(.field input, .field textarea):focus { background: var(--glass-tile-hover); border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+body.in-flow .preview {
+  background: var(--glass); border: 1px solid var(--glass-line);
+  -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px);
+  box-shadow: inset 0 1px 0 var(--glass-hi);
+}
+body.in-flow .ai-box { background: var(--glass-tile); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); box-shadow: inset 0 1px 0 var(--glass-hi); }
+/* review: an inset grouped list, like iOS Settings */
+body.in-flow .facts { border: 1px solid var(--glass-line); border-radius: 20px; background: var(--glass-tile); padding-inline: 18px; box-shadow: inset 0 1px 0 var(--glass-hi); }
+body.in-flow .fact:last-child { border-bottom: 0; }
+body.in-flow .fact { border-bottom-color: var(--glass-line); }
+/* the Next button floats on a glass tray instead of a full-width strip */
+body.in-flow .bar {
+  background: none; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none;
+  padding-block: 0 calc(14px + env(safe-area-inset-bottom, 0px)); pointer-events: none;
+}
+body.in-flow .bar-in {
+  pointer-events: auto; width: calc(100% - 28px); padding: 8px; border-radius: 36px;
+  background: var(--glass); border: 1px solid var(--glass-line);
+  -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 var(--glass-hi);
+}
+body.in-flow .bar-in .btn-primary { box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--accent) 80%, transparent); }
+@media (min-width: 860px) {
+  body.in-flow .bar-in { width: fit-content; }
+}
+/* ---------- skipped steps: anything still showing sample content is purple ---------- */
+.pstep.is-default { color: var(--accent-text); }
+.pstep.is-default .pstep-dot { background: var(--accent-soft); color: var(--accent-text); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.pstep.is-default:hover { background: var(--accent-soft); }
+.field input[data-def]:placeholder-shown {
+  border-style: dashed; border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+}
+.field input[data-def]::placeholder { color: var(--accent-text); opacity: .85; }
+.def-hint { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; color: var(--accent-text); }
+.def-hint::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.form:not(:has(input[data-def]:placeholder-shown)) .def-hint { display: none; }
+.def-note {
+  margin: 0; padding: 12px 14px; border-radius: 14px; font-size: 15px; line-height: 1.5;
+  background: var(--accent-soft); color: var(--accent-text); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.fact.is-default dd { color: var(--accent-text); }
+.def-tag { display: inline-block; margin-inline-start: 6px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.7; vertical-align: 1px; background: var(--accent); color: var(--accent-ink); }
+body.in-flow .fact.is-default { background: color-mix(in srgb, var(--accent-soft) 60%, transparent); margin-inline: -18px; padding-inline: 18px; }
+.bar-in { gap: 8px; align-items: center; }
+.bar .bar-in .btn-skip { width: auto; flex: none; min-width: 0; min-height: 56px; padding-inline: 24px; background: var(--glass-tile); border-color: var(--glass-line); }
+@media (prefers-reduced-transparency: reduce) {
+  body.in-flow :is(.cat, .occ, .font-tile, .choice, .check, .chip, .style-tile, .field input, .field textarea, .facts) { background: var(--tile); }
+  body.in-flow :is(.preview, .bar-in, .pbar, .asst-panel, .asst-btn) { background: var(--tile); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
 </style>
 
 <div class="app">
@@ -549,16 +709,24 @@ html[lang="ar"] .big { line-height: 1.3; }
     </div>
    </div>
   </header>
-  <div class="prog" id="prog" hidden><div class="wrap"><div class="prog-label"></div><div class="prog-track"><div class="prog-fill"></div></div></div></div>
+  <div class="prog" id="prog" hidden><div class="wrap"><nav class="pbar"></nav></div></div>
   <main id="screen" tabindex="-1"></main>
   <div class="bar" id="bar" hidden></div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <div class="modal" id="modal" hidden></div>
+<button class="asst-btn" id="asstBtn" type="button" hidden></button>
+<section class="asst-panel" id="asstPanel" hidden>
+  <header class="asst-head"><strong id="asstTitle"></strong><button class="asst-x" id="asstClose" type="button" aria-label="×">×</button></header>
+  <div class="asst-msgs" id="asstMsgs" aria-live="polite"></div>
+  <form class="asst-form" id="asstForm"><input id="asstInput" autocomplete="off"><button class="asst-send" type="submit" id="asstSendBtn"></button></form>
+</section>
 <!-- paint texture for the wordmark; kept in the page, not display:none, so the filters stay usable -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><filter id="kn-acrylic" x="-4%" y="-10%" width="108%" height="120%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="4" result="edge"/><feDisplacementMap in="SourceGraphic" in2="edge" scale="20" xChannelSelector="R" yChannelSelector="G" result="paint"/><feTurbulence type="fractalNoise" baseFrequency="0.0012 0.03" numOctaves="3" seed="11" result="bristle"/><feColorMatrix in="bristle" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -1.2 0 0 0 0.40" result="hi"/><feComposite in="hi" in2="paint" operator="in" result="hiIn"/><feColorMatrix in="bristle" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.2 0 0 0 -0.80" result="lo"/><feComposite in="lo" in2="paint" operator="in" result="loIn"/><feGaussianBlur in="paint" stdDeviation="10" result="soft"/><feSpecularLighting in="soft" surfaceScale="3" specularConstant="0.28" specularExponent="20" lighting-color="#ffffff" result="spec"><feDistantLight azimuth="235" elevation="55"/></feSpecularLighting><feComposite in="spec" in2="paint" operator="in" result="specIn"/><feMerge><feMergeNode in="paint"/><feMergeNode in="loIn"/><feMergeNode in="hiIn"/><feMergeNode in="specIn"/></feMerge></filter><filter id="kn-acrylic-sm" x="-4%" y="-10%" width="108%" height="120%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="1" seed="4" result="edge"/><feDisplacementMap in="SourceGraphic" in2="edge" scale="22" xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<!-- optional, git-ignored: sets window.KROOT_LOCAL = { aiKey } for local testing -->
+<script src="config.local.js"></script>
 <script>
 (function () {
 'use strict';
@@ -569,7 +737,13 @@ const CONFIG = {
   english: false,            // the site is Arabic only for now; true brings back the English switch
   price: 59,                 // SAR, VAT included
   descriptor: 'TENSO',       // name on the customer's bank statement
-  supportWhatsApp: ''        // e.g. '9665XXXXXXXX' to show a WhatsApp help link
+  supportWhatsApp: '',       // e.g. '9665XXXXXXXX' to show a WhatsApp help link
+  // Anthropic API key for the assistant and the smart helpers when the page is served normally
+  // (outside the claude.ai artifact). It comes from config.local.js, which is git-ignored.
+  // A key that reaches the browser is visible to every visitor, so this is for local testing only;
+  // in production route the calls through your own server.
+  aiKey: (window.KROOT_LOCAL && window.KROOT_LOCAL.aiKey) || '',
+  aiModel: 'claude-opus-5-5'
 };
 const W = 1080, H = 1920;
 
@@ -622,6 +796,11 @@ const I18N = {
     price: p => `${p} ر.س`, vatIncl: 'شامل ضريبة القيمة المضافة',
     start: 'ابدئي التصميم', startNew: 'ابدئي بطاقة جديدة', haveCard: 'عندي بطاقة أعجبتني', resume: 'كمّلي تصميمك السابق',
     stepOf: (i, n) => `الخطوة ${i} من ${n}`,
+    stepNames: ['المناسبة', 'التصميم', 'الأسماء', 'الموعد', 'المكان', 'النص', 'الخط', 'المراجعة'], stepsAria: 'خطوات الطلب',
+    skip: 'تخطي', defTag: 'افتراضي',
+    defHint: 'الخانات البنفسجية فاضية، فتطلع مكانها في البطاقة قيمة افتراضية.',
+    defNote: 'الأجزاء البنفسجية تستخدم القيم الافتراضية. عدّليها قبل الدفع إذا ما تناسبك.',
+    tashkeelToggle: 'تشكيل الأسماء تلقائيًا، مثل عبداللّٰه',
     occTitle: 'وش المناسبة؟',
     occPath: 'مسار الاختيار', crumbRoot: 'المناسبات',
     catSubs: { wedding: 'حفل الرجال · حفل النساء', newborn: 'مولود · مولودة · توأم', events: 'العيد · تخرج · حفل · مناسبات أخرى' },
@@ -629,6 +808,7 @@ const I18N = {
     eidTitle: 'أي عيد؟', eidName: 'العيد', eidSub: 'الفطر والأضحى',
     deckHint: 'تقدرين تسحبين يمين ويسار للتنقل بين الخيارات',
     styleTitle: 'اختاري التصميم', styleSub: 'تقدرين تغيّرينه في أي وقت.', recommended: 'مقترح', matched: 'الأقرب لبطاقتك',
+    comboTitle: 'تنسيق الخطوط', comboSub: 'جرّبي تنسيقًا، وشوفي كل التصاميم فيه.', comboDefault: 'خطوط التصميم',
     namesTitle: { weddingMen: 'أسماء أهل الفرح', weddingWomen: 'أسماء العروسين', babyGirl: 'اسم المولودة', babyBoy: 'اسم المولود', twins: 'أسماء التوأم', eidFitr: 'تفاصيل المعايدة', eidAdha: 'تفاصيل المعايدة', graduation: 'اسم الخريجة أو الخريج', ceremony: 'تفاصيل الحفل', other: 'تفاصيل المناسبة' },
     namesSub: 'اكتبي الأسماء مثل ما تبينها تطلع في البطاقة.',
     optional: '(اختياري)',
@@ -664,6 +844,8 @@ const I18N = {
     noAIUpload: 'في النسخة الكاملة نقرأ البطاقة تلقائياً. الحين اختاري المناسبة وأقرب تصميم لها.',
     copyNote: 'نصمم لك بطاقة جديدة مستوحاة من الستايل، ولا ننسخ تصميم أحد.',
     helpTitle: 'تحتاجين مساعدة؟', helpBody: 'فريقنا يساعدك على واتساب في أي خطوة: التصميم، العبارات، أو الدفع.',
+    asstTitle: 'مساعدة كرُوت', asstHi: 'هلا فيك! قولي لي وش مناسبتك أو وش تحبين يكون شكل الكرت، وأنا أجهّز لك كل شي.',
+    asstPh: 'اكتبي هنا…', asstSend: 'إرسال', asstBtn: 'مساعدة ذكية', asstFail: 'تعذّر الرد، جرّبي مرة ثانية.',
     helpNoNumber: 'رقم واتساب الدعم يُضاف هنا في النسخة النهائية.', helpLink: 'كلّمينا على واتساب', close: 'إغلاق',
     pickOcc: 'اختاري المناسبة', pickStyle: 'اختاري التصميم', fill: l => `اكتبي ${l}`, pickDate: 'اختاري التاريخ',
     fillVenue: 'اكتبي اسم المكان', confirmFirst: 'أكّدي المراجعة أولاً'
@@ -701,6 +883,11 @@ const I18N = {
     price: p => `SAR ${p}`, vatIncl: 'VAT included',
     start: 'Start designing', startNew: 'Start a new card', haveCard: 'I have a card I like', resume: 'Continue my last card',
     stepOf: (i, n) => `Step ${i} of ${n}`,
+    stepNames: ['Occasion', 'Design', 'Names', 'Date', 'Place', 'Wording', 'Font', 'Review'], stepsAria: 'Order steps',
+    skip: 'Skip', defTag: 'Default',
+    defHint: 'Purple fields are empty, so the card shows a sample value there.',
+    defNote: 'Purple items are using defaults. Change them before you pay if they don\'t fit.',
+    tashkeelToggle: 'Add Arabic diacritics to names like Abdullah automatically',
     occTitle: "What's the occasion?",
     occPath: 'Selection path', crumbRoot: 'Occasions',
     catSubs: { wedding: "Men's · Women's", newborn: 'Boy · Girl · Twins', events: 'Eid · Graduation · Ceremony · Other' },
@@ -708,6 +895,7 @@ const I18N = {
     eidTitle: 'Which Eid?', eidName: 'Eid', eidSub: 'Fitr & Adha',
     deckHint: 'Swipe sideways to move between the options',
     styleTitle: 'Choose a design', styleSub: 'You can change it any time.', recommended: 'Suggested', matched: 'Closest to your card',
+    comboTitle: 'Font pairing', comboSub: 'Pick a pairing and see every design in it.', comboDefault: "Design's fonts",
     namesTitle: { weddingMen: 'Family names', weddingWomen: 'Couple names', babyGirl: "Baby's name", babyBoy: "Baby's name", twins: "Twins' names", eidFitr: 'Eid details', eidAdha: 'Eid details', graduation: "Graduate's name", ceremony: 'Ceremony details', other: 'Event details' },
     namesSub: 'Write the names exactly as they should appear on the card.',
     optional: '(optional)',
@@ -743,6 +931,8 @@ const I18N = {
     noAIUpload: 'In the full version we read the card automatically. For now, choose the occasion and the closest design.',
     copyNote: "We design a new card inspired by the style. We don't copy anyone's design.",
     helpTitle: 'Need help?', helpBody: 'Our team can help you on WhatsApp at any step: design, wording or payment.',
+    asstTitle: 'Kroot assistant', asstHi: "Hi! Tell me your occasion or the look you want, and I'll set everything up for you.",
+    asstPh: 'Type here…', asstSend: 'Send', asstBtn: 'AI help', asstFail: "Couldn't reply — please try again.",
     helpNoNumber: 'The support WhatsApp number goes here in the final version.', helpLink: 'Chat with us on WhatsApp', close: 'Close',
     pickOcc: 'Choose the occasion', pickStyle: 'Choose a design', fill: l => `Please fill in: ${l}`, pickDate: 'Choose the date',
     fillVenue: 'Write the venue name', confirmFirst: 'Please confirm you checked the card'
@@ -958,7 +1148,24 @@ const REC = {
 // Playful nursery designs stay with the newborn occasions only; everything else gets the grown-up catalogue
 const CHILDISH = ['carouselPink', 'carouselBlue', 'balloon', 'toile', 'sky'];
 const KIDS_OCC = ['babyGirl', 'babyBoy', 'twins'];
-function allowedFor(oc) { return KIDS_OCC.includes(oc) ? TEMPLATE_IDS : TEMPLATE_IDS.filter(id => !CHILDISH.includes(id)); }
+// Designs whose look clashes with an occasion's audience stay out of that occasion's catalogue:
+// florals and henna off the men's wedding, the bisht off the women's, grown-up formal looks off the nursery
+const FEMININE = ['blossom', 'roses', 'relief', 'henna', 'sage', 'meadow'];
+const FORMAL_DARK = ['bisht', 'najdi', 'navy', 'diwani', 'velvet', 'golden', 'henna'];
+const AVOID = {
+  weddingMen: FEMININE,
+  weddingWomen: ['bisht'],
+  babyGirl: FORMAL_DARK,
+  babyBoy: [...FORMAL_DARK, 'blossom', 'roses', 'relief', 'sage', 'carouselPink'],
+  twins: FORMAL_DARK,
+  eidFitr: ['henna'], eidAdha: ['henna'],
+  graduation: ['henna'], ceremony: ['henna']
+};
+function allowedFor(oc) {
+  const base = KIDS_OCC.includes(oc) ? TEMPLATE_IDS : TEMPLATE_IDS.filter(id => !CHILDISH.includes(id));
+  const avoid = AVOID[oc] || [];
+  return base.filter(id => !avoid.includes(id));
+}
 
 const AR_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 const EN_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -993,6 +1200,25 @@ const FONT_GROUPS = {
 const BODY_FONTS = {
   ar: ['Tajawal', 'Cairo', 'Almarai', 'El Messiri', 'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', 'Markazi Text', 'Readex Pro', 'IBM Plex Sans Arabic', 'Changa', 'Lateef', 'Mirza', 'Zain', 'Beiruti', 'Reem Kufi', 'Harmattan', 'Aref Ruqaa'],
   en: ['Cormorant Garamond', 'Playfair Display', 'EB Garamond', 'Lora', 'Marcellus', 'Montserrat', 'Cinzel', 'Bodoni Moda']
+};
+// Curated name+body pairings offered on the design step; every family is already in the catalogue above
+const FONT_COMBOS = {
+  ar: [
+    { name: 'Aref Ruqaa', body: 'Tajawal', ar: 'كلاسيكي', en: 'Classic' },
+    { name: 'Amiri', body: 'Noto Naskh Arabic', ar: 'تقليدي', en: 'Traditional' },
+    { name: 'Reem Kufi', body: 'Almarai', ar: 'كوفي', en: 'Kufi' },
+    { name: 'El Messiri', body: 'Cairo', ar: 'عصري', en: 'Modern' },
+    { name: 'Rakkas', body: 'Harmattan', ar: 'مزخرف', en: 'Ornate' },
+    { name: 'Lalezar', body: 'Tajawal', ar: 'مرح', en: 'Playful' }
+  ],
+  en: [
+    { name: 'Great Vibes', body: 'Cormorant Garamond', ar: 'رومانسي', en: 'Romantic' },
+    { name: 'Playfair Display', body: 'EB Garamond', ar: 'كلاسيكي', en: 'Classic' },
+    { name: 'Cinzel', body: 'Montserrat', ar: 'فخم', en: 'Stately' },
+    { name: 'Pinyon Script', body: 'Lora', ar: 'أنيق', en: 'Elegant' },
+    { name: 'Italiana', body: 'Marcellus', ar: 'بسيط', en: 'Minimal' },
+    { name: 'Dancing Script', body: 'Montserrat', ar: 'مرح', en: 'Playful' }
+  ]
 };
 const ONLY_400 = new Set(['Great Vibes', 'Alkalami', 'Katibeh', 'Rakkas', 'Gulzar', 'Qahiri', 'Blaka', 'Blaka Hollow', 'Lalezar', 'Jomhuria', 'Badeen Display', 'Vibes', 'Oi', 'Pinyon Script', 'Parisienne', 'Allura', 'Alex Brush', 'Marcellus', 'Italiana']);
 function famOf(k) { return FONT_NAME[k] || k; }
@@ -2949,11 +3175,25 @@ function getBg(tpl) {
 /* ================= card content ================= */
 function isWedding(oc) { return oc === 'weddingMen' || oc === 'weddingWomen'; }
 function fieldDef(oc, k) { return (FIELDS[oc] || []).find(f => f.k === k); }
+// Names that are written with diacritics on cards: the dagger alif and shadda in Allah and the other
+// divine names (عبداللّٰه، عبدالرّحمٰن، عبدالإلٰه) and a few Quranic names. Plain spellings only, so a name the
+// customer already voweled is left as typed.
+const AR_L = '\\u0621-\\u064A\\u066E-\\u06D3';
+const TASHKEEL_RULES = [
+  [new RegExp(`عبد(\\s?)اللة(?![${AR_L}])`, 'g'), 'عبد$1اللّٰه'],
+  [new RegExp(`الله(?![${AR_L}])`, 'g'), 'اللّٰه'],
+  [new RegExp(`الرحمن(?![${AR_L}])`, 'g'), 'الرّحمٰن'],
+  [new RegExp(`ال[إا]له(?![${AR_L}])`, 'g'), 'الإلٰه'],
+  [new RegExp(`(^|[^${AR_L}])طه(?![${AR_L}])`, 'g'), '$1طٰه'],
+  [new RegExp(`(^|[^${AR_L}])يس(?![${AR_L}])`, 'g'), '$1يٰس'],
+  [new RegExp(`(^|[^${AR_L}])داود(?![${AR_L}])`, 'g'), '$1داوُد']
+];
+function addTashkeel(s) { return TASHKEEL_RULES.reduce((acc, [re, rep]) => acc.replace(re, rep), s); }
 function fieldVal(st, k) {
   const v = (st.fields[k] || '').trim();
-  if (v) return v;
   const d = fieldDef(st.occasion, k);
-  return d && !d.opt ? d.ph[st.lang] : '';
+  const out = v || (d && !d.opt ? d.ph[st.lang] : '');
+  return st.tashkeel === false ? out : addTashkeel(out);
 }
 function venueVal(st) { return st.venue.trim() || I18N[st.lang].venuePh; }
 function toDigits(s, tpl, L) { return (L === 'ar' && tpl.digits === 'arab') ? String(s).replace(/[0-9]/g, c => '٠١٢٣٤٥٦٧٨٩'[c]) : s; }
@@ -3403,9 +3643,19 @@ async function drawCard(canvas, st, opts) {
 /* ================= AI (stand-in for your own AI API) ================= */
 // In the prototype these calls go to Claude through the artifact's `sample` capability.
 // In production, replace AI.json() with a call to your own AI endpoint; the prompts stay the same.
+// One-line look descriptions of every design, shared by the card reader and the assistant
+const STYLE_GUIDE = 'blossom = soft pink flowers or embroidery on cream; diwani = classic dark Arabic calligraphy on ivory with a frame; golden = dark green with a gold arch; sky = light blue with clouds or stars; olive = minimal beige with an olive branch; ivory = cream and gold ornate arch with filigree; sage = white with watercolor eucalyptus leaves and a thin gold frame; navy = navy blue and gold, sparkles; roses = blush pink with watercolor roses in the corners; balloon = soft blue sky with clouds and a hot-air balloon; najdi = beige with a Sadu woven border, dallah and coffee cups; relief = warm grey with white sculpted paper flowers in the corners; bisht = black with gold embroidered bands down the sides like a bisht trim; velvet = deep burgundy with a cream scalloped arch panel and dark leaves; henna = cream linen with red bougainvillea, red tassels, arches and an incense burner; carouselPink = pink ribbons and bows with a carousel; carouselBlue = blue ribbons and bows with a carousel; toile = white with blue ink line drawings of a bow, hot-air balloons, clouds and trees; meadow = off-white with wildflowers and daisies growing along the bottom.';
 const HIDE_CODES = ['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'];
+async function imageBlock(file) {
+  const data = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+  return { type: 'image', source: { type: 'base64', media_type: file.type || 'image/jpeg', data } };
+}
 const AI = {
-  s: null, img: false, maxBytes: 0, off: false,
+  s: null, key: '', img: false, maxBytes: 0, off: false,
   async init() {
     try {
       const s = window.claude && window.claude.use ? await window.claude.use('sample') : null;
@@ -3414,15 +3664,68 @@ const AI = {
         try { const lim = await s.limits(); if (lim && lim.images) { this.img = true; this.maxBytes = lim.images.maxInputBytes || 0; } } catch (e) { /* no images */ }
       }
     } catch (e) { /* no AI here */ }
+    if (!this.s) {
+      let k = CONFIG.aiKey || '';
+      try { k = localStorage.getItem('krootnow-ai-key') || k; } catch (e) { /* storage unavailable */ }
+      if (k) { this.key = k; this.img = true; this.maxBytes = 5 * 1024 * 1024; }
+    }
     refreshAI();
   },
-  on() { return !!this.s && !this.off; },
+  on() { return !!(this.s || this.key) && !this.off; },
+  // Direct Messages API call from the browser; used when CONFIG.aiKey is set instead of the artifact runtime
+  async call(content) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': this.key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'server-side-fallback-2026-07-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: CONFIG.aiModel, max_tokens: 4000, fallbacks: 'default',
+        messages: [{ role: 'user', content }]
+      })
+    });
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) console.warn('Kroot AI: the API key in CONFIG.aiKey was rejected (' + res.status + ').');
+      const e = new Error('ai http ' + res.status);
+      e.code = res.status === 429 || res.status === 529 ? 'rate_limited' : 'error';
+      throw e;
+    }
+    const data = await res.json();
+    if (data.stop_reason === 'refusal') { const e = new Error('refusal'); e.code = 'refusal'; throw e; }
+    return data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+  },
   async json(prompt, opts) {
-    try { return await this.s.json(prompt, Object.assign({ modelTier: 'quick' }, opts || {})); }
-    catch (e) { if (e && HIDE_CODES.includes(e.code)) { this.off = true; refreshAI(); } throw e; }
+    if (this.s) {
+      try { return await this.s.json(prompt, Object.assign({ modelTier: 'quick' }, opts || {})); }
+      catch (e) { if (e && HIDE_CODES.includes(e.code)) { this.off = true; refreshAI(); } throw e; }
+    }
+    let content = prompt;
+    if (opts && opts.images && opts.images.length) {
+      content = [];
+      for (const f of opts.images) content.push(await imageBlock(f));
+      content.push({ type: 'text', text: prompt });
+    }
+    try {
+      const txt = await this.call(content);
+      const m = txt.match(/\{[\s\S]*\}/);
+      return m ? JSON.parse(m[0]) : null;
+    } catch (e) { if (e && HIDE_CODES.includes(e.code)) { this.off = true; refreshAI(); } throw e; }
   }
 };
-function refreshAI() { document.querySelectorAll('[data-ai]').forEach(el => { el.hidden = !AI.on(); }); }
+function refreshAI() {
+  document.querySelectorAll('[data-ai]').forEach(el => { el.hidden = !AI.on(); });
+  const btn = $('#asstBtn'), panel = $('#asstPanel');
+  if (!btn) return;
+  const ok = AI.on() && FLOW.includes(state.step);
+  btn.hidden = !ok || asst.open;
+  if (ok) btn.innerHTML = `${ICON.sparkle}<span>${t('asstBtn')}</span>`;
+  else if (panel && !panel.hidden) { panel.hidden = true; asst.open = false; }
+  document.body.classList.toggle('asst-open', asst.open);
+}
 function aiError(e) { return e && e.code === 'rate_limited' ? t('aiBusy') : t('aiFail'); }
 const cleanStr = (x, max) => typeof x === 'string' ? x.trim().slice(0, max || 160) : '';
 const isArabic = s => /[؀-ۿ]/.test(s);
@@ -3500,7 +3803,7 @@ async function aiReadCard(file) {
  "reason": "a short phrase in ${L === 'ar' ? 'Arabic' : 'English'} describing the card's look (at most 8 words)",
  "opening": "the card's opening phrase exactly as written, or empty",
  "closing": "the card's closing line exactly as written, or empty"}
-Styles: blossom = soft pink flowers or embroidery on cream; diwani = classic dark Arabic calligraphy on ivory with a frame; golden = dark green with a gold arch; sky = light blue with clouds or stars; olive = minimal beige with an olive branch; ivory = cream and gold ornate arch with filigree; sage = white with watercolor eucalyptus leaves and a thin gold frame; navy = navy blue and gold, sparkles; roses = blush pink with watercolor roses in the corners; balloon = soft blue sky with clouds and a hot-air balloon; najdi = beige with a Sadu woven border, dallah and coffee cups; relief = warm grey with white sculpted paper flowers in the corners; bisht = black with gold embroidered bands down the sides like a bisht trim; velvet = deep burgundy with a cream scalloped arch panel and dark leaves; henna = cream linen with red bougainvillea, red tassels, arches and an incense burner; carouselPink = pink ribbons and bows with a carousel; carouselBlue = blue ribbons and bows with a carousel; toile = white with blue ink line drawings of a bow, hot-air balloons, clouds and trees; meadow = off-white with wildflowers and daisies growing along the bottom.
+Styles: ${STYLE_GUIDE}
 Opening phrase: for a wedding or milka, the words before the hosts' names (like "يتشرف"); for a baby, the sentence before the baby's name; otherwise the phrase before the main name or title. Never copy personal names.`;
   state.reading = true; state.read = null; renderScreen();
   try {
@@ -3513,13 +3816,101 @@ Opening phrase: for a wedding or milka, the words before the hosts' names (like 
   } finally { state.reading = false; renderScreen(); }
 }
 
+/* ================= AI assistant chat ================= */
+const asst = { open: false, busy: false, msgs: [] };
+function asstSystem() {
+  const L = state.lang;
+  const snap = {
+    step: state.step, lang: L, occasion: state.occasion, template: state.template,
+    fields: state.fields, date: state.date, timeFrom: state.timeFrom, timeTo: state.timeTo,
+    venue: state.venue, venueDetail: state.venueDetail, nameFont: state.nameFont, bodyFont: state.bodyFont
+  };
+  const allowed = state.occasion ? allowedFor(state.occasion).join(', ') : 'any (no occasion picked yet)';
+  const fieldKeys = state.occasion ? FIELDS[state.occasion].map(f => `${f.k} = ${f.en}`).join('; ') : 'none until an occasion is picked';
+  return `You are the in-app assistant of "${CONFIG.brand.en}", a Saudi occasion-card builder. The customer designs one card through these steps: ${FLOW.join(' > ')}. Be warm, brief and practical; in Arabic address the customer as a Saudi woman (feminine). Guide her to the next missing piece (occasion, then design, names, date, place), one question at a time, and apply what she asks for right away.
+Today: ${todayISO()}.
+Current card state: ${JSON.stringify(snap)}
+Occasions: weddingMen (men's wedding), weddingWomen (women's wedding), babyGirl, babyBoy, twins, eidFitr, eidAdha, graduation, ceremony, other.
+Designs (template ids and their look): ${STYLE_GUIDE}
+Designs allowed for her occasion: ${allowed}.
+Name fonts: ${FONT_GROUPS[L].flatMap(g => g.fonts).join(', ')}. Body fonts: ${BODY_FONTS[L].join(', ')}.
+Field keys for this occasion: ${fieldKeys}.
+Reply with only one JSON object:
+{"say": "your reply to the customer in her language (at most 60 words, plain text)",
+ "apply": {"occasion": "", "template": "", "nameFont": "", "bodyFont": "", "fields": {}, "date": "YYYY-MM-DD", "timeFrom": "HH:MM", "timeTo": "HH:MM", "venue": "", "venueDetail": "", "opening": "", "closing": "", "goStep": ""}}
+Every "apply" key is optional: include only what should change, and omit "apply" entirely when nothing changes. "goStep" moves her to that step so she sees the change (e.g. "style" after you pick a template). Use template ids and font names exactly as listed; never invent them.`;
+}
+function asstApply(a) {
+  if (!a || typeof a !== 'object') return;
+  if (a.occasion && FIELDS[a.occasion]) setOccasion(a.occasion);
+  if (a.template && TEMPLATES[a.template] && (!state.occasion || allowedFor(state.occasion).includes(a.template))) { state.template = a.template; state.styleAuto = false; }
+  if (a.date || a.timeFrom || a.timeTo) unskip('when');
+  if (a.nameFont || a.bodyFont) unskip('fonts');
+  if (a.opening || a.closing) unskip('wording');
+  const fams = new Set([...FONT_GROUPS.ar, ...FONT_GROUPS.en].flatMap(g => g.fonts).concat(BODY_FONTS.ar, BODY_FONTS.en));
+  if (typeof a.nameFont === 'string' && fams.has(a.nameFont)) state.nameFont = a.nameFont;
+  if (typeof a.bodyFont === 'string' && fams.has(a.bodyFont)) state.bodyFont = a.bodyFont;
+  if (a.fields && typeof a.fields === 'object' && state.occasion) {
+    FIELDS[state.occasion].forEach(f => { const v = cleanStr(a.fields[f.k], 80); if (v) state.fields[f.k] = v; });
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(a.date || '')) state.date = a.date;
+  if (/^\d{1,2}:\d{2}$/.test(a.timeFrom || '')) state.timeFrom = a.timeFrom.padStart(5, '0');
+  if (/^\d{1,2}:\d{2}$/.test(a.timeTo || '')) state.timeTo = a.timeTo.padStart(5, '0');
+  if (cleanStr(a.venue)) state.venue = cleanStr(a.venue, 80);
+  if (cleanStr(a.venueDetail)) state.venueDetail = cleanStr(a.venueDetail, 80);
+  if (cleanStr(a.opening)) { state.customOpenings = [cleanStr(a.opening, 140)]; state.openingText = state.customOpenings[0]; }
+  if (cleanStr(a.closing)) { state.customClosings = [cleanStr(a.closing, 80)]; state.closingText = state.customClosings[0]; }
+  save();
+  let target = FLOW.includes(a.goStep) ? a.goStep : null;
+  if (target) {
+    if (!state.occasion) target = 'occasion';
+    else if (!state.template && FLOW.indexOf(target) > FLOW.indexOf('style')) target = 'style';
+    go(target);
+  } else renderScreen();
+}
+function asstRender() {
+  const panel = $('#asstPanel'); if (panel.hidden) return;
+  $('#asstTitle').textContent = t('asstTitle');
+  $('#asstInput').placeholder = t('asstPh');
+  $('#asstSendBtn').textContent = t('asstSend');
+  $('#asstSendBtn').disabled = asst.busy;
+  const msgs = [{ role: 'bot', show: t('asstHi') }, ...asst.msgs];
+  $('#asstMsgs').innerHTML = msgs.map(m => `<div class="asst-m ${m.role === 'user' ? 'user' : 'bot'}">${esc(m.show)}</div>`).join('')
+    + (asst.busy ? '<div class="asst-m bot">…</div>' : '');
+  const box = $('#asstMsgs'); box.scrollTop = box.scrollHeight;
+}
+async function asstSend(txt) {
+  if (!txt || asst.busy) return;
+  asst.msgs.push({ role: 'user', raw: txt, show: txt });
+  asst.busy = true; asstRender();
+  try {
+    const convo = asst.msgs.map(m => (m.role === 'user' ? 'Customer: ' : 'Assistant: ') + m.raw).join('\n');
+    const r = await AI.json(`${asstSystem()}\n\nConversation so far:\n${convo}`, { cache: false });
+    asst.msgs.push({ role: 'bot', raw: JSON.stringify(r || {}), show: cleanStr(r && r.say, 600) || t('asstFail') });
+    if (r && r.apply) asstApply(r.apply);
+  } catch (e) {
+    if (!(e && e.code === 'cancelled')) asst.msgs.push({ role: 'bot', raw: '{}', show: aiError(e) });
+  } finally { asst.busy = false; asstRender(); }
+}
+function setupAsst() {
+  const btn = $('#asstBtn'), panel = $('#asstPanel');
+  btn.addEventListener('click', () => { asst.open = true; panel.hidden = false; refreshAI(); asstRender(); $('#asstInput').focus(); });
+  $('#asstClose').addEventListener('click', () => { asst.open = false; panel.hidden = true; refreshAI(); });
+  $('#asstForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const inp = $('#asstInput'), v = inp.value.trim();
+    inp.value = ''; asstSend(v);
+  });
+}
+
 /* ================= state ================= */
 const KEY = 'krootnow-draft-v1';
 function todayISO() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 function isoPlus(days) { const d = new Date(); d.setDate(d.getDate() + days); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 function freshState(lang) {
   return {
-    lang: lang || 'ar', step: 'welcome', occasion: null, template: null, matched: null, fromUpload: false,
+    lang: lang || 'ar', step: 'welcome', occasion: null, template: null, matched: null, fromUpload: false, reached: 0,
+    skipped: [], styleAuto: false, tashkeel: true,
     fields: {}, date: isoPlus(14), timeFrom: '18:00', timeTo: '23:00', venue: '', venueDetail: '', mapLink: '',
     showQR: true, showHijri: true, note: 0, dua: true, duaText: null, nameFont: null, bodyFont: null,
     openingText: null, closingText: null, customOpenings: [], customClosings: [], cardOpening: '', cardClosing: '',
@@ -3676,7 +4067,11 @@ function setupHome() {
 }
 
 /* ================= screens ================= */
-function nextBar(label) { return `<button class="btn btn-primary" data-act="next" type="button">${label || t('next')}</button>`; }
+function skipBtn() { return `<button class="btn btn-ghost btn-skip" data-act="skip" type="button">${t('skip')}</button>`; }
+function nextBar(label) {
+  return (SKIPPABLE.includes(state.step) ? skipBtn() : '')
+    + `<button class="btn btn-primary" data-act="next" type="button">${label || t('next')}</button>`;
+}
 function previewHTML() {
   return `<div class="preview"><button class="preview-btn" data-act="zoom" type="button" aria-label="${esc(t('zoom'))}"><canvas data-preview width="540" height="960"></canvas></button><p class="hint">${t('tapToZoom')}</p></div>`;
 }
@@ -3684,7 +4079,7 @@ function editLayout(inner, pinned) { return `<div class="edit${pinned ? ' pinned
 function toggle(key, label) { return `<label class="check"><input type="checkbox" data-bind="${key}" ${state[key] ? 'checked' : ''}><span>${label}</span></label>`; }
 function fieldHTML(f) {
   return `<div class="field"><label for="f_${f.k}">${f[state.lang]}${f.opt ? ` <span class="opt">${t('optional')}</span>` : ''}</label>
-    <input id="f_${f.k}" data-bind="fields.${f.k}" value="${esc(state.fields[f.k] || '')}" placeholder="${esc(f.ph[state.lang])}" autocomplete="off" enterkeyhint="next"></div>`;
+    <input id="f_${f.k}" data-bind="fields.${f.k}" value="${esc(state.fields[f.k] || '')}" placeholder="${esc(f.ph[state.lang])}" autocomplete="off" enterkeyhint="next"${f.opt ? '' : ' data-def'}></div>`;
 }
 function choiceHTML(name, o, checked) {
   return `<label class="choice"><input type="radio" name="${name}" data-bind="${name}" value="${esc(o.text)}" ${checked ? 'checked' : ''}><span>${esc(o.text || o.label)}${o.tag ? `<span class="tag">${esc(o.tag)}</span>` : ''}</span></label>`;
@@ -3723,13 +4118,17 @@ function styleOrder() {
 }
 function facts() {
   const L = state.lang, out = [];
-  FIELDS[state.occasion].forEach(f => { const v = (state.fields[f.k] || '').trim(); if (v) out.push({ label: f[L], value: v, step: 'names' }); });
+  FIELDS[state.occasion].forEach(f => {
+    const v = (state.fields[f.k] || '').trim();
+    if (v || !f.opt) out.push({ label: f[L], value: fieldVal(state, f.k), step: 'names', def: !v });
+  });
+  const whenDef = isDefault('when');
   const d = dateInfo(state);
-  if (d) out.push({ label: t('factDate'), value: `${d.wd} ${d.gLong}${d.hijri ? ' · ' + d.hijri : ''}`, step: 'when' });
-  const tt = timeText(state); if (tt) out.push({ label: t('factTime'), value: `${tt.lead} ${tt.main}`.trim(), step: 'when' });
-  out.push({ label: t('factPlace'), value: venueVal(state) + (state.venueDetail.trim() ? ' · ' + state.venueDetail.trim() : ''), step: 'where' });
-  out.push({ label: t('factStyle'), value: TEMPLATES[state.template].name[L], step: 'style' });
-  out.push({ label: t('factFont'), value: [state.nameFont || t('designFont'), state.bodyFont].filter(Boolean).join(' · '), step: 'fonts' });
+  if (d) out.push({ label: t('factDate'), value: `${d.wd} ${d.gLong}${d.hijri ? ' · ' + d.hijri : ''}`, step: 'when', def: whenDef });
+  const tt = timeText(state); if (tt) out.push({ label: t('factTime'), value: `${tt.lead} ${tt.main}`.trim(), step: 'when', def: whenDef });
+  out.push({ label: t('factPlace'), value: venueVal(state) + (state.venueDetail.trim() ? ' · ' + state.venueDetail.trim() : ''), step: 'where', def: isDefault('where') });
+  out.push({ label: t('factStyle'), value: TEMPLATES[state.template].name[L], step: 'style', def: isDefault('style') });
+  out.push({ label: t('factFont'), value: [state.nameFont || t('designFont'), state.bodyFont].filter(Boolean).join(' · '), step: 'fonts', def: isDefault('fonts') });
   return out;
 }
 
@@ -3976,15 +4375,30 @@ const SCREENS = {
   },
   style() {
     const rec = REC[state.occasion] || [];
+    const L = state.lang, sample = nameSample();
+    const comboChip = (val, nameFam, bodyFam, label, pressed) => `<button class="font-tile combo-tile" type="button" data-act="fontCombo" data-val="${val}" aria-pressed="${pressed}" aria-label="${esc(label)}">
+      <span class="font-sample"${nameFam ? ` data-family="${esc(nameFam)}"` : ''}>${esc(sample)}</span>
+      <span class="font-sample combo-body"${bodyFam ? ` data-family="${esc(bodyFam)}"` : ''}>${esc(t('bodySample'))}</span>
+      <span class="font-name">${esc(label)}</span></button>`;
+    const tpl0 = TEMPLATES[state.template];
+    const defName = tpl0 ? famOf(L === 'ar' ? tpl0.styles.name.f : (tpl0.styles.name.fe || tpl0.styles.name.f)) : '';
+    const defBody = tpl0 ? famOf(L === 'ar' ? tpl0.styles.opening.f : (tpl0.styles.opening.fe || tpl0.styles.opening.f)) : '';
     return {
       html: `<h1>${t('styleTitle')}</h1><p class="lead">${t('styleSub')}</p>
+        <section class="font-sec combo-sec" aria-label="${esc(t('comboTitle'))}">
+          <h2>${t('comboTitle')}</h2><p class="hint">${t('comboSub')}</p>
+          <div class="font-row">
+            ${comboChip('def', defName, defBody, t('comboDefault'), !state.nameFont && !state.bodyFont)}
+            ${FONT_COMBOS[L].map((c, i) => comboChip(i, c.name, c.body, c[L], state.nameFont === c.name && state.bodyFont === c.body)).join('')}
+          </div>
+        </section>
         <div class="grid-style">${styleOrder().map((id, i) => {
           const badge = state.matched === id ? t('matched') : rec.includes(id) ? t('recommended') : '';
           return `<button class="style-tile" type="button" style="--i:${i}" data-act="tpl" data-val="${id}" aria-pressed="${state.template === id}">
             <canvas data-thumb="${id}" width="270" height="480"></canvas>
             <span class="style-name">${TEMPLATES[id].name[state.lang]}</span>${badge ? `<span class="badge">${badge}</span>` : ''}</button>`;
         }).join('')}</div>`,
-      bar: ''
+      bar: state.template && !state.styleAuto ? '' : skipBtn()
     };
   },
   names() {
@@ -3997,7 +4411,9 @@ const SCREENS = {
           <button class="btn btn-secondary" data-act="aiFill" type="button">${t('quickBtn')}</button>
           <p class="hint status" id="aiFillStatus" aria-live="polite"></p>
         </div>
-        ${FIELDS[state.occasion].map(fieldHTML).join('')}`),
+        ${FIELDS[state.occasion].map(fieldHTML).join('')}
+        <p class="def-hint">${t('defHint')}</p>
+        ${toggle('tashkeel', t('tashkeelToggle'))}`),
       bar: nextBar()
     };
   },
@@ -4018,7 +4434,8 @@ const SCREENS = {
   where() {
     return {
       html: editLayout(`<h1>${t('whereTitle')}</h1>
-        <div class="field"><label for="f_venue">${t('venue')}</label><input id="f_venue" data-bind="venue" value="${esc(state.venue)}" placeholder="${esc(t('venuePh'))}" autocomplete="off"></div>
+        <div class="field"><label for="f_venue">${t('venue')}</label><input id="f_venue" data-bind="venue" value="${esc(state.venue)}" placeholder="${esc(t('venuePh'))}" autocomplete="off" data-def></div>
+        <p class="def-hint">${t('defHint')}</p>
         <div class="field"><label for="f_vd">${t('venueDetail')} <span class="opt">${t('optional')}</span></label><input id="f_vd" data-bind="venueDetail" value="${esc(state.venueDetail)}" placeholder="${esc(t('venueDetailPh'))}" autocomplete="off"></div>
         <div class="field"><label for="f_map">${t('mapLink')} <span class="opt">${t('optional')}</span></label><input id="f_map" type="url" inputmode="url" dir="ltr" data-bind="mapLink" value="${esc(state.mapLink)}" placeholder="https://maps.app.goo.gl/…" autocomplete="off"><p class="hint">${t('mapHint')}</p></div>
         ${toggle('showQR', t('showQR'))}
@@ -4061,9 +4478,11 @@ const SCREENS = {
     };
   },
   review() {
+    const rows = facts();
     return {
       html: `<div class="edit">${previewHTML()}<div class="form"><h1>${t('reviewTitle')}</h1><p class="lead">${t('reviewSub')}</p>
-        <dl class="facts">${facts().map(f => `<div class="fact"><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd><button class="link" type="button" data-act="goto" data-val="${f.step}">${t('edit')}</button></div>`).join('')}</dl>
+        ${rows.some(f => f.def) ? `<p class="def-note">${t('defNote')}</p>` : ''}
+        <dl class="facts">${rows.map(f => `<div class="fact${f.def ? ' is-default' : ''}"><dt>${esc(f.label)}${f.def ? ` <span class="def-tag">${t('defTag')}</span>` : ''}</dt><dd>${esc(f.value)}</dd><button class="link" type="button" data-act="goto" data-val="${f.step}">${t('edit')}</button></div>`).join('')}</dl>
         <label class="check"><input type="checkbox" id="f_confirm" data-bind="confirmed" ${state.confirmed ? 'checked' : ''}><span>${t('confirm')}</span></label></div></div>`,
       bar: `<button class="btn btn-primary" id="toPay" data-act="next" type="button" ${state.confirmed ? '' : 'disabled'}>${t('toPay')}</button>`
     };
@@ -4109,7 +4528,7 @@ const AFTER = {
     slideDeck(occNav.level, true);
     setupDeckSwipe();
   },
-  style() { renderThumbs(); },
+  style() { renderThumbs(); observeFonts(); },
   fonts() { observeFonts(); },
   done() {
     serial(async () => {
@@ -4168,21 +4587,41 @@ function renderScreen() {
   $('#help').textContent = t('help');
   $('#back span').textContent = t('back');
   $('#back').hidden = state.step === 'welcome' || state.step === 'done';
-  const fi = FLOW.indexOf(state.step), prog = $('#prog');
-  prog.hidden = fi < 0;
-  if (fi >= 0) { $('.prog-label', prog).textContent = t('stepOf', fi + 1, FLOW.length); $('.prog-fill', prog).style.width = ((fi + 1) / FLOW.length * 100) + '%'; }
+  document.body.classList.toggle('in-flow', state.step !== 'welcome');
+  renderProgress(true);
   if (homeCleanup) { homeCleanup(); homeCleanup = null; }
   const nav = $('#navCta'); nav.textContent = t('navCta'); nav.hidden = state.step !== 'welcome';
   const view = SCREENS[state.step]();
   const scr = $('#screen');
   scr.innerHTML = state.step === 'welcome' ? view.html : `<div class="wrap step">${view.html}</div>`;
-  scr.classList.remove('enter', 'back'); void scr.offsetWidth;
-  scr.classList.add('enter'); scr.classList.toggle('back', navDir === 'back');
+  scr.classList.remove('enter', 'rev'); void scr.offsetWidth;
+  scr.classList.add('enter'); scr.classList.toggle('rev', navDir === 'back');
   navDir = 'fwd';
   const bar = $('#bar'); bar.innerHTML = view.bar ? `<div class="wrap bar-in">${view.bar}</div>` : ''; bar.hidden = !view.bar;
   refreshAI();
   if (AFTER[state.step]) AFTER[state.step]();
   scheduleRender();
+}
+// Progress capsule: a check for finished steps, purple for steps still showing sample content.
+// Once an occasion is picked every step is open, so any step can be skipped.
+function renderProgress(recenter) {
+  const fi = FLOW.indexOf(state.step), prog = $('#prog');
+  prog.hidden = fi < 0;
+  if (fi < 0) return;
+  state.reached = Math.max(state.reached || 0, fi);
+  const bar = $('.pbar', prog);
+  bar.setAttribute('aria-label', `${t('stepsAria')} · ${t('stepOf', fi + 1, FLOW.length)}`);
+  bar.innerHTML = FLOW.map((s, i) => {
+    const passed = i <= state.reached && i !== fi;
+    const def = passed && isDefault(s);
+    const open = i === 0 || !!state.occasion;
+    const cls = `pstep${passed && !def ? ' is-done' : ''}${def ? ' is-default' : ''}${i === fi ? ' is-cur' : ''}`;
+    const digit = state.lang === 'ar' ? '٠١٢٣٤٥٦٧٨٩'[i + 1] : i + 1;
+    return `<button type="button" class="${cls}" data-act="goStep" data-val="${s}" ${open ? '' : 'disabled'} aria-current="${i === fi ? 'step' : 'false'}"${def ? ` title="${esc(t('defTag'))}"` : ''}>
+      <span class="pstep-dot">${passed && !def ? '✓' : digit}</span><span class="pstep-name">${t('stepNames')[i]}</span></button>`;
+  }).join('');
+  const cur = $('.pstep.is-cur', bar);
+  if (recenter && cur) bar.scrollLeft = cur.offsetLeft - (bar.clientWidth - cur.offsetWidth) / 2;
 }
 let navDir = 'fwd';
 function go(step, dir) {
@@ -4193,6 +4632,28 @@ function go(step, dir) {
 }
 
 /* ================= navigation ================= */
+// Steps the customer may skip; the card then shows sample content there, marked in purple
+const SKIPPABLE = ['style', 'names', 'when', 'where', 'wording', 'fonts'];
+function isDefault(step) {
+  if (!state.occasion) return false;
+  const skipped = (state.skipped || []).includes(step);
+  if (step === 'style') return !!state.styleAuto;
+  if (step === 'names') return FIELDS[state.occasion].some(f => !f.opt && !(state.fields[f.k] || '').trim());
+  if (step === 'where') return !state.venue.trim();
+  return skipped;
+}
+function unskip(step) {
+  if (!(state.skipped || []).includes(step)) return;
+  state.skipped = state.skipped.filter(s => s !== step);
+  renderProgress();
+}
+// Leaving a step without finishing it: pick a design if none, and remember it was skipped
+function skipStep(step) {
+  if (step === 'style' && !state.template) { state.template = styleOrder()[0]; state.styleAuto = true; }
+  if (step === 'when' && !parseDate(state.date)) state.date = isoPlus(14);
+  if (['when', 'wording', 'fonts'].includes(step) && !(state.skipped || []).includes(step)) state.skipped = [...(state.skipped || []), step];
+}
+const BIND_STEP = { date: 'when', timeFrom: 'when', timeTo: 'when', showHijri: 'when', openingText: 'wording', closingText: 'wording', duaText: 'wording', dua: 'wording' };
 function validate() {
   const s = state.step;
   if (s === 'occasion' && !state.occasion) return { msg: t('pickOcc') };
@@ -4315,24 +4776,51 @@ const ACTIONS = {
     save(); setTimeout(() => go(nextStep), 220);
   },
   tpl(id, el) {
-    state.template = id;
+    state.template = id; state.styleAuto = false;
     document.querySelectorAll('.style-tile').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
     save(); setTimeout(() => go('names'), 220);
   },
   next() { next(); },
   goto(step) { go(step, 'back'); },
+  goStep(step) {
+    const i = FLOW.indexOf(step), c = FLOW.indexOf(state.step);
+    if (i < 0 || i === c) return;
+    if (i > 0 && !state.occasion) { toast(t('pickOcc')); return; }
+    // jumping ahead skips the steps on the way that were never opened; a card always needs a design
+    for (let k = Math.max(c, 1); k < i; k++) {
+      if (k > (state.reached || 0)) skipStep(FLOW[k]);
+      else if (FLOW[k] === 'style' && !state.template) skipStep('style');
+    }
+    go(step, i < c ? 'back' : 'fwd');
+  },
+  skip() {
+    const i = FLOW.indexOf(state.step);
+    if (!SKIPPABLE.includes(state.step)) return;
+    skipStep(state.step);
+    go(FLOW[i + 1]);
+  },
   note(i, el) {
     state.note = +i;
     document.querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
     saveSoon(); scheduleRender();
   },
+  fontCombo(val, el) {
+    const c = val === 'def' ? null : FONT_COMBOS[state.lang][+val];
+    state.nameFont = c ? c.name : null;
+    state.bodyFont = c ? c.body : null;
+    unskip('fonts');
+    document.querySelectorAll('[data-act="fontCombo"]').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
+    save(); renderThumbs();
+  },
   nameFont(fam, el) {
     state.nameFont = fam || null;
+    unskip('fonts');
     document.querySelectorAll('[data-act="nameFont"]').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
     saveSoon(); scheduleRender();
   },
   bodyFont(fam, el) {
     state.bodyFont = fam || null;
+    unskip('fonts');
     document.querySelectorAll('[data-act="bodyFont"]').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
     saveSoon(); scheduleRender();
   },
@@ -4384,6 +4872,8 @@ document.addEventListener('input', e => {
   el.classList.remove('invalid');
   const val = el.type === 'checkbox' ? el.checked : el.value;
   if (key.startsWith('fields.')) state.fields[key.slice(7)] = val; else state[key] = val;
+  if (BIND_STEP[key]) unskip(BIND_STEP[key]);
+  if (key.startsWith('fields.') || key === 'venue') renderProgress();
   if (key === 'date') { const h = $('#hijriHint'); if (h) h.textContent = hijriHint(); }
   if (key === 'confirmed') { const b = $('#toPay'); if (b) b.disabled = !val; }
   if (key === 'dua') { save(); renderScreen(); return; }
@@ -4428,6 +4918,7 @@ if (CONFIG.english && draft && (draft.lang === 'ar' || draft.lang === 'en')) sta
 $('#brand').innerHTML = KN_ICON + `<span id="brandText">${wordmarkSVG('kn-acrylic-sm')}</span>`;
 $('#brand').setAttribute('aria-label', CONFIG.brand.ar);
 renderScreen();
+setupAsst();
 AI.init();
 initDownloads();
 })();

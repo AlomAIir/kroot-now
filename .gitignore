@@ -1,0 +1,2 @@
+# Local-only settings (holds the Anthropic API key). Never commit.
+config.local.js
