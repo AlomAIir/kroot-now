@@ -846,6 +846,9 @@ const I18N = {
     helpTitle: 'تحتاجين مساعدة؟', helpBody: 'فريقنا يساعدك على واتساب في أي خطوة: التصميم، العبارات، أو الدفع.',
     asstTitle: 'مساعدة كرُوت', asstHi: 'هلا فيك! قولي لي وش مناسبتك أو وش تحبين يكون شكل الكرت، وأنا أجهّز لك كل شي.',
     asstPh: 'اكتبي هنا…', asstSend: 'إرسال', asstBtn: 'مساعدة ذكية', asstFail: 'تعذّر الرد، جرّبي مرة ثانية.',
+    keyTitle: 'مفتاح الذكاء الاصطناعي للتجربة', keySub: 'يُحفظ في هذا المتصفح فقط، ولا يُرفع لأي مكان غير خدمة الذكاء الاصطناعي.',
+    keySave: 'حفظ وتفعيل', keyRemove: 'حذف المفتاح من هذا المتصفح', keyOn: 'المساعد مفعّل في هذا المتصفح.', keyOff: 'المساعد غير مفعّل حاليًا.',
+    keyBad: 'المفتاح غير صحيح. يبدأ بـ sk-ant-', keySaved: 'تم تفعيل المساعد في هذا المتصفح', keyRemoved: 'تم حذف المفتاح',
     helpNoNumber: 'رقم واتساب الدعم يُضاف هنا في النسخة النهائية.', helpLink: 'كلّمينا على واتساب', close: 'إغلاق',
     pickOcc: 'اختاري المناسبة', pickStyle: 'اختاري التصميم', fill: l => `اكتبي ${l}`, pickDate: 'اختاري التاريخ',
     fillVenue: 'اكتبي اسم المكان', confirmFirst: 'أكّدي المراجعة أولاً'
@@ -933,6 +936,9 @@ const I18N = {
     helpTitle: 'Need help?', helpBody: 'Our team can help you on WhatsApp at any step: design, wording or payment.',
     asstTitle: 'Kroot assistant', asstHi: "Hi! Tell me your occasion or the look you want, and I'll set everything up for you.",
     asstPh: 'Type here…', asstSend: 'Send', asstBtn: 'AI help', asstFail: "Couldn't reply — please try again.",
+    keyTitle: 'AI key for testing', keySub: 'Saved in this browser only. It is sent nowhere except the AI service.',
+    keySave: 'Save and turn on', keyRemove: 'Remove the key from this browser', keyOn: 'The assistant is on in this browser.', keyOff: 'The assistant is off right now.',
+    keyBad: "That doesn't look like a key. It starts with sk-ant-", keySaved: 'Assistant turned on in this browser', keyRemoved: 'Key removed',
     helpNoNumber: 'The support WhatsApp number goes here in the final version.', helpLink: 'Chat with us on WhatsApp', close: 'Close',
     pickOcc: 'Choose the occasion', pickStyle: 'Choose a design', fill: l => `Please fill in: ${l}`, pickDate: 'Choose the date',
     fillVenue: 'Write the venue name', confirmFirst: 'Please confirm you checked the card'
@@ -3892,6 +3898,36 @@ async function asstSend(txt) {
     if (!(e && e.code === 'cancelled')) asst.msgs.push({ role: 'bot', raw: '{}', show: aiError(e) });
   } finally { asst.busy = false; asstRender(); }
 }
+// Testing on the public site: opening the page with #ai lets a tester paste their own key.
+// It is kept in this browser's storage only and never leaves it except to call the API.
+function openKeyBox() {
+  const has = !!AI.key;
+  openModal(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="keyTitle">
+    <h2 id="keyTitle">${t('keyTitle')}</h2><p>${t('keySub')}</p>
+    <div class="field"><input id="keyInput" type="password" autocomplete="off" spellcheck="false" dir="ltr" placeholder="sk-ant-…" aria-label="${esc(t('keyTitle'))}"></div>
+    <button class="btn btn-primary" id="keySave" type="button">${t('keySave')}</button>
+    ${has ? `<button class="btn btn-ghost" id="keyRemove" type="button">${t('keyRemove')}</button>` : ''}
+    <p class="hint">${has ? t('keyOn') : t('keyOff')}</p>
+    <button class="btn btn-secondary" data-close type="button">${t('close')}</button></div>`);
+  const done = msg => {
+    closeModal(); refreshAI(); toast(msg);
+    if (location.hash === '#ai') history.replaceState(null, '', location.pathname + location.search);
+  };
+  $('#keySave').addEventListener('click', () => {
+    const v = $('#keyInput').value.trim();
+    if (!/^sk-ant-[\w-]{20,}$/.test(v)) { toast(t('keyBad')); $('#keyInput').focus(); return; }
+    try { localStorage.setItem('krootnow-ai-key', v); } catch (e) { /* storage unavailable: works until reload */ }
+    AI.key = v; AI.img = true; AI.maxBytes = 5 * 1024 * 1024; AI.off = false;
+    done(t('keySaved'));
+  });
+  const rm = $('#keyRemove');
+  if (rm) rm.addEventListener('click', () => {
+    try { localStorage.removeItem('krootnow-ai-key'); } catch (e) { /* storage unavailable */ }
+    AI.key = CONFIG.aiKey || '';
+    done(t('keyRemoved'));
+  });
+  $('#keyInput').focus();
+}
 function setupAsst() {
   const btn = $('#asstBtn'), panel = $('#asstPanel');
   btn.addEventListener('click', () => { asst.open = true; panel.hidden = false; refreshAI(); asstRender(); $('#asstInput').focus(); });
@@ -4919,7 +4955,8 @@ $('#brand').innerHTML = KN_ICON + `<span id="brandText">${wordmarkSVG('kn-acryli
 $('#brand').setAttribute('aria-label', CONFIG.brand.ar);
 renderScreen();
 setupAsst();
-AI.init();
+AI.init().then(() => { if (location.hash === '#ai') openKeyBox(); });
+window.addEventListener('hashchange', () => { if (location.hash === '#ai') openKeyBox(); });
 initDownloads();
 })();
 </script>
