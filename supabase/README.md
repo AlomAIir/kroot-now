@@ -43,6 +43,5 @@ If the table is missing the function still works but falls back to a rough per-i
 limit and logs `rate limit check failed`.
 
 The origin check stops other websites from using the proxy from a browser, but a script
-can fake the `Origin` header, so the rate limits are what protect the key: the site caps bound
-the spend even if someone rotates IPs. Also set a monthly spend limit for the key in the
-Anthropic Console.
+can fake the `Origin` header, so the rate limit is what protects the key. Also set a monthly
+spend limit for the key in the Anthropic Console.
