@@ -272,17 +272,15 @@ html[lang="ar"] .big { line-height: 1.3; }
 .reveal { transform: translateY(44px); transition: transform 1.2s var(--ease-out); }
 .reveal.in { transform: none; }
 
-.hero { padding-block: 56px 0; text-align: center; overflow: hidden; }
+/* the header already carries the logo, so the hero opens on the headline and gets a whole card on a phone's first screen */
+.hero { padding-block: 36px 0; text-align: center; overflow: hidden; }
 .hero .big { font-size: clamp(36px, 8.8vw, 76px); max-width: 15ch; margin-inline: auto; animation: rise 1s var(--ease-out) both; }
-.hero-logo { display: inline-flex; align-items: center; gap: 12px; margin: 0 0 22px; animation: rise 1s var(--ease-out) both; }
-.hero-logo .mark { width: 62px; height: 62px; flex: none; color: var(--accent); }
-.hero-logo .wordmark { height: 68px; }
 .hero .sub { animation: rise 1s .08s var(--ease-out) both; }
 .hero-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 24px; margin-top: 30px; }
 .hero-actions .btn { width: auto; min-width: 210px; }
 .hero .hero-actions { animation: rise 1s .14s var(--ease-out) both; }
 .from { margin: 16px 0 0; font-size: 15px; color: var(--muted); }
-.hero-stage { --q: .3; position: relative; height: clamp(400px, 112vw, 640px); margin-top: 44px; }
+.hero-stage { --q: .3; position: relative; height: clamp(400px, 112vw, 640px); margin-top: clamp(28px, 4vw, 44px); }
 .hc { position: absolute; top: 0; left: 50%; width: clamp(196px, 54vw, 310px); aspect-ratio: 9 / 16; margin-left: calc(clamp(196px, 54vw, 310px) / -2); }
 .hc.side {
   width: clamp(172px, 47vw, 272px); margin-left: calc(clamp(172px, 47vw, 272px) / -2); top: 34px;
@@ -294,14 +292,15 @@ html[lang="ar"] .big { line-height: 1.3; }
 .hc canvas { display: block; width: 100%; height: 100%; border-radius: 16px; box-shadow: var(--shadow-card); background: var(--stage); }
 
 .demo-grid { display: grid; gap: 30px; align-items: center; margin-top: 40px; }
-.demo-field { display: grid; gap: 12px; text-align: center; max-width: 440px; width: 100%; margin-inline: auto; }
+/* card first, input under it: on a phone the keyboard covers the bottom of the screen, so the card has to sit above what's being typed */
+.demo-field { order: 2; display: grid; gap: 12px; text-align: center; max-width: 440px; width: 100%; margin-inline: auto; }
 .demo-field input {
   width: 100%; height: 66px; border-radius: 18px; border: 1px solid var(--line); background: var(--tile); color: var(--ink);
   font-size: 26px; font-weight: 600; text-align: center; padding: 0 20px; transition: border-color .2s, box-shadow .2s;
 }
 .demo-field input::placeholder { color: var(--muted); font-weight: 400; font-size: 21px; }
 .demo-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
-.demo-card { justify-self: center; width: min(76vw, 330px); }
+.demo-card { justify-self: center; width: clamp(200px, 54vw, 330px); scroll-margin-top: calc(66px + env(safe-area-inset-top, 0px)); }
 .demo-card canvas { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 16px; box-shadow: var(--shadow-card); background: var(--stage); }
 
 .bento { display: grid; gap: 16px; margin-top: 44px; }
@@ -781,6 +780,8 @@ function wordmarkSVG(filter) {
   return `<svg class="wordmark" viewBox="${KN_WORD.vb}" aria-hidden="true" focusable="false"><g filter="url(#${filter})"><path class="kn-ink" d="${KN_WORD.ink}"/><path class="kn-damma" d="${KN_WORD.damma}"/></g></svg>`;
 }
 const FLOW = ['occasion', 'style', 'names', 'when', 'where', 'wording', 'fonts', 'review'];
+// Arabic-Indic digits for numbers shown in Arabic copy (the price), matching the digits on the cards
+function arNum(n) { return String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); }
 
 /* ================= copy ================= */
 const I18N = {
@@ -789,11 +790,11 @@ const I18N = {
     back: 'رجوع', help: 'مساعدة', langSwitch: 'English',
     navCta: 'ابدئي',
     heroEyebrow: 'كرُوت ناو',
-    heroTitle: 'أول وأفضل موقع لتصاميم كروت المناسبات <span class="hl">باستخدام الذكاء الاصطناعي</span>',
-    heroSub: 'صممي كرت مناسبتك في دقائق، وشوفيه كامل قبل ما تدفعين.',
+    heroTitle: 'كرت مناسبتك <span class="hl">جاهز في ثواني</span>',
+    heroSub: 'اختاري التصميم واكتبي الأسماء، وشوفي الكرت كامل قبل ما تدفعين.',
     heroAlt: 'ثلاثة أمثلة لكروت دعوة: مولودة وزواج وعيد',
     heroLink: 'عندي كرت أعجبني',
-    fromPrice: p => `ابتداءً من ${p} ر.س · بدون تسجيل`,
+    fromPrice: p => `${arNum(p)} ر.س للكرت · بدون تسجيل`,
     demoEyebrow: 'جربيها الحين', demoTitle: 'اكتبي الاسم.<br>وشوفي الكرت يتغير قدامك.',
     demoPh: 'اكتبي اسم المولودة', demoHint: 'هذا كرت حقيقي يُرسم لحظياً، مو صورة جاهزة.',
     bentoTitle: 'كل التفاصيل. محسوبة.',
@@ -813,13 +814,13 @@ const I18N = {
     finalTitle: 'مناسبتك تستاهل كرت يليق فيها.', finalCta: 'ابدئي التصميم',
     footer: 'نموذج تجريبي: الدفع وهمي ولن يُخصم أي مبلغ. الأسماء في الأمثلة وهمية.',
     footer2: '© ٢٠٢٦ كرُوت ناو. جميع الحقوق محفوظة.', footerLive: 'الأسماء في الأمثلة وهمية.',
-    how: ['اختاري المناسبة والتصميم', 'اكتبي الأسماء والتاريخ والمكان', 'ادفعي واستلمي بطاقتك'],
-    price: p => `${p} ر.س`, vatIncl: 'شامل ضريبة القيمة المضافة',
-    start: 'ابدئي التصميم', startNew: 'ابدئي بطاقة جديدة', haveCard: 'عندي بطاقة أعجبتني', resume: 'كمّلي تصميمك السابق',
+    how: ['اختاري المناسبة والتصميم', 'اكتبي الأسماء والتاريخ والمكان', 'ادفعي واستلمي كرتك'],
+    price: p => `${arNum(p)} ر.س`, vatIncl: 'شامل ضريبة القيمة المضافة',
+    start: 'ابدئي التصميم', startNew: 'ابدئي كرت جديد', haveCard: 'عندي كرت أعجبني', resume: 'كمّلي تصميمك السابق',
     stepOf: (i, n) => `الخطوة ${i} من ${n}`,
     stepNames: ['المناسبة', 'التصميم', 'الأسماء', 'الموعد', 'المكان', 'النص', 'الخط', 'المراجعة'], stepsAria: 'خطوات الطلب',
     skip: 'تخطي', defTag: 'افتراضي',
-    defHint: 'الخانات البنفسجية فاضية، فتطلع مكانها في البطاقة قيمة افتراضية.',
+    defHint: 'الخانات البنفسجية فاضية، فتطلع مكانها في الكرت قيمة افتراضية.',
     defNote: 'الأجزاء البنفسجية تستخدم القيم الافتراضية. عدّليها قبل الدفع إذا ما تناسبك.',
     tashkeelToggle: 'تشكيل الأسماء تلقائيًا، مثل عبداللّٰه',
     occTitle: 'وش المناسبة؟',
@@ -828,54 +829,54 @@ const I18N = {
     subTitle: { wedding: 'لمن الحفل؟', newborn: 'ألف مبروك! وش عندكم؟', events: 'وش مناسبتكم؟' },
     eidTitle: 'أي عيد؟', eidName: 'العيد', eidSub: 'الفطر والأضحى',
     deckHint: 'تقدرين تسحبين يمين ويسار للتنقل بين الخيارات',
-    styleTitle: 'اختاري التصميم', styleSub: 'تقدرين تغيّرينه في أي وقت.', recommended: 'مقترح', matched: 'الأقرب لبطاقتك',
+    styleTitle: 'اختاري التصميم', styleSub: 'تقدرين تغيّرينه في أي وقت.', recommended: 'مقترح', matched: 'الأقرب لكرتك',
     comboTitle: 'تنسيق الخطوط', comboSub: 'جرّبي تنسيقًا، وشوفي كل التصاميم فيه.', comboDefault: 'خطوط التصميم',
     namesTitle: { weddingMen: 'أسماء أهل الفرح', weddingWomen: 'أسماء العروسين', babyGirl: 'اسم المولودة', babyBoy: 'اسم المولود', twins: 'أسماء التوأم', eidFitr: 'تفاصيل المعايدة', eidAdha: 'تفاصيل المعايدة', graduation: 'اسم الخريجة أو الخريج', ceremony: 'تفاصيل الحفل', other: 'تفاصيل المناسبة' },
-    namesSub: 'اكتبي الأسماء مثل ما تبينها تطلع في البطاقة.',
+    namesSub: 'اكتبي الأسماء مثل ما تبينها تطلع في الكرت.',
     optional: '(اختياري)',
     quickTitle: 'أسرع طريقة',
-    quickSub: 'اكتبي كل التفاصيل برسالة وحدة ونرتبها لك في البطاقة. تقدرين تتكلمين بمايك الكيبورد بدل الكتابة.',
+    quickSub: 'اكتبي كل التفاصيل برسالة وحدة ونرتبها لك في الكرت. تقدرين تتكلمين بمايك الكيبورد بدل الكتابة.',
     quickPh: 'مثال: حفل مولودتي نورة بنت فيصل السالم، يوم الخميس الجاي من ٧ إلى ١١ مساءً في قاعة الياسمين، الدور الثاني',
     quickBtn: 'رتّبيها لي', quickEmpty: 'اكتبي التفاصيل أولاً', working: 'جاري الترتيب…', filled: 'عبّينا التفاصيل، راجعيها في كل خطوة',
     aiFail: 'ما قدرنا نرتبها هالمرة. جربي مرة ثانية أو عبّي الخانات بنفسك.', aiBusy: 'الخدمة مشغولة الحين، جربي بعد شوي.',
-    whenTitle: 'متى المناسبة؟', date: 'التاريخ', from: 'من الساعة', to: 'إلى الساعة', showHijri: 'أظهري التاريخ الهجري في البطاقة',
+    whenTitle: 'متى المناسبة؟', date: 'التاريخ', from: 'من الساعة', to: 'إلى الساعة', showHijri: 'أظهري التاريخ الهجري في الكرت',
     whereTitle: 'وين المناسبة؟', venue: 'اسم المكان', venuePh: 'قاعة الياسمين للاحتفالات', venueDetail: 'تفاصيل إضافية', venueDetailPh: 'الدور الحادي عشر - جناح 1121',
-    mapLink: 'رابط الموقع من خرائط قوقل', mapHint: 'إذا أضفتيه نحط في البطاقة باركود يفتح الموقع.', showQR: 'أضيفي باركود الموقع للبطاقة', qrCaption: 'موقع المناسبة',
-    noteTitle: 'ملاحظة في أسفل البطاقة',
-    wordTitle: 'اختاري العبارات', opening: 'عبارة البداية', closing: 'عبارة الختام', noClosing: 'بدون عبارة ختامية', dua: 'أضيفي الدعاء في أعلى البطاقة',
-    aiSuggest: 'اقترحي عبارات جديدة', aiWorking: 'نكتب لك عبارات جديدة…', fromCard: 'من بطاقتك', newTag: 'جديدة',
+    mapLink: 'رابط الموقع من خرائط قوقل', mapHint: 'إذا أضفتيه نحط في الكرت باركود يفتح الموقع.', showQR: 'أضيفي باركود الموقع للكرت', qrCaption: 'موقع المناسبة',
+    noteTitle: 'ملاحظة في أسفل الكرت',
+    wordTitle: 'اختاري العبارات', opening: 'عبارة البداية', closing: 'عبارة الختام', noClosing: 'بدون عبارة ختامية', dua: 'أضيفي الدعاء في أعلى الكرت',
+    aiSuggest: 'اقترحي عبارات جديدة', aiWorking: 'نكتب لك عبارات جديدة…', fromCard: 'من كرتك', newTag: 'جديدة',
     moreWording: n => `عبارات أكثر (${n})`, duaPick: 'الدعاء',
-    fontTitle: 'اختاري الخط', fontSub: 'اضغطي على أي خط وتشوفينه في البطاقة فوراً. اسحبي يمين ويسار لخطوط أكثر.',
+    fontTitle: 'اختاري الخط', fontSub: 'اضغطي على أي خط وتشوفينه في الكرت فوراً. اسحبي يمين ويسار لخطوط أكثر.',
     nameFont: 'خط الأسماء', bodyFont: 'خط باقي النص', designFont: 'خط التصميم', bodySample: 'يسعدنا ويشرفنا', factFont: 'الخط',
     fontLicense: 'كل الخطوط مجانية ومرخصة للاستخدام التجاري (رخصة SIL Open Font License).',
-    reviewTitle: 'راجعي بطاقتك', reviewSub: 'تأكدي من كل اسم وتاريخ. بعد الدفع تستلمين البطاقة بدون العلامة المائية.',
+    reviewTitle: 'راجعي كرتك', reviewSub: 'تأكدي من كل اسم وتاريخ. بعد الدفع تستلمين الكرت بدون العلامة المائية.',
     confirm: 'راجعت الأسماء والتاريخ والمكان، وكلها صحيحة', edit: 'تعديل', toPay: 'متابعة للدفع', next: 'التالي',
     factStyle: 'التصميم', factDate: 'التاريخ', factTime: 'الوقت', factPlace: 'المكان',
-    payTitle: 'الدفع', orderItem: 'بطاقة دعوة رقمية', includes: ['صورة عالية الجودة جاهزة للإرسال', 'بدون علامة مائية'], total: 'الإجمالي',
+    payTitle: 'الدفع', orderItem: 'كرت دعوة رقمي', includes: ['صورة عالية الجودة جاهزة للإرسال', 'بدون علامة مائية'], total: 'الإجمالي',
     payWith: 'ادفعي بـ', mada: 'مدى أو بطاقة ائتمانية', demoPay: 'وضع تجريبي: لن يُخصم أي مبلغ.',
     descriptor: d => `تظهر العملية في كشف حسابك باسم ${d}.`, paying: 'جاري الدفع…', paid: 'تم الدفع',
     buyerName: 'اسمك', buyerEmail: 'بريدك الإلكتروني', buyerHint: 'تطلبه بوابة الدفع لإتمام العملية.',
-    payNow: p => `ادفعي ${p} ر.س`, payTapNote: 'تنتقلين لصفحة الدفع الآمنة من Tap، ثم ترجعين هنا وبطاقتك جاهزة.',
+    payNow: p => `ادفعي ${arNum(p)} ر.س`, payTapNote: 'تنتقلين لصفحة الدفع الآمنة من Tap، ثم ترجعين هنا وكرتك جاهز.',
     payOpening: 'نفتح صفحة الدفع…', payBadName: 'اكتبي اسمك', payBadEmail: 'اكتبي بريد إلكتروني صحيح',
     payFail: 'ما قدرنا نفتح صفحة الدفع، جرّبي مرة ثانية.', payChecking: 'نتأكد من الدفع…',
     payNotDone: 'ما اكتمل الدفع وما انخصم شي. تقدرين تجربين مرة ثانية.', payCheckFail: 'ما قدرنا نتأكد من الدفع. حدّثي الصفحة بعد شوي.',
-    payLostCard: 'وصلنا دفعك، لكن البطاقة محفوظة في الجهاز والمتصفح اللي صممتيها فيه. افتحي الموقع منه وبتلقينها جاهزة، أو احتفظي برقم الطلب.',
+    payLostCard: 'وصلنا دفعك، لكن الكرت محفوظ في الجهاز والمتصفح اللي صممتيه فيه. افتحي الموقع منه وبتلقينه جاهز، أو احتفظي برقم الطلب.',
     payOr: 'أو ادفعي بالبطاقة', payCardNote: 'بيانات بطاقتك تروح لـ Tap مباشرة، وممكن يطلب بنكك رمز تحقق.',
     payCardIncomplete: 'كمّلي بيانات البطاقة', payProcessing: 'نكمل الدفع…',
     payDeclined: 'ما تمت عملية الدفع وما انخصم شي. جرّبي بطاقة ثانية.',
-    doneTitle: 'مبروك! بطاقتك جاهزة', doneSub: 'احفظيها وأرسليها لأحبابك.', orderNo: 'رقم الطلب', finalAlt: 'بطاقة الدعوة النهائية',
-    save: 'حفظ في الصور', saved: 'تم حفظ البطاقة', longPress: 'اضغطي مطولاً على البطاقة واختاري حفظ الصورة.', tryAgain: 'جربي مرة ثانية بعد لحظات.',
-    share: 'مشاركة', shareText: 'يسعدنا دعوتكم، وهذي بطاقة الدعوة',
+    doneTitle: 'مبروك! كرتك جاهز', doneSub: 'احفظيه وأرسليه لأحبابك.', orderNo: 'رقم الطلب', finalAlt: 'كرت الدعوة النهائي',
+    save: 'حفظ في الصور', saved: 'تم حفظ الكرت', longPress: 'اضغطي مطولاً على الكرت واختاري حفظ الصورة.', tryAgain: 'جربي مرة ثانية بعد لحظات.',
+    share: 'مشاركة', shareText: 'يسعدنا دعوتكم، وهذا كرت الدعوة',
     saveIosHint: 'من القائمة اختاري «حفظ الصورة» لتنحفظ في الصور.',
     shareHint: 'المشاركة تفتح خيارات جوالك: واتساب، الرسائل، البريد وغيرها.',
-    whatsapp: 'إرسال على واتساب', waNote: 'احفظي البطاقة أولاً، ثم أرفقيها في محادثة واتساب.', waText: 'يسعدنا دعوتكم، وهذي بطاقة الدعوة', newCard: 'تصميم بطاقة جديدة',
-    tapToZoom: 'اضغطي على البطاقة لتكبيرها', zoom: 'تكبير البطاقة', closeZoom: 'اضغطي في أي مكان للإغلاق',
-    uploadTitle: 'ارفعي البطاقة اللي أعجبتك', uploadSub: 'نقرأ ستايلها وعباراتها، ونصمم لك بطاقة جديدة بنفس الروح وبأسمائك أنتِ.',
-    uploadBtn: 'اختاري صورة البطاقة من جوالك', changePhoto: 'اضغطي لتغيير الصورة',
-    reading: 'نقرأ البطاقة…', readDone: 'قرأنا بطاقتك', readOcc: 'المناسبة', readStyle: 'أقرب تصميم عندنا', readWording: 'عبارة البداية',
-    readFail: 'ما قدرنا نقرأ البطاقة. اختاري المناسبة والتصميم بنفسك.',
-    noAIUpload: 'في النسخة الكاملة نقرأ البطاقة تلقائياً. الحين اختاري المناسبة وأقرب تصميم لها.',
-    copyNote: 'نصمم لك بطاقة جديدة مستوحاة من الستايل، ولا ننسخ تصميم أحد.',
+    whatsapp: 'إرسال على واتساب', waNote: 'احفظي الكرت أولاً، ثم أرفقيه في محادثة واتساب.', waText: 'يسعدنا دعوتكم، وهذا كرت الدعوة', newCard: 'تصميم كرت جديد',
+    tapToZoom: 'اضغطي على الكرت لتكبيره', zoom: 'تكبير الكرت', closeZoom: 'اضغطي في أي مكان للإغلاق',
+    uploadTitle: 'ارفعي الكرت اللي أعجبك', uploadSub: 'نقرأ ستايله وعباراته، ونصمم لك كرت جديد بنفس الروح وبأسمائك أنتِ.',
+    uploadBtn: 'اختاري صورة الكرت من جوالك', changePhoto: 'اضغطي لتغيير الصورة',
+    reading: 'نقرأ الكرت…', readDone: 'قرأنا كرتك', readOcc: 'المناسبة', readStyle: 'أقرب تصميم عندنا', readWording: 'عبارة البداية',
+    readFail: 'ما قدرنا نقرأ الكرت. اختاري المناسبة والتصميم بنفسك.',
+    noAIUpload: 'في النسخة الكاملة نقرأ الكرت تلقائياً. الحين اختاري المناسبة وأقرب تصميم لها.',
+    copyNote: 'نصمم لك كرت جديد مستوحى من الستايل، ولا ننسخ تصميم أحد.',
     helpTitle: 'تحتاجين مساعدة؟', helpBody: 'قريبًا يساعدك فريقنا على واتساب في أي خطوة: التصميم، العبارات، أو الدفع.',
     asstTitle: 'مساعدة كرُوت', asstHi: 'هلا فيك! قولي لي وش مناسبتك أو وش تحبين يكون شكل الكرت، وأنا أجهّز لك كل شي.',
     asstPh: 'اكتبي هنا…', asstSend: 'إرسال', asstBtn: 'مساعدة ذكية', asstFail: 'تعذّر الرد، جرّبي مرة ثانية.',
@@ -891,11 +892,11 @@ const I18N = {
     back: 'Back', help: 'Help', langSwitch: 'عربي',
     navCta: 'Start',
     heroEyebrow: 'Kroot Now',
-    heroTitle: 'The first and best site for occasion cards <span class="hl">designed with AI</span>',
-    heroSub: 'Design your card in minutes, and see all of it before you pay.',
+    heroTitle: 'Your occasion card, <span class="hl">ready in seconds</span>',
+    heroSub: 'Pick a design, type the names, and see the whole card before you pay.',
     heroAlt: 'Three sample invitation cards: baby girl, wedding and Eid',
     heroLink: 'I have a card I like',
-    fromPrice: p => `From SAR ${p} · No sign-up`,
+    fromPrice: p => `SAR ${p} per card · No sign-up`,
     demoEyebrow: 'Try it now', demoTitle: 'Type a name.<br>Watch the card change.',
     demoPh: "Type the baby's name", demoHint: 'This is a real card drawn live, not a stock image.',
     bentoTitle: 'Every detail. Considered.',
@@ -3775,10 +3776,12 @@ function refreshAI() {
   document.querySelectorAll('[data-ai]').forEach(el => { el.hidden = !AI.on(); });
   const btn = $('#asstBtn'), panel = $('#asstPanel');
   if (!btn) return;
+  // the floating button shows on the design steps; the panel itself can also be opened from Help on the home page
   const ok = AI.on() && FLOW.includes(state.step);
+  const panelOk = AI.on() && !['pay', 'done'].includes(state.step);
   btn.hidden = !ok || asst.open;
   if (ok) btn.innerHTML = `${ICON.sparkle}<span>${t('asstBtn')}</span>`;
-  else if (panel && !panel.hidden) { panel.hidden = true; asst.open = false; }
+  if (!panelOk && panel && !panel.hidden) { panel.hidden = true; asst.open = false; }
   document.body.classList.toggle('asst-open', asst.open);
 }
 function aiError(e) { return e && e.code === 'rate_limited' ? t('aiBusy') : t('aiFail'); }
@@ -3899,6 +3902,8 @@ Reply with only one JSON object:
 Every "apply" key is optional: include only what should change, and omit "apply" entirely when nothing changes. "goStep" moves her to that step so she sees the change (e.g. "style" after you pick a template).
 The date and times in the card state start as placeholders (two weeks from today, the occasion's usual hours) and the venue starts empty: treat them as not given until she tells you, and ask for them instead of calling them ready.
 Whenever she mentions a name, put it in apply.fields right away, using the field keys of the occasion you set in this same reply (or the current one); keep names exactly as she wrote them.
+She may also ask how the site works, since this panel is the site's Help: a card costs ${CONFIG.price} SAR including VAT, there's no sign-up, she sees the whole card (with a watermark) before paying, pays online through Tap, and then saves the finished image and shares it on WhatsApp. If she wants to talk to a person, say WhatsApp support is coming soon. Answer briefly, then offer to start her card.
+In Arabic, call the card «كرت», never «بطاقة».
 Template ids, occasion ids and field keys go only inside "apply". In "say", call a design by the name she sees (for example «${TEMPLATES.bisht.name[L]}»), never by its id, and never show ids or English code words. Use ids and font names exactly as listed; never invent them.`;
 }
 function asstApply(a) {
@@ -3923,6 +3928,8 @@ function asstApply(a) {
   if (cleanStr(a.closing)) { state.customClosings = [cleanStr(a.closing, 80)]; state.closingText = state.customClosings[0]; }
   save();
   let target = FLOW.includes(a.goStep) ? a.goStep : null;
+  // opened from Help on the home or upload page: once there's an occasion, take her into the design steps
+  if (!target && !FLOW.includes(state.step) && state.occasion) target = state.template ? 'names' : 'style';
   if (target) {
     if (!state.occasion) target = 'occasion';
     else if (!state.template && FLOW.indexOf(target) > FLOW.indexOf('style')) target = 'style';
@@ -3983,9 +3990,12 @@ function openKeyBox() {
   });
   $('#keyInput').focus();
 }
+function openAsst() {
+  asst.open = true; $('#asstPanel').hidden = false; refreshAI(); asstRender(); $('#asstInput').focus();
+}
 function setupAsst() {
   const btn = $('#asstBtn'), panel = $('#asstPanel');
-  btn.addEventListener('click', () => { asst.open = true; panel.hidden = false; refreshAI(); asstRender(); $('#asstInput').focus(); });
+  btn.addEventListener('click', openAsst);
   $('#asstClose').addEventListener('click', () => { asst.open = false; panel.hidden = true; refreshAI(); });
   $('#asstForm').addEventListener('submit', e => {
     e.preventDefault();
@@ -4113,6 +4123,11 @@ function setupHome() {
   paintTo(demo, demoState(), { watermark: false });
   let dt;
   inp.addEventListener('input', () => { clearTimeout(dt); dt = setTimeout(() => paintTo(demo, demoState(), { watermark: false }), 90); });
+  // on a phone, once the keyboard is up, line the card up under the header so it stays in view while she types
+  inp.addEventListener('focus', () => {
+    if (!matchMedia('(max-width: 859px)').matches) return;
+    setTimeout(() => { if (demo.isConnected) demo.parentElement.scrollIntoView({ block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth' }); }, 350);
+  });
   // preview vs. paid card
   paintTo($('#pvA'), sampleState('ivory', 'weddingMen'), { watermark: true });
   paintTo($('#pvB'), sampleState('ivory', 'weddingMen'), { watermark: false });
@@ -4307,7 +4322,6 @@ const SCREENS = {
       html: `<div class="home">
         <section class="band hero">
           <div class="wrap">
-            <div class="hero-logo" role="img" aria-label="${esc(CONFIG.brand.ar)}">${KN_ICON}${wordmarkSVG('kn-acrylic')}</div>
             <h1 class="big">${t('heroTitle')}</h1>
             <p class="sub">${t('heroSub')}</p>
             <div class="hero-actions">
@@ -4700,6 +4714,7 @@ function renderScreen() {
   $('#demo').hidden = !!CONFIG.payUrl;
   $('#lang').textContent = t('langSwitch'); $('#lang').hidden = !CONFIG.english;
   $('#help').textContent = t('help');
+  $('#help').hidden = !CONFIG.supportWhatsApp && !AI.on();
   $('#back span').textContent = t('back');
   $('#back').hidden = state.step === 'welcome' || state.step === 'done';
   document.body.classList.toggle('in-flow', state.step !== 'welcome');
@@ -5090,6 +5105,8 @@ const ACTIONS = {
     save(); renderScreen();
   },
   help() {
+    // until a WhatsApp number is set, Help opens the assistant instead of a "coming soon" note
+    if (!CONFIG.supportWhatsApp && AI.on()) { closeModal(); openAsst(); return; }
     const link = CONFIG.supportWhatsApp ? `<a class="btn btn-wa" href="https://wa.me/${encodeURIComponent(CONFIG.supportWhatsApp)}" target="_blank" rel="noopener">${ICON.chat}${t('helpLink')}</a><p class="hint" dir="ltr">+${esc(CONFIG.supportWhatsApp)}</p>` : `<p class="hint">${t('helpNoNumber')}</p>`;
     openModal(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><h2 id="helpTitle">${t('helpTitle')}</h2><p>${t('helpBody')}</p>${link}<button class="btn btn-secondary" data-close type="button">${t('close')}</button></div>`);
   },
