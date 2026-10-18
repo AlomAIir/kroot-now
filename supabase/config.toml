@@ -3,3 +3,7 @@ project_id = "kroot-now"
 # The public page calls the proxy without a Supabase login
 [functions.ai-proxy]
 verify_jwt = false
+
+# The public page starts and checks payments without a Supabase login
+[functions.tap-checkout]
+verify_jwt = false
