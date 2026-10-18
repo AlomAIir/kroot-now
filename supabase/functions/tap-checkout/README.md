@@ -11,6 +11,9 @@ It runs in the same Supabase project as `ai-proxy`.
   bank's 3-D Secure check; the customer comes back with `?tap_id=` like below), or a decline.
 - `create` makes a Tap charge with `source: src_all`, so Tap shows every payment method enabled on
   your account (mada, cards, and Apple Pay once Tap enables it), then returns Tap's page URL.
+- The buyer gives an **email or a mobile number** (Saudi `5XXXXXXXX`, or another GCC country with its code). Tap's charge
+  API documents email as required unless a customer id is given, so for a phone-only buyer `tap-checkout` first creates
+  a Tap customer (`POST /v2/customers` with name + phone) and charges that customer id.
 - When it creates a charge, it saves a row in the `tap_orders` table tying the charge to the order
   number and to a random secret the buyer's browser made (stored as a hash). No names or emails
   are kept; Tap has them.

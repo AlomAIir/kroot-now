@@ -11,17 +11,22 @@
 // tap_orders table (supabase/migrations), which ties each charge to the browser that started it.
 // Deployed with --no-verify-jwt so the public page can call it without a Supabase login.
 //
-// POST { action: 'create', name, email, order, token, returnUrl } → { id, url }
-// POST { action: 'pay', source: 'tok_...', name, email, order, token, returnUrl }
+// POST { action: 'create', name, email | phone, order, token, returnUrl } → { id, url }
+// POST { action: 'pay', source: 'tok_...', name, email | phone, order, token, returnUrl }
 //        → { paid: true, unlock: true, order } paid now | { id, url } go to 3-D Secure | { paid: false, status }
 // POST { action: 'verify', id, order?, token? }                  → { paid, unlock, status, order }
 //   paid:   Tap captured the full price for this charge
+// phone: { country_code: '966', number: '5XXXXXXXX' } (GCC mobiles); a phone-only buyer is created as a Tap
+//   customer first, because Tap's charge API documents email as required unless a customer id is given.
 //   unlock: paid, and order + token match the ones sent when the charge was created,
 //           so a paid tap_id shared or replayed elsewhere can't unlock another card
 
 const PRICE = 15;
 const CURRENCY = 'SAR';
-const TAP = 'https://api.tap.company/v2/charges';
+const TAP = 'https://api.tap.company/v2';
+// Mobile numbers accepted instead of an email: Saudi (5XXXXXXXX) and the other GCC countries
+const PHONE_CC = ['966', '971', '965', '973', '974', '968'];
+const validPhone = (cc: string, n: string) => PHONE_CC.includes(cc) && (cc === '966' ? /^5\d{8}$/ : /^\d{7,9}$/).test(n);
 const RATE_LIMIT = 10, RATE_WINDOW_S = 60; // checkout links per IP per minute
 
 const allowed = (Deno.env.get('ALLOWED_ORIGINS') || 'https://alomaiir.github.io')
@@ -106,11 +111,15 @@ Deno.serve(async request => {
     if (limited(clientIp(request))) return fail(429, 'too many requests, try again in a minute', h);
 
     const name = clean(body.name, 60), email = clean(body.email, 120), order = clean(body.order, 20);
+    const phone = body.phone && typeof body.phone === 'object'
+      ? { country_code: clean(body.phone.country_code, 4), number: clean(body.phone.number, 12) } : null;
     const token = clean(body.token, 64);
     const source = body.action === 'pay' ? clean(body.source, 64) : 'src_all';
     if (!/^(src_all|tok_[A-Za-z0-9]+)$/.test(source)) return fail(400, 'bad card token', h);
     if (!name) return fail(400, 'name is required', h);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return fail(400, 'a valid email is required', h);
+    if (email ? !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) : !(phone && validPhone(phone.country_code, phone.number))) {
+      return fail(400, 'a valid email or mobile number is required', h);
+    }
     if (!/^KN-[A-Z0-9]{4,12}$/.test(order)) return fail(400, 'bad order number', h);
     if (!/^[a-f0-9]{32,64}$/.test(token)) return fail(400, 'bad token', h);
     // Tap sends the customer back here, so it must be a page on the site that asked
@@ -119,14 +128,23 @@ Deno.serve(async request => {
     if (returnUrl.origin !== origin) return fail(400, 'returnUrl must be on the calling site', h);
     returnUrl.search = ''; returnUrl.hash = '';
 
-    const r = await tap('', key, {
+    let customer: Record<string, unknown> = { first_name: name, email };
+    if (!email) {
+      const cr = await tap('/customers', key, { method: 'POST', body: JSON.stringify({ first_name: name, phone }) });
+      if (!cr.ok || !/^cus_/.test(cr.data?.id || '')) {
+        console.error('tap customer failed', cr.status, JSON.stringify(cr.data?.errors || cr.data));
+        return fail(502, 'could not start the payment', h);
+      }
+      customer = { id: cr.data.id };
+    }
+    const r = await tap('/charges', key, {
       method: 'POST',
       body: JSON.stringify({
         amount: PRICE, currency: CURRENCY, threeDSecure: true, save_card: false,
         description: 'Kroot Now invitation card ' + order,
         metadata: { order },
         reference: { transaction: order, order },
-        customer: { first_name: name, email },
+        customer,
         source: { id: source },
         redirect: { url: returnUrl.toString() }
       })
@@ -166,7 +184,7 @@ Deno.serve(async request => {
   if (body?.action === 'verify') {
     const id = clean(body.id, 64), order = clean(body.order, 20), token = clean(body.token, 64);
     if (!/^chg_[A-Za-z0-9]+$/.test(id)) return fail(400, 'bad charge id', h);
-    const r = await tap('/' + id, key);
+    const r = await tap('/charges/' + id, key);
     if (!r.ok || !r.data) {
       console.error('tap retrieve failed', r.status, JSON.stringify(r.data?.errors || r.data));
       return fail(502, 'could not check the payment', h);

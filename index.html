@@ -855,9 +855,9 @@ const I18N = {
     payTitle: 'الدفع', orderItem: 'كرت دعوة رقمي', includes: ['صورة عالية الجودة جاهزة للإرسال', 'بدون علامة مائية'], total: 'الإجمالي',
     payWith: 'ادفعي بـ', mada: 'مدى أو بطاقة ائتمانية', demoPay: 'وضع تجريبي: لن يُخصم أي مبلغ.',
     descriptor: d => `تظهر العملية في كشف حسابك باسم ${d}.`, paying: 'جاري الدفع…', paid: 'تم الدفع',
-    buyerName: 'اسمك', buyerEmail: 'بريدك الإلكتروني', buyerHint: 'تطلبه بوابة الدفع لإتمام العملية.',
+    buyerName: 'اسمك', buyerContact: 'بريدك الإلكتروني أو رقم جوالك', buyerHint: 'تطلبه بوابة الدفع لإتمام العملية.',
     payNow: p => `ادفعي ${arNum(p)} ر.س`, payTapNote: 'تنتقلين لصفحة الدفع الآمنة من Tap، ثم ترجعين هنا وكرتك جاهز.',
-    payOpening: 'نفتح صفحة الدفع…', payBadName: 'اكتبي اسمك', payBadEmail: 'اكتبي بريد إلكتروني صحيح',
+    payOpening: 'نفتح صفحة الدفع…', payBadName: 'اكتبي اسمك', payBadContact: 'اكتبي بريد إلكتروني أو رقم جوال صحيح',
     payFail: 'ما قدرنا نفتح صفحة الدفع، جرّبي مرة ثانية.', payChecking: 'نتأكد من الدفع…',
     payNotDone: 'ما اكتمل الدفع وما انخصم شي. تقدرين تجربين مرة ثانية.', payCheckFail: 'ما قدرنا نتأكد من الدفع. حدّثي الصفحة بعد شوي.',
     payLostCard: 'وصلنا دفعك، لكن الكرت محفوظ في الجهاز والمتصفح اللي صممتيه فيه. افتحي الموقع منه وبتلقينه جاهز، أو احتفظي برقم الطلب.',
@@ -957,9 +957,9 @@ const I18N = {
     payTitle: 'Payment', orderItem: 'Digital invitation card', includes: ['High-quality image ready to send', 'No watermark'], total: 'Total',
     payWith: 'Pay with', mada: 'mada or credit card', demoPay: 'Prototype: nothing will be charged.',
     descriptor: d => `The charge appears on your statement as ${d}.`, paying: 'Processing payment…', paid: 'Paid',
-    buyerName: 'Your name', buyerEmail: 'Your email', buyerHint: 'The payment gateway needs it to complete the payment.',
+    buyerName: 'Your name', buyerContact: 'Your email or mobile number', buyerHint: 'The payment gateway needs it to complete the payment.',
     payNow: p => `Pay SAR ${p}`, payTapNote: "You'll go to Tap's secure payment page, then come back here to your finished card.",
-    payOpening: 'Opening the payment page…', payBadName: 'Enter your name', payBadEmail: 'Enter a valid email',
+    payOpening: 'Opening the payment page…', payBadName: 'Enter your name', payBadContact: 'Enter a valid email or mobile number',
     payFail: "We couldn't open the payment page. Please try again.", payChecking: 'Checking your payment…',
     payNotDone: "The payment didn't go through and nothing was charged. You can try again.", payCheckFail: "We couldn't confirm the payment. Refresh the page in a moment.",
     payLostCard: "We received your payment, but your card is saved in the device and browser you designed it in. Open the site there to find it ready, or keep your order number.",
@@ -4015,7 +4015,7 @@ function freshState(lang) {
     fields: {}, date: isoPlus(14), timeFrom: '18:00', timeTo: '23:00', venue: '', venueDetail: '', mapLink: '',
     showQR: true, showHijri: true, note: 0, dua: true, duaText: null, nameFont: null, bodyFont: null,
     openingText: null, closingText: null, customOpenings: [], customClosings: [], cardOpening: '', cardClosing: '',
-    confirmed: false, paid: false, orderNo: '', pendingOrder: '', payToken: '', buyerName: '', buyerEmail: ''
+    confirmed: false, paid: false, orderNo: '', pendingOrder: '', payToken: '', buyerName: '', buyerContact: ''
   };
 }
 let state = freshState('ar');
@@ -4593,13 +4593,15 @@ const SCREENS = {
     };
   },
   pay() {
+    // drafts saved before the field took phone numbers too
+    if (state.buyerEmail !== undefined) { state.buyerContact = state.buyerContact || state.buyerEmail; delete state.buyerEmail; }
     return {
       html: `<section class="pay"><h1>${t('payTitle')}</h1>
         <div class="order"><canvas data-preview width="540" height="960"></canvas><div><p class="order-name">${t('orderItem')}</p><p class="hint">${esc(TEMPLATES[state.template].name[state.lang])} · ${esc(occName())}</p><ul class="includes">${t('includes').map(x => `<li>${x}</li>`).join('')}</ul></div></div>
         <div class="total"><span>${t('total')}</span><strong>${t('price', CONFIG.price)}</strong></div>
         <p class="hint">${t('vatIncl')}</p>
         ${CONFIG.payUrl ? `<div class="field"><label for="f_bn">${t('buyerName')}</label><input id="f_bn" data-bind="buyerName" value="${esc(state.buyerName)}" autocomplete="name"></div>
-        <div class="field"><label for="f_be">${t('buyerEmail')}</label><input id="f_be" type="email" inputmode="email" dir="ltr" data-bind="buyerEmail" value="${esc(state.buyerEmail)}" autocomplete="email"><p class="hint">${t('buyerHint')}</p></div>
+        <div class="field"><label for="f_be">${t('buyerContact')}</label><input id="f_be" type="text" dir="ltr" data-bind="buyerContact" value="${esc(state.buyerContact)}" autocomplete="email" autocapitalize="off" spellcheck="false"><p class="hint">${t('buyerHint')}</p></div>
         ${inPagePay() ? `<div class="apple-box" id="applePayBox" hidden><div id="apple-pay-button"></div>
           <button class="btn btn-apple" id="applePayGate" data-act="applePayGate" type="button"><span>${t('payWith')}</span><b>Apple&nbsp;Pay</b></button></div>
         <p class="pay-or" id="payOr" hidden>${t('payOr')}</p>
@@ -4835,10 +4837,28 @@ const payCall = async body => {
   if (!res.ok) throw new Error(data.error || 'payment ' + res.status);
   return data;
 };
-// Tap needs the buyer's name and email for the charge; with show, point at the first one missing
+// The buyer's email or mobile number, as Tap takes it: { email } or { phone: { country_code, number } }, or null.
+// Arabic digits, spaces and dashes are fine; a Saudi mobile can be 05XXXXXXXX, 5XXXXXXXX or +966/00966/966 5XXXXXXXX.
+// Other GCC mobiles need their country code (+971, +965, +973, +974, +968). The server checks the same rules.
+function parseContact(raw) {
+  const v = String(raw || '').trim()
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+  if (v.includes('@')) return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? { email: v } : null;
+  if (!/^\+?[\d\s().-]+$/.test(v)) return null;
+  let d = v.replace(/[\s().-]/g, '');
+  const intl = /^(\+|00)/.test(d);
+  d = d.replace(/^(\+|00)/, '');
+  if (!intl && /^9665\d{8}$/.test(d)) d = d.slice(3);
+  let cc = '966';
+  if (intl) { cc = ['966', '971', '965', '973', '974', '968'].find(c => d.startsWith(c)); if (!cc) return null; d = d.slice(3); }
+  d = d.replace(/^0/, '');
+  return (cc === '966' ? /^5\d{8}$/ : /^\d{7,9}$/).test(d) ? { phone: { country_code: cc, number: d } } : null;
+}
+const buyerContact = () => parseContact(state.buyerContact);
+// Tap needs the buyer's name and an email or mobile number; with show, point at the first one missing
 function buyerOk(show) {
-  const name = state.buyerName.trim(), email = state.buyerEmail.trim();
-  const bad = !name ? ['#f_bn', 'payBadName'] : !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? ['#f_be', 'payBadEmail'] : null;
+  const name = state.buyerName.trim();
+  const bad = !name ? ['#f_bn', 'payBadName'] : !buyerContact() ? ['#f_be', 'payBadContact'] : null;
   if (bad && show) { toast(t(bad[1])); const el = $(bad[0]); if (el) { el.classList.add('invalid'); el.focus(); } }
   return !bad;
 }
@@ -4850,7 +4870,7 @@ function startOrder() {
   state.payToken = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
   save();
   return {
-    name: state.buyerName.trim(), email: state.buyerEmail.trim(), order: state.pendingOrder, token: state.payToken,
+    name: state.buyerName.trim(), ...buyerContact(), order: state.pendingOrder, token: state.payToken,
     returnUrl: location.origin + location.pathname
   };
 }
@@ -4984,7 +5004,7 @@ function mountApplePay() {
 async function applePayGateCheck() {
   if (tapUI.apple || state.step !== 'pay' || !inPagePay() || !applePayReady() || !buyerOk(false)) return;
   tapUI.apple = true;
-  const ar = state.lang === 'ar', name = state.buyerName.trim(), email = state.buyerEmail.trim();
+  const ar = state.lang === 'ar', name = state.buyerName.trim(), who = buyerContact() || {};
   try {
     loadStyle(CONFIG.tapApplePaySdk + '.css');
     await loadScript(CONFIG.tapApplePaySdk + '.js');
@@ -4999,7 +5019,10 @@ async function applePayGateCheck() {
       acceptance: {
         supportedBrands: [sdkVal(A.SupportedNetworks, 'Mada', 'mada'), sdkVal(A.SupportedNetworks, 'Visa', 'visa'), sdkVal(A.SupportedNetworks, 'MasterCard', 'masterCard')]
       },
-      customer: { name: [{ lang: ar ? 'ar' : 'en', locale: ar ? 'ar' : 'en', first: name }], contact: { email } },
+      customer: {
+        name: [{ lang: ar ? 'ar' : 'en', locale: ar ? 'ar' : 'en', first: name }],
+        contact: who.email ? { email: who.email } : { phone: { countryCode: who.phone.country_code, number: who.phone.number } }
+      },
       interface: {
         locale: ar ? sdkVal(A.Locale, 'AR', 'ar') : sdkVal(A.Locale, 'EN', 'en'),
         theme: darkUI() ? sdkVal(A.ThemeMode, 'LIGHT', 'light') : sdkVal(A.ThemeMode, 'DARK', 'dark'),
@@ -5242,7 +5265,7 @@ document.addEventListener('input', e => {
   if (key.startsWith('fields.') || key === 'venue') renderProgress();
   if (key === 'date') { const h = $('#hijriHint'); if (h) h.textContent = hijriHint(); }
   if (key === 'confirmed') { const b = $('#toPay'); if (b) b.disabled = !val; }
-  if (key === 'buyerName' || key === 'buyerEmail') { clearTimeout(tapUI.appleTimer); tapUI.appleTimer = setTimeout(applePayGateCheck, 700); }
+  if (key === 'buyerName' || key === 'buyerContact') { clearTimeout(tapUI.appleTimer); tapUI.appleTimer = setTimeout(applePayGateCheck, 700); }
   if (key === 'dua') { save(); renderScreen(); return; }
   saveSoon(); scheduleRender();
 });
