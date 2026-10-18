@@ -560,6 +560,7 @@ html[lang="ar"] .big { line-height: 1.3; }
 .sheet { background: var(--tile); color: var(--ink); border-radius: 22px; padding: 24px; width: min(100%, 420px); display: grid; gap: 12px; box-shadow: var(--shadow-card); animation: zoomIn .4s var(--ease-out) both; }
 .sheet h2 { margin: 0; font-size: 24px; }
 .sheet p { margin: 0; color: var(--muted); }
+.soon { display: inline-block; margin-inline-end: 6px; padding: 1px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; background: var(--accent-soft); color: var(--accent-text); }
 .paying { display: grid; justify-items: center; gap: 16px; color: #ffffff; font-size: 20px; font-weight: 600; }
 .spin { width: 48px; height: 48px; border: 4px solid rgba(255, 255, 255, .25); border-top-color: #ffffff; border-radius: 50%; animation: spin .9s linear infinite; }
 .tick { width: 72px; height: 72px; border-radius: 50%; background: var(--good); display: grid; place-items: center; animation: pick .5s var(--ease-out) both; }
@@ -735,7 +736,7 @@ body.in-flow .fact.is-default { background: color-mix(in srgb, var(--accent-soft
 const CONFIG = {
   brand: { ar: 'كرُوت ناو', en: 'Kroot Now' },
   english: false,            // the site is Arabic only for now; true brings back the English switch
-  price: 59,                 // SAR, VAT included
+  price: 15,                 // SAR, VAT included
   descriptor: 'TENSO',       // name on the customer's bank statement
   supportWhatsApp: '',       // e.g. '9665XXXXXXXX' to show a WhatsApp help link
   // Anthropic API key for the assistant and the smart helpers when the page is served normally
@@ -847,13 +848,13 @@ const I18N = {
     readFail: 'ما قدرنا نقرأ البطاقة. اختاري المناسبة والتصميم بنفسك.',
     noAIUpload: 'في النسخة الكاملة نقرأ البطاقة تلقائياً. الحين اختاري المناسبة وأقرب تصميم لها.',
     copyNote: 'نصمم لك بطاقة جديدة مستوحاة من الستايل، ولا ننسخ تصميم أحد.',
-    helpTitle: 'تحتاجين مساعدة؟', helpBody: 'فريقنا يساعدك على واتساب في أي خطوة: التصميم، العبارات، أو الدفع.',
+    helpTitle: 'تحتاجين مساعدة؟', helpBody: 'قريبًا يساعدك فريقنا على واتساب في أي خطوة: التصميم، العبارات، أو الدفع.',
     asstTitle: 'مساعدة كرُوت', asstHi: 'هلا فيك! قولي لي وش مناسبتك أو وش تحبين يكون شكل الكرت، وأنا أجهّز لك كل شي.',
     asstPh: 'اكتبي هنا…', asstSend: 'إرسال', asstBtn: 'مساعدة ذكية', asstFail: 'تعذّر الرد، جرّبي مرة ثانية.',
     keyTitle: 'مفتاح الذكاء الاصطناعي للتجربة', keySub: 'يُحفظ في هذا المتصفح فقط، ولا يُرفع لأي مكان غير خدمة الذكاء الاصطناعي.',
     keySave: 'حفظ وتفعيل', keyRemove: 'حذف المفتاح من هذا المتصفح', keyOn: 'المساعد مفعّل في هذا المتصفح.', keyOff: 'المساعد غير مفعّل حاليًا.',
     keyBad: 'المفتاح غير صحيح. يبدأ بـ sk-ant-', keySaved: 'تم تفعيل المساعد في هذا المتصفح', keyRemoved: 'تم حذف المفتاح',
-    helpNoNumber: 'رقم واتساب الدعم يُضاف هنا في النسخة النهائية.', helpLink: 'كلّمينا على واتساب', close: 'إغلاق',
+    helpNoNumber: '<span class="soon">قريبًا</span> دعم واتساب', helpLink: 'كلّمينا على واتساب', close: 'إغلاق',
     pickOcc: 'اختاري المناسبة', pickStyle: 'اختاري التصميم', fill: l => `اكتبي ${l}`, pickDate: 'اختاري التاريخ',
     fillVenue: 'اكتبي اسم المكان', confirmFirst: 'أكّدي المراجعة أولاً'
   },
@@ -937,13 +938,13 @@ const I18N = {
     readFail: "We couldn't read the card. Choose the occasion and design yourself.",
     noAIUpload: 'In the full version we read the card automatically. For now, choose the occasion and the closest design.',
     copyNote: "We design a new card inspired by the style. We don't copy anyone's design.",
-    helpTitle: 'Need help?', helpBody: 'Our team can help you on WhatsApp at any step: design, wording or payment.',
+    helpTitle: 'Need help?', helpBody: 'Soon our team will help you on WhatsApp at any step: design, wording or payment.',
     asstTitle: 'Kroot assistant', asstHi: "Hi! Tell me your occasion or the look you want, and I'll set everything up for you.",
     asstPh: 'Type here…', asstSend: 'Send', asstBtn: 'AI help', asstFail: "Couldn't reply — please try again.",
     keyTitle: 'AI key for testing', keySub: 'Saved in this browser only. It is sent nowhere except the AI service.',
     keySave: 'Save and turn on', keyRemove: 'Remove the key from this browser', keyOn: 'The assistant is on in this browser.', keyOff: 'The assistant is off right now.',
     keyBad: "That doesn't look like a key. It starts with sk-ant-", keySaved: 'Assistant turned on in this browser', keyRemoved: 'Key removed',
-    helpNoNumber: 'The support WhatsApp number goes here in the final version.', helpLink: 'Chat with us on WhatsApp', close: 'Close',
+    helpNoNumber: '<span class="soon">Coming soon</span> WhatsApp support', helpLink: 'Chat with us on WhatsApp', close: 'Close',
     pickOcc: 'Choose the occasion', pickStyle: 'Choose a design', fill: l => `Please fill in: ${l}`, pickDate: 'Choose the date',
     fillVenue: 'Write the venue name', confirmFirst: 'Please confirm you checked the card'
   }
