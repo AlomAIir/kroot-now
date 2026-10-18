@@ -743,7 +743,8 @@ const CONFIG = {
   // A key that reaches the browser is visible to every visitor, so this is for local testing only;
   // in production the calls go through aiProxy instead.
   aiKey: (window.KROOT_LOCAL && window.KROOT_LOCAL.aiKey) || '',
-  // Our server-side proxy (proxy/worker.js) that holds the key; turns the assistant on for every visitor.
+  // Our server-side proxy (Supabase function supabase/functions/ai-proxy) that holds the key;
+  // turns the assistant on for every visitor.
   // A key in aiKey or saved through #ai overrides it for that browser.
   aiProxy: '',
   aiModel: 'claude-opus-5-5'
