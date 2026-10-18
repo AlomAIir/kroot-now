@@ -1,0 +1,16 @@
+name = "kroot-now-ai"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+
+[vars]
+# Only these page origins may call the proxy (comma-separated, no trailing slash)
+ALLOWED_ORIGINS = "https://alomaiir.github.io"
+
+# Per-IP limit: 20 requests a minute (period must be 10 or 60 seconds)
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }
+
+# The API key is a secret, never in this file:
+#   npx wrangler secret put ANTHROPIC_API_KEY

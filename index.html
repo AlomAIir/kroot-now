@@ -741,8 +741,11 @@ const CONFIG = {
   // Anthropic API key for the assistant and the smart helpers when the page is served normally
   // (outside the claude.ai artifact). It comes from config.local.js, which is git-ignored.
   // A key that reaches the browser is visible to every visitor, so this is for local testing only;
-  // in production route the calls through your own server.
+  // in production the calls go through aiProxy instead.
   aiKey: (window.KROOT_LOCAL && window.KROOT_LOCAL.aiKey) || '',
+  // Our server-side proxy (proxy/worker.js) that holds the key; turns the assistant on for every visitor.
+  // A key in aiKey or saved through #ai overrides it for that browser.
+  aiProxy: '',
   aiModel: 'claude-opus-5-5'
 };
 const W = 1080, H = 1920;
@@ -3673,29 +3676,33 @@ const AI = {
     if (!this.s) {
       let k = CONFIG.aiKey || '';
       try { k = localStorage.getItem('krootnow-ai-key') || k; } catch (e) { /* storage unavailable */ }
-      if (k) { this.key = k; this.img = true; this.maxBytes = 5 * 1024 * 1024; }
+      if (k) this.key = k;
+      if (k || CONFIG.aiProxy) { this.img = true; this.maxBytes = 5 * 1024 * 1024; }
     }
     refreshAI();
   },
-  on() { return !!(this.s || this.key) && !this.off; },
-  // Direct Messages API call from the browser; used when CONFIG.aiKey is set instead of the artifact runtime
+  on() { return !!(this.s || this.key || CONFIG.aiProxy) && !this.off; },
+  // Messages API call from the browser, used outside the artifact runtime: straight to the API
+  // with this browser's own key, otherwise through CONFIG.aiProxy, which adds the key on the server
   async call(content) {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const direct = !!this.key;
+    const headers = { 'content-type': 'application/json' };
+    if (direct) Object.assign(headers, {
+      'x-api-key': this.key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-beta': 'server-side-fallback-2026-07-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    });
+    const res = await fetch(direct ? 'https://api.anthropic.com/v1/messages' : CONFIG.aiProxy, {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': this.key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'server-side-fallback-2026-07-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers,
       body: JSON.stringify({
         model: CONFIG.aiModel, max_tokens: 4000, fallbacks: 'default',
         messages: [{ role: 'user', content }]
       })
     });
     if (!res.ok) {
-      if (res.status === 401 || res.status === 403) console.warn('Kroot AI: the API key in CONFIG.aiKey was rejected (' + res.status + ').');
+      if (res.status === 401 || res.status === 403) console.warn('Kroot AI: ' + (direct ? 'the API key in this browser' : 'the AI proxy') + ' rejected the call (' + res.status + ').');
       const e = new Error('ai http ' + res.status);
       e.code = res.status === 429 || res.status === 529 ? 'rate_limited' : 'error';
       throw e;
@@ -3907,7 +3914,7 @@ function openKeyBox() {
     <div class="field"><input id="keyInput" type="password" autocomplete="off" spellcheck="false" dir="ltr" placeholder="sk-ant-…" aria-label="${esc(t('keyTitle'))}"></div>
     <button class="btn btn-primary" id="keySave" type="button">${t('keySave')}</button>
     ${has ? `<button class="btn btn-ghost" id="keyRemove" type="button">${t('keyRemove')}</button>` : ''}
-    <p class="hint">${has ? t('keyOn') : t('keyOff')}</p>
+    <p class="hint">${has || CONFIG.aiProxy ? t('keyOn') : t('keyOff')}</p>
     <button class="btn btn-secondary" data-close type="button">${t('close')}</button></div>`);
   const done = msg => {
     closeModal(); refreshAI(); toast(msg);
