@@ -4629,14 +4629,26 @@ function scheduleRender() {
     });
   });
 }
-let thumbRun = 0;
+// Design thumbnails are full card drawings, so only the ones on or near the screen are drawn,
+// one at a time with a pause between them so taps and scrolling stay responsive on phones
+let thumbRun = 0, thumbIO = null;
 function renderThumbs() {
   const run = ++thumbRun;
-  document.querySelectorAll('canvas[data-thumb]').forEach(c => serial(async () => {
+  if (thumbIO) { thumbIO.disconnect(); thumbIO = null; }
+  const paint = c => serial(async () => {
+    if (run !== thumbRun || !c.isConnected) return;
+    await new Promise(r => setTimeout(r, 0));
     if (run !== thumbRun || !c.isConnected) return;
     await drawCard(scratch, Object.assign({}, state, { template: c.dataset.thumb }), { watermark: false });
     if (run === thumbRun && c.isConnected) c.getContext('2d').drawImage(scratch, 0, 0, c.width, c.height);
-  }));
+  });
+  const canvases = document.querySelectorAll('canvas[data-thumb]');
+  if (!('IntersectionObserver' in window)) { canvases.forEach(paint); return; }
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting) { io.unobserve(e.target); paint(e.target); }
+  }), { rootMargin: '300px 0px' });
+  thumbIO = io;
+  canvases.forEach(c => io.observe(c));
 }
 function renderScreen() {
   const L = state.lang;
