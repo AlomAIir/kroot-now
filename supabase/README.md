@@ -43,7 +43,8 @@ spend limit for the key in the Anthropic Console.
 # Kroot Now payments (`functions/tap-checkout`)
 
 Sends customers to Tap's hosted payment page for the 15 SAR card and confirms the charge when they
-come back. Its secret is `TAP_SECRET_KEY`; it uses no database tables. Setup, deploy and test cards
+come back. Its secret is `TAP_SECRET_KEY`; it records each charge in the `tap_orders` table
+(`migrations/20261018130000_tap_orders.sql`, apply it before deploying). Setup, deploy and test cards
 are in [`functions/tap-checkout/README.md`](functions/tap-checkout/README.md).
 
 ```bash
