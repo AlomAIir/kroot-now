@@ -1,10 +1,14 @@
 # Kroot Now payments (Tap Payments)
 
-`tap-checkout` sends customers to Tap's hosted payment page and confirms the charge when they come back.
+`tap-checkout` charges customers on the site itself (Tap's card form and Apple Pay button, with `CONFIG.tapPublicKey` set)
+or sends them to Tap's hosted payment page, and confirms charges when they come back.
 It runs in the same Supabase project as `ai-proxy`.
 
 - The price (15 SAR) is fixed in `index.ts`; the page cannot change what is charged. If you change the
   price, change `PRICE` there and `CONFIG.price` in `index.html` together.
+- `pay` charges a `tok_...` that Tap's card form (Card SDK v2) or Apple Pay button (Apple Pay Web SDK) made in
+  the page. Tap answers `CAPTURED` (paid now: the page unlocks straight away), `INITIATED` with a URL (the
+  bank's 3-D Secure check; the customer comes back with `?tap_id=` like below), or a decline.
 - `create` makes a Tap charge with `source: src_all`, so Tap shows every payment method enabled on
   your account (mada, cards, and Apple Pay once Tap enables it), then returns Tap's page URL.
 - When it creates a charge, it saves a row in the `tap_orders` table tying the charge to the order
@@ -18,7 +22,13 @@ It runs in the same Supabase project as `ai-proxy`.
 - Only `https://alomaiir.github.io` may call it (override with an `ALLOWED_ORIGINS` secret).
 - Each IP can open 10 checkout links a minute (per function instance; the IP comes from
   `cf-connecting-ip`).
-- The public key (`pk_...`) is not used: it is only for Tap's embedded card form (Card SDK).
+- The page needs Tap's **public** key and merchant id for the card form and Apple Pay (`CONFIG.tapPublicKey`,
+  `CONFIG.tapMerchantId` in `index.html`). They are publishable. Without a public key, or if Tap's scripts
+  don't load, the page falls back to the hosted page (`create`).
+- **Apple Pay** also needs: Tap to register `krotnow.com` and `www.krotnow.com` for Apple Pay (Tap then issues a
+  public key for the domain), Tap's domain file published at
+  `/.well-known/apple-developer-merchantid-domain-association` (the repo has `.nojekyll` so GitHub Pages serves
+  that folder), and `CONFIG.applePay` turned on. The button only shows on devices that can pay with Apple Pay.
 
 ## Deploy
 
