@@ -736,7 +736,10 @@ body.in-flow .fact.is-default { background: color-mix(in srgb, var(--accent-soft
 const CONFIG = {
   brand: { ar: 'كرُوت ناو', en: 'Kroot Now' },
   english: false,            // the site is Arabic only for now; true brings back the English switch
-  price: 15,                 // SAR, VAT included
+  price: 15,                 // SAR, VAT included; the amount actually charged is fixed in supabase/functions/tap-checkout
+  // Real payments through Tap's hosted page (Supabase function supabase/functions/tap-checkout).
+  // Blank keeps the simulated payment and the "prototype" banner. config.local.js can override it for testing.
+  payUrl: (window.KROOT_LOCAL && window.KROOT_LOCAL.payUrl) || 'https://fslixkzqmkqezdactxxg.supabase.co/functions/v1/tap-checkout',
   descriptor: 'TENSO',       // name on the customer's bank statement
   supportWhatsApp: '',       // e.g. '9665XXXXXXXX' to show a WhatsApp help link
   // Anthropic API key for the assistant and the smart helpers when the page is served normally
@@ -796,7 +799,7 @@ const I18N = {
     ],
     finalTitle: 'مناسبتك تستاهل كرت يليق فيها.', finalCta: 'ابدئي التصميم',
     footer: 'نموذج تجريبي: الدفع وهمي ولن يُخصم أي مبلغ. الأسماء في الأمثلة وهمية.',
-    footer2: '© ٢٠٢٦ كرُوت ناو. جميع الحقوق محفوظة.',
+    footer2: '© ٢٠٢٦ كرُوت ناو. جميع الحقوق محفوظة.', footerLive: 'الأسماء في الأمثلة وهمية.',
     how: ['اختاري المناسبة والتصميم', 'اكتبي الأسماء والتاريخ والمكان', 'ادفعي واستلمي بطاقتك'],
     price: p => `${p} ر.س`, vatIncl: 'شامل ضريبة القيمة المضافة',
     start: 'ابدئي التصميم', startNew: 'ابدئي بطاقة جديدة', haveCard: 'عندي بطاقة أعجبتني', resume: 'كمّلي تصميمك السابق',
@@ -838,6 +841,12 @@ const I18N = {
     payTitle: 'الدفع', orderItem: 'بطاقة دعوة رقمية', includes: ['صورة عالية الجودة جاهزة للإرسال', 'بدون علامة مائية'], total: 'الإجمالي',
     payWith: 'ادفعي بـ', mada: 'مدى أو بطاقة ائتمانية', demoPay: 'وضع تجريبي: لن يُخصم أي مبلغ.',
     descriptor: d => `تظهر العملية في كشف حسابك باسم ${d}.`, paying: 'جاري الدفع…', paid: 'تم الدفع',
+    buyerName: 'اسمك', buyerEmail: 'بريدك الإلكتروني', buyerHint: 'تطلبه بوابة الدفع لإتمام العملية.',
+    payNow: p => `ادفعي ${p} ر.س`, payTapNote: 'تنتقلين لصفحة الدفع الآمنة من Tap، ثم ترجعين هنا وبطاقتك جاهزة.',
+    payOpening: 'نفتح صفحة الدفع…', payBadName: 'اكتبي اسمك', payBadEmail: 'اكتبي بريد إلكتروني صحيح',
+    payFail: 'ما قدرنا نفتح صفحة الدفع، جرّبي مرة ثانية.', payChecking: 'نتأكد من الدفع…',
+    payNotDone: 'ما اكتمل الدفع وما انخصم شي. تقدرين تجربين مرة ثانية.', payCheckFail: 'ما قدرنا نتأكد من الدفع. حدّثي الصفحة بعد شوي.',
+    payLostCard: 'وصلنا دفعك، لكن البطاقة محفوظة في الجهاز والمتصفح اللي صممتيها فيه. افتحي الموقع منه وبتلقينها جاهزة، أو احتفظي برقم الطلب.',
     doneTitle: 'مبروك! بطاقتك جاهزة', doneSub: 'احفظيها وأرسليها لأحبابك.', orderNo: 'رقم الطلب', finalAlt: 'بطاقة الدعوة النهائية',
     save: 'حفظ في الصور', saved: 'تم حفظ البطاقة', longPress: 'اضغطي مطولاً على البطاقة واختاري حفظ الصورة.', tryAgain: 'جربي مرة ثانية بعد لحظات.',
     share: 'مشاركة', shareText: 'يسعدنا دعوتكم، وهذي بطاقة الدعوة',
@@ -889,7 +898,7 @@ const I18N = {
     ],
     finalTitle: 'Your occasion deserves a card to match.', finalCta: 'Start designing',
     footer: 'Prototype: payment is simulated and nothing is charged. Names in the samples are fictional.',
-    footer2: '© 2026 Kroot Now. All rights reserved.',
+    footer2: '© 2026 Kroot Now. All rights reserved.', footerLive: 'Names in the examples are made up.',
     how: ['Choose the occasion and design', 'Add names, date and place', 'Pay and receive your card'],
     price: p => `SAR ${p}`, vatIncl: 'VAT included',
     start: 'Start designing', startNew: 'Start a new card', haveCard: 'I have a card I like', resume: 'Continue my last card',
@@ -931,6 +940,12 @@ const I18N = {
     payTitle: 'Payment', orderItem: 'Digital invitation card', includes: ['High-quality image ready to send', 'No watermark'], total: 'Total',
     payWith: 'Pay with', mada: 'mada or credit card', demoPay: 'Prototype: nothing will be charged.',
     descriptor: d => `The charge appears on your statement as ${d}.`, paying: 'Processing payment…', paid: 'Paid',
+    buyerName: 'Your name', buyerEmail: 'Your email', buyerHint: 'The payment gateway needs it to complete the payment.',
+    payNow: p => `Pay SAR ${p}`, payTapNote: "You'll go to Tap's secure payment page, then come back here to your finished card.",
+    payOpening: 'Opening the payment page…', payBadName: 'Enter your name', payBadEmail: 'Enter a valid email',
+    payFail: "We couldn't open the payment page. Please try again.", payChecking: 'Checking your payment…',
+    payNotDone: "The payment didn't go through and nothing was charged. You can try again.", payCheckFail: "We couldn't confirm the payment. Refresh the page in a moment.",
+    payLostCard: "We received your payment, but your card is saved in the device and browser you designed it in. Open the site there to find it ready, or keep your order number.",
     doneTitle: 'Congratulations! Your card is ready', doneSub: 'Save it and send it to your loved ones.', orderNo: 'Order number', finalAlt: 'Your final invitation card',
     save: 'Save to Photos', saved: 'Card saved', longPress: 'Press and hold the card, then choose Save Image.', tryAgain: 'Try again in a moment.',
     share: 'Share', shareText: "You're invited! Here is our invitation card",
@@ -3971,7 +3986,7 @@ function freshState(lang) {
     fields: {}, date: isoPlus(14), timeFrom: '18:00', timeTo: '23:00', venue: '', venueDetail: '', mapLink: '',
     showQR: true, showHijri: true, note: 0, dua: true, duaText: null, nameFont: null, bodyFont: null,
     openingText: null, closingText: null, customOpenings: [], customClosings: [], cardOpening: '', cardClosing: '',
-    confirmed: false, paid: false, orderNo: ''
+    confirmed: false, paid: false, orderNo: '', pendingOrder: '', payToken: '', buyerName: '', buyerEmail: ''
   };
 }
 let state = freshState('ar');
@@ -4384,7 +4399,7 @@ const SCREENS = {
           </div>
         </section>
 
-        <footer class="foot"><div class="wrap"><p>${t('footer')}</p><hr><p>${t('footer2')}</p></div></footer>
+        <footer class="foot"><div class="wrap"><p>${t(CONFIG.payUrl ? 'footerLive' : 'footer')}</p><hr><p>${t('footer2')}</p></div></footer>
       </div>`, bar: ''
     };
   },
@@ -4550,11 +4565,14 @@ const SCREENS = {
         <div class="order"><canvas data-preview width="540" height="960"></canvas><div><p class="order-name">${t('orderItem')}</p><p class="hint">${esc(TEMPLATES[state.template].name[state.lang])} · ${esc(occName())}</p><ul class="includes">${t('includes').map(x => `<li>${x}</li>`).join('')}</ul></div></div>
         <div class="total"><span>${t('total')}</span><strong>${t('price', CONFIG.price)}</strong></div>
         <p class="hint">${t('vatIncl')}</p>
-        <div class="stack">
+        ${CONFIG.payUrl ? `<div class="field"><label for="f_bn">${t('buyerName')}</label><input id="f_bn" data-bind="buyerName" value="${esc(state.buyerName)}" autocomplete="name"></div>
+        <div class="field"><label for="f_be">${t('buyerEmail')}</label><input id="f_be" type="email" inputmode="email" dir="ltr" data-bind="buyerEmail" value="${esc(state.buyerEmail)}" autocomplete="email"><p class="hint">${t('buyerHint')}</p></div>
+        <button class="btn btn-primary" id="payBtn" data-act="pay" data-val="tap" type="button">${t('payNow', CONFIG.price)}</button>
+        <p class="hint">${t('payTapNote')}</p>` : `<div class="stack">
           <button class="btn btn-apple" data-act="pay" data-val="apple" type="button"><span>${t('payWith')}</span><b>Apple&nbsp;Pay</b></button>
           <button class="btn btn-secondary" data-act="pay" data-val="card" type="button">${t('mada')}</button>
         </div>
-        <p class="demo-note">${t('demoPay')}</p>
+        <p class="demo-note">${t('demoPay')}</p>`}
         <p class="hint">${esc(t('descriptor', CONFIG.descriptor))}</p></section>`,
       bar: ''
     };
@@ -4654,6 +4672,7 @@ function renderScreen() {
   const L = state.lang;
   document.documentElement.lang = L; document.documentElement.dir = L === 'ar' ? 'rtl' : 'ltr';
   $('#demo').textContent = t('demo');
+  $('#demo').hidden = !!CONFIG.payUrl;
   $('#lang').textContent = t('langSwitch'); $('#lang').hidden = !CONFIG.english;
   $('#help').textContent = t('help');
   $('#back span').textContent = t('back');
@@ -4764,6 +4783,64 @@ function openModal(html, onClose) {
   m.onclick = e => { if (e.target === m || e.target.closest('[data-close]')) { closeModal(); onClose && onClose(); } };
 }
 function closeModal() { const m = $('#modal'); m.hidden = true; m.innerHTML = ''; m.onclick = null; }
+
+/* ================= payment (Tap hosted page) ================= */
+const payCall = async body => {
+  const res = await fetch(CONFIG.payUrl, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'payment ' + res.status);
+  return data;
+};
+async function payTap(btn) {
+  const name = state.buyerName.trim(), email = state.buyerEmail.trim();
+  const bad = !name ? ['#f_bn', 'payBadName'] : !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? ['#f_be', 'payBadEmail'] : null;
+  if (bad) { toast(t(bad[1])); const el = $(bad[0]); if (el) { el.classList.add('invalid'); el.focus(); } return; }
+  const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  state.pendingOrder = 'KN-' + Array.from(crypto.getRandomValues(new Uint8Array(6)), b => abc[b % abc.length]).join('');
+  // A secret only this browser holds: the server ties the charge to it, so a paid tap_id can't unlock other cards
+  state.payToken = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
+  save();
+  btn.disabled = true; btn.textContent = t('payOpening');
+  try {
+    const r = await payCall({
+      action: 'create', name, email, order: state.pendingOrder, token: state.payToken,
+      returnUrl: location.origin + location.pathname
+    });
+    location.href = r.url;
+  } catch (e) {
+    console.warn('Kroot pay:', e);
+    toast(t('payFail'));
+    btn.disabled = false; btn.textContent = t('payNow', CONFIG.price);
+  }
+}
+// A charge was paid, but not from the order this browser started: say so and show the order number
+function showPaidElsewhere(order) {
+  openModal(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="lostTitle"><h2 id="lostTitle">${t('paid')}</h2>
+    <p>${t('payLostCard')}</p><p class="hint">${t('orderNo')}: <bdi>${esc(order)}</bdi></p>
+    <button class="btn btn-secondary" data-close type="button">${t('close')}</button></div>`);
+}
+// Tap sends the customer back with ?tap_id=chg_...; the card comes back from this browser's saved draft.
+// The server unlocks it only for the order and secret this browser sent when it opened the payment.
+async function verifyReturn(tapId) {
+  openModal(`<div class="paying" role="status"><span class="spin"></span><span>${t('payChecking')}</span></div>`);
+  $('#modal').onclick = null;
+  try {
+    const r = state.pendingOrder && state.payToken
+      ? await payCall({ action: 'verify', id: tapId, order: state.pendingOrder, token: state.payToken })
+      : await payCall({ action: 'verify', id: tapId });
+    if (r.unlock && r.order === state.pendingOrder) {
+      state.paid = true; state.orderNo = r.order; state.pendingOrder = ''; state.payToken = '';
+      save(); closeModal(); go('done');
+      return;
+    }
+    closeModal();
+    if (r.paid) showPaidElsewhere(r.order);
+    else toast(t('payNotDone'));
+  } catch (e) {
+    console.warn('Kroot pay verify:', e);
+    closeModal(); toast(t('payCheckFail'));
+  }
+}
 
 let DL = null;
 async function initDownloads() { try { DL = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { DL = null; } }
@@ -4926,7 +5003,8 @@ const ACTIONS = {
   pickDesign(tp) { const L = state.lang; state = freshState(L); state.template = tp; state.fromGallery = true; draft = null; save(); go('occasion'); },
   aiFill(_, el) { aiFill(el); },
   aiWord(_, el) { aiWording(el); },
-  pay() {
+  pay(_, el) {
+    if (CONFIG.payUrl) { payTap(el); return; }
     openModal(`<div class="paying" role="status"><span class="spin"></span><span>${t('paying')}</span></div>`);
     $('#modal').onclick = null;
     setTimeout(() => {
@@ -4998,7 +5076,22 @@ draft = loadDraft();
 if (CONFIG.english && draft && (draft.lang === 'ar' || draft.lang === 'en')) state.lang = draft.lang;
 $('#brand').innerHTML = KN_ICON + `<span id="brandText">${wordmarkSVG('kn-acrylic-sm')}</span>`;
 $('#brand').setAttribute('aria-label', CONFIG.brand.ar);
+const tapId = new URLSearchParams(location.search).get('tap_id');
+if (tapId && CONFIG.payUrl && draft) {
+  // back from Tap's payment page: reopen the card on the pay step, then check the charge
+  history.replaceState(null, '', location.pathname + location.hash);
+  state = Object.assign(freshState(), draft); draft = null;
+  state.step = 'pay';
+} else if (draft && draft.paid && draft.orderNo && draft.step === 'done') {
+  // a paid card stays paid after a reload
+  state = Object.assign(freshState(), draft); draft = null;
+}
 renderScreen();
+if (tapId && CONFIG.payUrl && state.step === 'pay') verifyReturn(tapId);
+else if (tapId && CONFIG.payUrl) {
+  history.replaceState(null, '', location.pathname + location.hash);
+  payCall({ action: 'verify', id: tapId }).then(r => { if (r.paid) showPaidElsewhere(r.order); }).catch(() => {});
+}
 setupAsst();
 AI.init().then(() => { if (location.hash === '#ai') openKeyBox(); });
 window.addEventListener('hashchange', () => { if (location.hash === '#ai') openKeyBox(); });
