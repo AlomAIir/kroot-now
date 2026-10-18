@@ -1,0 +1,5 @@
+project_id = "kroot-now"
+
+# The public page calls the proxy without a Supabase login
+[functions.ai-proxy]
+verify_jwt = false
