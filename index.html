@@ -202,6 +202,13 @@ html[lang="en"] h1, html[lang="en"] .big { letter-spacing: -.02em; }
 .btn-ghost { background: transparent; color: var(--accent-text); border: 1px solid var(--line); min-height: 52px; font-size: 17px; }
 .btn-apple { background: var(--apple-bg); color: var(--apple-fg); border: 1px solid var(--apple-edge); }
 .btn-apple b { font-family: -apple-system, "SF Pro Display", "Segoe UI", sans-serif; font-weight: 600; }
+/* Where Apple Pay works, WebKit draws Apple's own button (logo and wording, in the page language) */
+@supports (-webkit-appearance: -apple-pay-button) {
+  .apple-native { -webkit-appearance: -apple-pay-button; -apple-pay-button-type: buy; -apple-pay-button-style: black; padding: 0; border: 0; }
+  .apple-native > * { display: none; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .apple-native { -apple-pay-button-style: white; } }
+  :root[data-theme="dark"] .apple-native { -apple-pay-button-style: white; }
+}
 .btn-wa { background: var(--wa); color: var(--on-wa); }
 .btn svg { width: 22px; height: 22px; flex: none; }
 .link-arrow {
@@ -752,7 +759,6 @@ const CONFIG = {
   applePay: !!(window.KROOT_LOCAL && window.KROOT_LOCAL.applePay) || false,
   tapCardSdk: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapCardSdk) || 'https://tap-sdks.b-cdn.net/card/1.0.2/index.js',
   tapApplePaySdk: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapApplePaySdk) || 'https://tap-sdks.b-cdn.net/apple-pay/build-1.0.19/main',
-  descriptor: 'TENSO',       // name on the customer's bank statement
   supportWhatsApp: '',       // e.g. '9665XXXXXXXX' to show a WhatsApp help link
   // Anthropic API key for the assistant and the smart helpers when the page is served normally
   // (outside the claude.ai artifact). It comes from config.local.js, which is git-ignored.
@@ -854,7 +860,7 @@ const I18N = {
     factStyle: 'التصميم', factDate: 'التاريخ', factTime: 'الوقت', factPlace: 'المكان',
     payTitle: 'الدفع', orderItem: 'كرت دعوة رقمي', includes: ['صورة عالية الجودة جاهزة للإرسال', 'بدون علامة مائية'], total: 'الإجمالي',
     payWith: 'ادفعي بـ', mada: 'مدى أو بطاقة ائتمانية', demoPay: 'وضع تجريبي: لن يُخصم أي مبلغ.',
-    descriptor: d => `تظهر العملية في كشف حسابك باسم ${d}.`, paying: 'جاري الدفع…', paid: 'تم الدفع',
+    paying: 'جاري الدفع…', paid: 'تم الدفع',
     buyerName: 'اسمك', buyerContact: 'بريدك الإلكتروني أو رقم جوالك', buyerHint: 'تطلبه بوابة الدفع لإتمام العملية.',
     payNow: p => `ادفعي ${arNum(p)} ر.س`, payTapNote: 'تنتقلين لصفحة الدفع الآمنة من Tap، ثم ترجعين هنا وكرتك جاهز.',
     payOpening: 'نفتح صفحة الدفع…', payBadName: 'اكتبي اسمك', payBadContact: 'اكتبي بريد إلكتروني أو رقم جوال صحيح',
@@ -956,7 +962,7 @@ const I18N = {
     factStyle: 'Design', factDate: 'Date', factTime: 'Time', factPlace: 'Place',
     payTitle: 'Payment', orderItem: 'Digital invitation card', includes: ['High-quality image ready to send', 'No watermark'], total: 'Total',
     payWith: 'Pay with', mada: 'mada or credit card', demoPay: 'Prototype: nothing will be charged.',
-    descriptor: d => `The charge appears on your statement as ${d}.`, paying: 'Processing payment…', paid: 'Paid',
+    paying: 'Processing payment…', paid: 'Paid',
     buyerName: 'Your name', buyerContact: 'Your email or mobile number', buyerHint: 'The payment gateway needs it to complete the payment.',
     payNow: p => `Pay SAR ${p}`, payTapNote: "You'll go to Tap's secure payment page, then come back here to your finished card.",
     payOpening: 'Opening the payment page…', payBadName: 'Enter your name', payBadContact: 'Enter a valid email or mobile number',
@@ -4603,7 +4609,7 @@ const SCREENS = {
         ${CONFIG.payUrl ? `<div class="field"><label for="f_bn">${t('buyerName')}</label><input id="f_bn" data-bind="buyerName" value="${esc(state.buyerName)}" autocomplete="name"></div>
         <div class="field"><label for="f_be">${t('buyerContact')}</label><input id="f_be" type="text" dir="ltr" data-bind="buyerContact" value="${esc(state.buyerContact)}" autocomplete="email" autocapitalize="off" spellcheck="false"><p class="hint">${t('buyerHint')}</p></div>
         ${inPagePay() ? `<div class="apple-box" id="applePayBox" hidden><div id="apple-pay-button"></div>
-          <button class="btn btn-apple" id="applePayGate" data-act="applePayGate" type="button"><span>${t('payWith')}</span><b>Apple&nbsp;Pay</b></button></div>
+          <button class="btn btn-apple apple-native" id="applePayGate" data-act="applePayGate" type="button" aria-label="${esc(t('payWith'))} Apple Pay"><span>${t('payWith')}</span><b>Apple&nbsp;Pay</b></button></div>
         <p class="pay-or" id="payOr" hidden>${t('payOr')}</p>
         <div id="tapCard" class="tap-card"></div>
         <button class="btn btn-primary" id="payBtn" data-act="pay" data-val="card" type="button">${t('payNow', CONFIG.price)}</button>
@@ -4612,8 +4618,7 @@ const SCREENS = {
           <button class="btn btn-apple" data-act="pay" data-val="apple" type="button"><span>${t('payWith')}</span><b>Apple&nbsp;Pay</b></button>
           <button class="btn btn-secondary" data-act="pay" data-val="card" type="button">${t('mada')}</button>
         </div>
-        <p class="demo-note">${t('demoPay')}</p>`}
-        <p class="hint">${esc(t('descriptor', CONFIG.descriptor))}</p></section>`,
+        <p class="demo-note">${t('demoPay')}</p>`}</section>`,
       bar: ''
     };
   },
