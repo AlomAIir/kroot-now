@@ -839,7 +839,10 @@ const I18N = {
     payWith: 'ادفعي بـ', mada: 'مدى أو بطاقة ائتمانية', demoPay: 'وضع تجريبي: لن يُخصم أي مبلغ.',
     descriptor: d => `تظهر العملية في كشف حسابك باسم ${d}.`, paying: 'جاري الدفع…', paid: 'تم الدفع',
     doneTitle: 'مبروك! بطاقتك جاهزة', doneSub: 'احفظيها وأرسليها لأحبابك.', orderNo: 'رقم الطلب', finalAlt: 'بطاقة الدعوة النهائية',
-    save: 'حفظ البطاقة', saved: 'تم حفظ البطاقة', longPress: 'اضغطي مطولاً على البطاقة واختاري حفظ الصورة.', tryAgain: 'جربي مرة ثانية بعد لحظات.',
+    save: 'حفظ في الصور', saved: 'تم حفظ البطاقة', longPress: 'اضغطي مطولاً على البطاقة واختاري حفظ الصورة.', tryAgain: 'جربي مرة ثانية بعد لحظات.',
+    share: 'مشاركة', shareText: 'يسعدنا دعوتكم، وهذي بطاقة الدعوة',
+    saveIosHint: 'من القائمة اختاري «حفظ الصورة» لتنحفظ في الصور.',
+    shareHint: 'المشاركة تفتح خيارات جوالك: واتساب، الرسائل، البريد وغيرها.',
     whatsapp: 'إرسال على واتساب', waNote: 'احفظي البطاقة أولاً، ثم أرفقيها في محادثة واتساب.', waText: 'يسعدنا دعوتكم، وهذي بطاقة الدعوة', newCard: 'تصميم بطاقة جديدة',
     tapToZoom: 'اضغطي على البطاقة لتكبيرها', zoom: 'تكبير البطاقة', closeZoom: 'اضغطي في أي مكان للإغلاق',
     uploadTitle: 'ارفعي البطاقة اللي أعجبتك', uploadSub: 'نقرأ ستايلها وعباراتها، ونصمم لك بطاقة جديدة بنفس الروح وبأسمائك أنتِ.',
@@ -929,7 +932,10 @@ const I18N = {
     payWith: 'Pay with', mada: 'mada or credit card', demoPay: 'Prototype: nothing will be charged.',
     descriptor: d => `The charge appears on your statement as ${d}.`, paying: 'Processing payment…', paid: 'Paid',
     doneTitle: 'Congratulations! Your card is ready', doneSub: 'Save it and send it to your loved ones.', orderNo: 'Order number', finalAlt: 'Your final invitation card',
-    save: 'Save card', saved: 'Card saved', longPress: 'Press and hold the card, then choose Save Image.', tryAgain: 'Try again in a moment.',
+    save: 'Save to Photos', saved: 'Card saved', longPress: 'Press and hold the card, then choose Save Image.', tryAgain: 'Try again in a moment.',
+    share: 'Share', shareText: "You're invited! Here is our invitation card",
+    saveIosHint: 'Choose "Save Image" to add it to Photos.',
+    shareHint: "Share opens your phone's options: WhatsApp, Messages, email and more.",
     whatsapp: 'Send on WhatsApp', waNote: 'Save the card first, then attach it in your WhatsApp chat.', waText: "You're invited! Here is our invitation card", newCard: 'Design a new card',
     tapToZoom: 'Tap the card to enlarge it', zoom: 'Enlarge card', closeZoom: 'Tap anywhere to close',
     uploadTitle: 'Upload the card you like', uploadSub: 'We read its style and wording, then design a new card in the same spirit with your own names.',
@@ -4548,15 +4554,14 @@ const SCREENS = {
     };
   },
   done() {
-    const wa = `https://wa.me/?text=${encodeURIComponent(t('waText'))}`;
     return {
       html: `<section class="done"><h1 class="display">${t('doneTitle')}</h1><p class="lead">${t('doneSub')}</p>
         <p class="hint">${t('orderNo')}: <bdi>${esc(state.orderNo)}</bdi></p>
         <div class="final-wrap"><img id="finalImg" class="final" alt="${esc(t('finalAlt'))}"></div>
         <div class="stack">
           <button class="btn btn-primary" data-act="save" type="button">${t('save')}</button>
-          <a class="btn btn-wa" id="waLink" href="${wa}" target="_blank" rel="noopener">${ICON.chat}${t('whatsapp')}</a>
-          <p class="hint">${t('waNote')}</p>
+          <button class="btn btn-secondary" data-act="share" type="button">${t('share')}</button>
+          <p class="hint">${t('shareHint')}</p>
           <button class="btn btn-secondary" data-act="newCard" type="button">${t('newCard')}</button>
         </div></section>`,
       bar: ''
@@ -4576,9 +4581,12 @@ const AFTER = {
   style() { renderThumbs(); observeFonts(); },
   fonts() { observeFonts(); },
   done() {
+    cardFile = null;
     serial(async () => {
       await drawCard(master, state, { watermark: false });
       const img = $('#finalImg'); if (img) img.src = master.toDataURL('image/png');
+      const blob = await new Promise(r => master.toBlob(r, 'image/png'));
+      if (blob) cardFile = new File([blob], cardFileName(), { type: 'image/png' });
     });
   }
 };
@@ -4741,14 +4749,34 @@ function closeModal() { const m = $('#modal'); m.hidden = true; m.innerHTML = ''
 
 let DL = null;
 async function initDownloads() { try { DL = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { DL = null; } }
+// The finished card as a file, made when the done screen opens: iPhone Safari only allows the share
+// sheet straight from a tap, so the file has to be ready before the button is pressed
+let cardFile = null;
+function cardFileName() {
+  const base = (fieldVal(state, 'main') || 'card').replace(/\p{M}+/gu, '').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').slice(0, 40) || 'card';
+  return (state.lang === 'ar' ? 'دعوة-' : 'invitation-') + base + '.png';
+}
+const canShareFile = f => !!(f && navigator.canShare && navigator.canShare({ files: [f] }));
+// iPhones and iPads can only put a web image in Photos through the share sheet's "Save Image"
+const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+async function shareCard() {
+  if (!canShareFile(cardFile)) { saveCard(); return; }
+  try { await navigator.share({ files: [cardFile], text: t('shareText') }); }
+  catch (e) { if (!(e && e.name === 'AbortError')) toast(t('longPress')); }
+}
 async function saveCard() {
-  const blob = await serial(async () => {
+  if (!DL && !window.claude && isIOS() && canShareFile(cardFile)) {
+    toast(t('saveIosHint'));
+    try { await navigator.share({ files: [cardFile] }); }
+    catch (e) { if (!(e && e.name === 'AbortError')) toast(t('longPress')); }
+    return;
+  }
+  const blob = cardFile || await serial(async () => {
     await drawCard(master, state, { watermark: false });
     return new Promise(r => master.toBlob(r, 'image/png'));
   });
   if (!blob) return toast(t('longPress'));
-  const base = (fieldVal(state, 'main') || 'card').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').slice(0, 40) || 'card';
-  const name = (state.lang === 'ar' ? 'دعوة-' : 'invitation-') + base + '.png';
+  const name = cardFileName();
   if (DL) {
     try { await DL.save({ filename: name, data: blob }); toast(t('saved')); }
     catch (e) {
@@ -4761,19 +4789,10 @@ async function saveCard() {
   if (!window.claude) {
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
+    toast(t('saved'));
     return;
   }
   toast(t('longPress'));
-}
-async function shareWhatsApp(e) {
-  try {
-    const blob = await new Promise(r => master.toBlob(r, 'image/png'));
-    const file = blob && new File([blob], 'invitation.png', { type: 'image/png' });
-    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-      e.preventDefault();
-      await navigator.share({ files: [file], text: t('waText') });
-    }
-  } catch (err) { /* fall back to the plain WhatsApp link */ }
 }
 
 const ACTIONS = {
@@ -4902,13 +4921,12 @@ const ACTIONS = {
     }, 1400);
   },
   save() { saveCard(); },
+  share() { shareCard(); },
   newCard() { const L = state.lang; state = freshState(L); draft = null; save(); go('occasion'); }
 };
 
 /* ================= events ================= */
 document.addEventListener('click', e => {
-  const wa = e.target.closest('#waLink');
-  if (wa) { shareWhatsApp(e); return; }
   const a = e.target.closest('[data-act]'); if (!a) return;
   const fn = ACTIONS[a.dataset.act]; if (fn) fn(a.dataset.val, a, e);
 });
