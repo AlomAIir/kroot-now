@@ -3846,20 +3846,26 @@ function asstSystem() {
     fields: state.fields, date: state.date, timeFrom: state.timeFrom, timeTo: state.timeTo,
     venue: state.venue, venueDetail: state.venueDetail, nameFont: state.nameFont, bodyFont: state.bodyFont
   };
-  const allowed = state.occasion ? allowedFor(state.occasion).join(', ') : 'any (no occasion picked yet)';
-  const fieldKeys = state.occasion ? FIELDS[state.occasion].map(f => `${f.k} = ${f.en}`).join('; ') : 'none until an occasion is picked';
+  const occIds = Object.keys(FIELDS);
+  // Everything per occasion up front, so a first message that names the occasion can also fill in names and pick a design
+  const perOcc = occIds.map(oc => `- ${oc}: fields {${FIELDS[oc].map(f => `${f.k}: ${f.en}${f.opt ? ' (optional)' : ''}`).join('; ')}}; designs allowed: ${allowedFor(oc).join(', ')}`).join('\n');
+  const designNames = TEMPLATE_IDS.map(id => `${id} = «${TEMPLATES[id].name[L]}»`).join(', ');
   return `You are the in-app assistant of "${CONFIG.brand.en}", a Saudi occasion-card builder. The customer designs one card through these steps: ${FLOW.join(' > ')}. Be warm, brief and practical; in Arabic address the customer as a Saudi woman (feminine). Guide her to the next missing piece (occasion, then design, names, date, place), one question at a time, and apply what she asks for right away.
 Today: ${todayISO()}.
 Current card state: ${JSON.stringify(snap)}
 Occasions: weddingMen (men's wedding), weddingWomen (women's wedding), babyGirl, babyBoy, twins, eidFitr, eidAdha, graduation, ceremony, other.
-Designs (template ids and their look): ${STYLE_GUIDE}
-Designs allowed for her occasion: ${allowed}.
+Per occasion, its name fields and the designs allowed for it:
+${perOcc}
+Design looks (by id): ${STYLE_GUIDE}
+Design names the customer sees: ${designNames}.
 Name fonts: ${FONT_GROUPS[L].flatMap(g => g.fonts).join(', ')}. Body fonts: ${BODY_FONTS[L].join(', ')}.
-Field keys for this occasion: ${fieldKeys}.
 Reply with only one JSON object:
 {"say": "your reply to the customer in her language (at most 60 words, plain text)",
  "apply": {"occasion": "", "template": "", "nameFont": "", "bodyFont": "", "fields": {}, "date": "YYYY-MM-DD", "timeFrom": "HH:MM", "timeTo": "HH:MM", "venue": "", "venueDetail": "", "opening": "", "closing": "", "goStep": ""}}
-Every "apply" key is optional: include only what should change, and omit "apply" entirely when nothing changes. "goStep" moves her to that step so she sees the change (e.g. "style" after you pick a template). Use template ids and font names exactly as listed; never invent them.`;
+Every "apply" key is optional: include only what should change, and omit "apply" entirely when nothing changes. "goStep" moves her to that step so she sees the change (e.g. "style" after you pick a template).
+The date and times in the card state start as placeholders (two weeks from today, the occasion's usual hours) and the venue starts empty: treat them as not given until she tells you, and ask for them instead of calling them ready.
+Whenever she mentions a name, put it in apply.fields right away, using the field keys of the occasion you set in this same reply (or the current one); keep names exactly as she wrote them.
+Template ids, occasion ids and field keys go only inside "apply". In "say", call a design by the name she sees (for example «${TEMPLATES.bisht.name[L]}»), never by its id, and never show ids or English code words. Use ids and font names exactly as listed; never invent them.`;
 }
 function asstApply(a) {
   if (!a || typeof a !== 'object') return;
