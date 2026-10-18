@@ -3974,7 +3974,7 @@ function freshState(lang) {
     fields: {}, date: isoPlus(14), timeFrom: '18:00', timeTo: '23:00', venue: '', venueDetail: '', mapLink: '',
     showQR: true, showHijri: true, note: 0, dua: true, duaText: null, nameFont: null, bodyFont: null,
     openingText: null, closingText: null, customOpenings: [], customClosings: [], cardOpening: '', cardClosing: '',
-    confirmed: false, paid: false, orderNo: '', pendingOrder: '', buyerName: '', buyerEmail: ''
+    confirmed: false, paid: false, orderNo: '', pendingOrder: '', payToken: '', buyerName: '', buyerEmail: ''
   };
 }
 let state = freshState('ar');
@@ -4771,10 +4771,15 @@ async function payTap(btn) {
   if (bad) { toast(t(bad[1])); const el = $(bad[0]); if (el) { el.classList.add('invalid'); el.focus(); } return; }
   const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   state.pendingOrder = 'KN-' + Array.from(crypto.getRandomValues(new Uint8Array(6)), b => abc[b % abc.length]).join('');
+  // A secret only this browser holds: the server ties the charge to it, so a paid tap_id can't unlock other cards
+  state.payToken = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
   save();
   btn.disabled = true; btn.textContent = t('payOpening');
   try {
-    const r = await payCall({ action: 'create', name, email, order: state.pendingOrder, returnUrl: location.origin + location.pathname });
+    const r = await payCall({
+      action: 'create', name, email, order: state.pendingOrder, token: state.payToken,
+      returnUrl: location.origin + location.pathname
+    });
     location.href = r.url;
   } catch (e) {
     console.warn('Kroot pay:', e);
@@ -4782,18 +4787,29 @@ async function payTap(btn) {
     btn.disabled = false; btn.textContent = t('payNow', CONFIG.price);
   }
 }
-// Tap sends the customer back with ?tap_id=chg_...; the card comes back from this browser's saved draft
+// A charge was paid, but not from the order this browser started: say so and show the order number
+function showPaidElsewhere(order) {
+  openModal(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="lostTitle"><h2 id="lostTitle">${t('paid')}</h2>
+    <p>${t('payLostCard')}</p><p class="hint">${t('orderNo')}: <bdi>${esc(order)}</bdi></p>
+    <button class="btn btn-secondary" data-close type="button">${t('close')}</button></div>`);
+}
+// Tap sends the customer back with ?tap_id=chg_...; the card comes back from this browser's saved draft.
+// The server unlocks it only for the order and secret this browser sent when it opened the payment.
 async function verifyReturn(tapId) {
   openModal(`<div class="paying" role="status"><span class="spin"></span><span>${t('payChecking')}</span></div>`);
   $('#modal').onclick = null;
   try {
-    const r = await payCall({ action: 'verify', id: tapId });
-    if (r.paid && (!state.pendingOrder || r.order === state.pendingOrder)) {
-      state.paid = true; state.orderNo = r.order || state.pendingOrder; state.pendingOrder = '';
+    const r = state.pendingOrder && state.payToken
+      ? await payCall({ action: 'verify', id: tapId, order: state.pendingOrder, token: state.payToken })
+      : await payCall({ action: 'verify', id: tapId });
+    if (r.unlock && r.order === state.pendingOrder) {
+      state.paid = true; state.orderNo = r.order; state.pendingOrder = ''; state.payToken = '';
       save(); closeModal(); go('done');
       return;
     }
-    closeModal(); toast(t('payNotDone'));
+    closeModal();
+    if (r.paid) showPaidElsewhere(r.order);
+    else toast(t('payNotDone'));
   } catch (e) {
     console.warn('Kroot pay verify:', e);
     closeModal(); toast(t('payCheckFail'));
@@ -5038,11 +5054,7 @@ renderScreen();
 if (tapId && CONFIG.payUrl && state.step === 'pay') verifyReturn(tapId);
 else if (tapId && CONFIG.payUrl) {
   history.replaceState(null, '', location.pathname + location.hash);
-  payCall({ action: 'verify', id: tapId }).then(r => {
-    if (r.paid) openModal(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="lostTitle"><h2 id="lostTitle">${t('paid')}</h2>
-      <p>${t('payLostCard')}</p><p class="hint">${t('orderNo')}: <bdi>${esc(r.order)}</bdi></p>
-      <button class="btn btn-secondary" data-close type="button">${t('close')}</button></div>`);
-  }).catch(() => {});
+  payCall({ action: 'verify', id: tapId }).then(r => { if (r.paid) showPaidElsewhere(r.order); }).catch(() => {});
 }
 setupAsst();
 AI.init().then(() => { if (location.hash === '#ai') openKeyBox(); });
