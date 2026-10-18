@@ -739,7 +739,6 @@ const CONFIG = {
   // Real payments through Tap's hosted page (Supabase function supabase/functions/tap-checkout).
   // Blank keeps the simulated payment and the "prototype" banner. config.local.js can override it for testing.
   payUrl: (window.KROOT_LOCAL && window.KROOT_LOCAL.payUrl) || 'https://fslixkzqmkqezdactxxg.supabase.co/functions/v1/tap-checkout',
-  descriptor: 'TENSO',       // name on the customer's bank statement
   supportWhatsApp: '',       // e.g. '9665XXXXXXXX' to show a WhatsApp help link
   // Anthropic API key for the assistant and the smart helpers when the page is served normally
   // (outside the claude.ai artifact). It comes from config.local.js, which is git-ignored.
@@ -841,7 +840,7 @@ const I18N = {
     factStyle: 'التصميم', factDate: 'التاريخ', factTime: 'الوقت', factPlace: 'المكان',
     payTitle: 'الدفع', orderItem: 'كرت دعوة رقمي', includes: ['صورة عالية الجودة جاهزة للإرسال', 'بدون علامة مائية'], total: 'الإجمالي',
     payWith: 'ادفعي بـ', mada: 'مدى أو بطاقة ائتمانية', demoPay: 'وضع تجريبي: لن يُخصم أي مبلغ.',
-    descriptor: d => `تظهر العملية في كشف حسابك باسم ${d}.`, paying: 'جاري الدفع…', paid: 'تم الدفع',
+    paying: 'جاري الدفع…', paid: 'تم الدفع',
     buyerName: 'اسمك', buyerEmail: 'بريدك الإلكتروني', buyerHint: 'تطلبه بوابة الدفع لإتمام العملية.',
     payNow: p => `ادفعي ${arNum(p)} ر.س`, payTapNote: 'تنتقلين لصفحة الدفع الآمنة من Tap، ثم ترجعين هنا وكرتك جاهز.',
     payOpening: 'نفتح صفحة الدفع…', payBadName: 'اكتبي اسمك', payBadEmail: 'اكتبي بريد إلكتروني صحيح',
@@ -940,7 +939,7 @@ const I18N = {
     factStyle: 'Design', factDate: 'Date', factTime: 'Time', factPlace: 'Place',
     payTitle: 'Payment', orderItem: 'Digital invitation card', includes: ['High-quality image ready to send', 'No watermark'], total: 'Total',
     payWith: 'Pay with', mada: 'mada or credit card', demoPay: 'Prototype: nothing will be charged.',
-    descriptor: d => `The charge appears on your statement as ${d}.`, paying: 'Processing payment…', paid: 'Paid',
+    paying: 'Processing payment…', paid: 'Paid',
     buyerName: 'Your name', buyerEmail: 'Your email', buyerHint: 'The payment gateway needs it to complete the payment.',
     payNow: p => `Pay SAR ${p}`, payTapNote: "You'll go to Tap's secure payment page, then come back here to your finished card.",
     payOpening: 'Opening the payment page…', payBadName: 'Enter your name', payBadEmail: 'Enter a valid email',
@@ -4586,8 +4585,7 @@ const SCREENS = {
           <button class="btn btn-apple" data-act="pay" data-val="apple" type="button"><span>${t('payWith')}</span><b>Apple&nbsp;Pay</b></button>
           <button class="btn btn-secondary" data-act="pay" data-val="card" type="button">${t('mada')}</button>
         </div>
-        <p class="demo-note">${t('demoPay')}</p>`}
-        <p class="hint">${esc(t('descriptor', CONFIG.descriptor))}</p></section>`,
+        <p class="demo-note">${t('demoPay')}</p>`}</section>`,
       bar: ''
     };
   },
