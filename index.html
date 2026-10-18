@@ -739,7 +739,7 @@ const CONFIG = {
   price: 15,                 // SAR, VAT included; the amount actually charged is fixed in supabase/functions/tap-checkout
   // Real payments through Tap's hosted page (Supabase function supabase/functions/tap-checkout).
   // Blank keeps the simulated payment and the "prototype" banner. config.local.js can override it for testing.
-  payUrl: (window.KROOT_LOCAL && window.KROOT_LOCAL.payUrl) || '',
+  payUrl: (window.KROOT_LOCAL && window.KROOT_LOCAL.payUrl) || 'https://fslixkzqmkqezdactxxg.supabase.co/functions/v1/tap-checkout',
   descriptor: 'TENSO',       // name on the customer's bank statement
   supportWhatsApp: '',       // e.g. '9665XXXXXXXX' to show a WhatsApp help link
   // Anthropic API key for the assistant and the smart helpers when the page is served normally
