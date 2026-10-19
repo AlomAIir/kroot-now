@@ -1,6 +1,7 @@
-// Kroot Now payments (Supabase Edge Function) through Tap Payments' hosted payment page.
-// The page asks for a checkout link, sends the customer to Tap, and when Tap sends them back
-// with ?tap_id=... the page asks this function whether that charge was paid.
+// Kroot Now payments (Supabase Edge Function) through Tap Payments.
+// The page either charges a token from Tap's card form or Apple Pay button on the page (pay), or asks
+// for a link to Tap's hosted payment page (create). When Tap sends the customer back from 3-D Secure
+// or its hosted page with ?tap_id=..., the page asks this function whether that charge was paid.
 // The price and currency are fixed here, so the page cannot change what is charged.
 //
 // Secrets: TAP_SECRET_KEY   sk_test_... while testing, sk_live_... at launch
@@ -10,15 +11,22 @@
 // tap_orders table (supabase/migrations), which ties each charge to the browser that started it.
 // Deployed with --no-verify-jwt so the public page can call it without a Supabase login.
 //
-// POST { action: 'create', name, email, order, token, returnUrl } → { id, url }
+// POST { action: 'create', name, email | phone, order, token, returnUrl } → { id, url }
+// POST { action: 'pay', source: 'tok_...', name, email | phone, order, token, returnUrl }
+//        → { paid: true, unlock: true, order } paid now | { id, url } go to 3-D Secure | { paid: false, status }
 // POST { action: 'verify', id, order?, token? }                  → { paid, unlock, status, order }
 //   paid:   Tap captured the full price for this charge
+// phone: { country_code: '966', number: '5XXXXXXXX' } (GCC mobiles); a phone-only buyer is created as a Tap
+//   customer first, because Tap's charge API documents email as required unless a customer id is given.
 //   unlock: paid, and order + token match the ones sent when the charge was created,
 //           so a paid tap_id shared or replayed elsewhere can't unlock another card
 
 const PRICE = 15;
 const CURRENCY = 'SAR';
-const TAP = 'https://api.tap.company/v2/charges';
+const TAP = 'https://api.tap.company/v2';
+// Mobile numbers accepted instead of an email: Saudi (5XXXXXXXX) and the other GCC countries
+const PHONE_CC = ['966', '971', '965', '973', '974', '968'];
+const validPhone = (cc: string, n: string) => PHONE_CC.includes(cc) && (cc === '966' ? /^5\d{8}$/ : /^\d{7,9}$/).test(n);
 const RATE_LIMIT = 10, RATE_WINDOW_S = 60; // checkout links per IP per minute
 
 const allowed = (Deno.env.get('ALLOWED_ORIGINS') || 'https://alomaiir.github.io')
@@ -98,13 +106,20 @@ Deno.serve(async request => {
   let body;
   try { body = JSON.parse((await request.text()).slice(0, 4096)); } catch { return fail(400, 'body must be JSON', h); }
 
-  if (body?.action === 'create') {
+  // create: a charge paid on Tap's hosted page; pay: a charge on a tok_ from the page's card form or Apple Pay
+  if (body?.action === 'create' || body?.action === 'pay') {
     if (limited(clientIp(request))) return fail(429, 'too many requests, try again in a minute', h);
 
     const name = clean(body.name, 60), email = clean(body.email, 120), order = clean(body.order, 20);
+    const phone = body.phone && typeof body.phone === 'object'
+      ? { country_code: clean(body.phone.country_code, 4), number: clean(body.phone.number, 12) } : null;
     const token = clean(body.token, 64);
+    const source = body.action === 'pay' ? clean(body.source, 64) : 'src_all';
+    if (!/^(src_all|tok_[A-Za-z0-9]+)$/.test(source)) return fail(400, 'bad card token', h);
     if (!name) return fail(400, 'name is required', h);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return fail(400, 'a valid email is required', h);
+    if (email ? !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) : !(phone && validPhone(phone.country_code, phone.number))) {
+      return fail(400, 'a valid email or mobile number is required', h);
+    }
     if (!/^KN-[A-Z0-9]{4,12}$/.test(order)) return fail(400, 'bad order number', h);
     if (!/^[a-f0-9]{32,64}$/.test(token)) return fail(400, 'bad token', h);
     // Tap sends the customer back here, so it must be a page on the site that asked
@@ -113,42 +128,63 @@ Deno.serve(async request => {
     if (returnUrl.origin !== origin) return fail(400, 'returnUrl must be on the calling site', h);
     returnUrl.search = ''; returnUrl.hash = '';
 
-    const r = await tap('', key, {
+    let customer: Record<string, unknown> = { first_name: name, email };
+    if (!email) {
+      const cr = await tap('/customers', key, { method: 'POST', body: JSON.stringify({ first_name: name, phone }) });
+      if (!cr.ok || !/^cus_/.test(cr.data?.id || '')) {
+        console.error('tap customer failed', cr.status, JSON.stringify(cr.data?.errors || cr.data));
+        return fail(502, 'could not start the payment', h);
+      }
+      customer = { id: cr.data.id };
+    }
+    const r = await tap('/charges', key, {
       method: 'POST',
       body: JSON.stringify({
         amount: PRICE, currency: CURRENCY, threeDSecure: true, save_card: false,
         description: 'Kroot Now invitation card ' + order,
         metadata: { order },
         reference: { transaction: order, order },
-        customer: { first_name: name, email },
-        source: { id: 'src_all' },
+        customer,
+        source: { id: source },
         redirect: { url: returnUrl.toString() }
       })
     });
-    const url = r.data?.transaction?.url;
-    if (!r.ok || !url) {
-      console.error('tap create failed', r.status, JSON.stringify(r.data?.errors || r.data));
+    const c = r.data;
+    if (!r.ok || !c?.id) {
+      console.error('tap charge failed', r.status, JSON.stringify(c?.errors || c));
       return fail(502, 'could not start the payment', h);
+    }
+    // CAPTURED: paid on the spot (Apple Pay, or a card without 3-D Secure).
+    // INITIATED with a URL: the customer goes there (Tap's page, or their bank's 3-D Secure check)
+    // and comes back with ?tap_id=, which verify confirms. Anything else was declined.
+    const paid = c.status === 'CAPTURED' && Number(c.amount) === PRICE && c.currency === CURRENCY;
+    const url = c.status === 'INITIATED' ? c.transaction?.url : '';
+    if (!paid && !url) {
+      console.error('tap charge not paid', c.status, JSON.stringify(c.response || {}));
+      return reply(200, { paid: false, unlock: false, status: c.status, order }, h);
     }
     // Record the charge before sending anyone to pay it; without the record it could never unlock
     try {
       await db('tap_orders', {
         method: 'POST',
         body: JSON.stringify({
-          charge_id: r.data.id, order_no: order, token_hash: await sha256(token), amount: PRICE, currency: CURRENCY
+          charge_id: c.id, order_no: order, token_hash: await sha256(token), amount: PRICE, currency: CURRENCY,
+          status: c.status, claimed_at: paid ? new Date().toISOString() : null
         })
       });
     } catch (e) {
-      console.error('saving the order failed', e);
-      return fail(502, 'could not start the payment', h);
+      console.error('saving the order failed', c.id, e);
+      // already paid: the customer still gets the card; Tap has the charge
+      if (!paid) return fail(502, 'could not start the payment', h);
     }
-    return reply(200, { id: r.data.id, url }, h);
+    if (paid) return reply(200, { paid: true, unlock: true, status: c.status, order }, h);
+    return reply(200, { id: c.id, url }, h);
   }
 
   if (body?.action === 'verify') {
     const id = clean(body.id, 64), order = clean(body.order, 20), token = clean(body.token, 64);
     if (!/^chg_[A-Za-z0-9]+$/.test(id)) return fail(400, 'bad charge id', h);
-    const r = await tap('/' + id, key);
+    const r = await tap('/charges/' + id, key);
     if (!r.ok || !r.data) {
       console.error('tap retrieve failed', r.status, JSON.stringify(r.data?.errors || r.data));
       return fail(502, 'could not check the payment', h);

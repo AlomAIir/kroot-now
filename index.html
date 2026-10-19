@@ -196,6 +196,13 @@ html[lang="en"] h1, html[lang="en"] .big { letter-spacing: -.02em; }
 .btn-ghost { background: transparent; color: var(--accent-text); border: 1px solid var(--line); min-height: 52px; font-size: 17px; }
 .btn-apple { background: var(--apple-bg); color: var(--apple-fg); border: 1px solid var(--apple-edge); }
 .btn-apple b { font-family: -apple-system, "SF Pro Display", "Segoe UI", sans-serif; font-weight: 600; }
+/* Where Apple Pay works, WebKit draws Apple's own button (logo and wording, in the page language) */
+@supports (-webkit-appearance: -apple-pay-button) {
+  .apple-native { -webkit-appearance: -apple-pay-button; -apple-pay-button-type: buy; -apple-pay-button-style: black; padding: 0; border: 0; }
+  .apple-native > * { display: none; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .apple-native { -apple-pay-button-style: white; } }
+  :root[data-theme="dark"] .apple-native { -apple-pay-button-style: white; }
+}
 .btn-wa { background: var(--wa); color: var(--on-wa); }
 .btn svg { width: 22px; height: 22px; flex: none; }
 .link-arrow {
@@ -476,6 +483,13 @@ html[lang="ar"] .big { line-height: 1.3; }
 .busy { display: flex; align-items: center; gap: 10px; color: var(--muted); font-weight: 600; }
 .busy .spin { width: 22px; height: 22px; border-width: 3px; border-color: var(--line); border-top-color: var(--accent); }
 .pay { display: grid; gap: 16px; max-width: 520px; margin-inline: auto; width: 100%; }
+.pay-or { display: flex; align-items: center; gap: 12px; margin: 0; color: var(--muted); font-size: 14px; }
+.pay-or::before, .pay-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.tap-card { min-height: 64px; }
+/* Tap's card form is a light page in a frame: matching its colour scheme keeps the browser from painting it a white backdrop on the dark theme */
+.tap-card iframe { color-scheme: light; }
+.apple-box { display: grid; }
+.apple-box #apple-pay-button:empty { display: none; }
 .order { display: flex; gap: 16px; align-items: center; background: var(--band); border-radius: 20px; padding: 14px; }
 .order canvas { width: 84px; height: auto; aspect-ratio: 9 / 16; border-radius: 8px; flex: none; background: var(--tile); box-shadow: var(--shadow-sm); }
 .order-name { margin: 0; font-weight: 700; font-size: 19px; }
@@ -738,6 +752,14 @@ const CONFIG = {
   // Real payments through Tap's hosted page (Supabase function supabase/functions/tap-checkout).
   // Blank keeps the simulated payment and the "prototype" banner. config.local.js can override it for testing.
   payUrl: (window.KROOT_LOCAL && window.KROOT_LOCAL.payUrl) || 'https://fslixkzqmkqezdactxxg.supabase.co/functions/v1/tap-checkout',
+  // Paying on this page: Tap's card form, plus Tap's Apple Pay button on Apple devices. The public key and
+  // merchant id are publishable (they sit in the page); the secret key stays in Supabase. A blank public key
+  // sends customers to Tap's hosted page instead. Test keys for now: switch to the pk_live_ key together with sk_live_.
+  tapPublicKey: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapPublicKey) || 'pk_test_GNUaSuKpc8TS45tRjNqlwoFQ0MdYf',
+  tapMerchantId: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapMerchantId) || '68066245',
+  applePay: !(window.KROOT_LOCAL && window.KROOT_LOCAL.applePay === false),
+  tapCardSdk: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapCardSdk) || 'https://tap-sdks.b-cdn.net/card/1.0.2/index.js',
+  tapApplePaySdk: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapApplePaySdk) || 'https://tap-sdks.b-cdn.net/apple-pay/build-1.0.19/main',
   supportWhatsApp: '',       // e.g. '9665XXXXXXXX' to show a WhatsApp help link
   // Anthropic API key for the assistant and the smart helpers when the page is served normally
   // (outside the claude.ai artifact). It comes from config.local.js, which is git-ignored.
@@ -833,12 +855,15 @@ const I18N = {
     payTitle: 'الدفع', orderItem: 'كرت دعوة رقمي', includes: ['صورة عالية الجودة جاهزة للإرسال', 'بدون علامة مائية'], total: 'الإجمالي',
     payWith: 'ادفعي بـ', mada: 'مدى أو بطاقة ائتمانية', demoPay: 'وضع تجريبي: لن يُخصم أي مبلغ.',
     paying: 'جاري الدفع…', paid: 'تم الدفع',
-    buyerName: 'اسمك', buyerEmail: 'بريدك الإلكتروني', buyerHint: 'تطلبه بوابة الدفع لإتمام العملية.',
+    buyerName: 'اسمك', buyerContact: 'بريدك الإلكتروني أو رقم جوالك', buyerHint: 'تطلبه بوابة الدفع لإتمام العملية.',
     payNow: p => `ادفعي ${arNum(p)} ر.س`, payTapNote: 'تنتقلين لصفحة الدفع الآمنة من Tap، ثم ترجعين هنا وكرتك جاهز.',
-    payOpening: 'نفتح صفحة الدفع…', payBadName: 'اكتبي اسمك', payBadEmail: 'اكتبي بريد إلكتروني صحيح',
+    payOpening: 'نفتح صفحة الدفع…', payBadName: 'اكتبي اسمك', payBadContact: 'اكتبي بريد إلكتروني أو رقم جوال صحيح',
     payFail: 'ما قدرنا نفتح صفحة الدفع، جرّبي مرة ثانية.', payChecking: 'نتأكد من الدفع…',
     payNotDone: 'ما اكتمل الدفع وما انخصم شي. تقدرين تجربين مرة ثانية.', payCheckFail: 'ما قدرنا نتأكد من الدفع. حدّثي الصفحة بعد شوي.',
     payLostCard: 'وصلنا دفعك، لكن الكرت محفوظ في الجهاز والمتصفح اللي صممتيه فيه. افتحي الموقع منه وبتلقينه جاهز، أو احتفظي برقم الطلب.',
+    payOr: 'أو ادفعي بالبطاقة', payCardNote: 'بيانات بطاقتك تروح لـ Tap مباشرة، وممكن يطلب بنكك رمز تحقق.',
+    payCardIncomplete: 'كمّلي بيانات البطاقة', payProcessing: 'نكمل الدفع…',
+    payDeclined: 'ما تمت عملية الدفع وما انخصم شي. جرّبي بطاقة ثانية.',
     doneTitle: 'مبروك! كرتك جاهز', doneSub: 'احفظيه وأرسليه لأحبابك.', orderNo: 'رقم الطلب', finalAlt: 'كرت الدعوة النهائي',
     save: 'حفظ في الصور', saved: 'تم حفظ الكرت', longPress: 'اضغطي مطولاً على الكرت واختاري حفظ الصورة.', tryAgain: 'جربي مرة ثانية بعد لحظات.',
     share: 'مشاركة', shareText: 'يسعدنا دعوتكم، وهذا كرت الدعوة',
@@ -929,12 +954,15 @@ const I18N = {
     payTitle: 'Payment', orderItem: 'Digital invitation card', includes: ['High-quality image ready to send', 'No watermark'], total: 'Total',
     payWith: 'Pay with', mada: 'mada or credit card', demoPay: 'Prototype: nothing will be charged.',
     paying: 'Processing payment…', paid: 'Paid',
-    buyerName: 'Your name', buyerEmail: 'Your email', buyerHint: 'The payment gateway needs it to complete the payment.',
+    buyerName: 'Your name', buyerContact: 'Your email or mobile number', buyerHint: 'The payment gateway needs it to complete the payment.',
     payNow: p => `Pay SAR ${p}`, payTapNote: "You'll go to Tap's secure payment page, then come back here to your finished card.",
-    payOpening: 'Opening the payment page…', payBadName: 'Enter your name', payBadEmail: 'Enter a valid email',
+    payOpening: 'Opening the payment page…', payBadName: 'Enter your name', payBadContact: 'Enter a valid email or mobile number',
     payFail: "We couldn't open the payment page. Please try again.", payChecking: 'Checking your payment…',
     payNotDone: "The payment didn't go through and nothing was charged. You can try again.", payCheckFail: "We couldn't confirm the payment. Refresh the page in a moment.",
     payLostCard: "We received your payment, but your card is saved in the device and browser you designed it in. Open the site there to find it ready, or keep your order number.",
+    payOr: 'Or pay by card', payCardNote: 'Your card details go straight to Tap, and your bank may ask for a verification code.',
+    payCardIncomplete: 'Complete your card details', payProcessing: 'Completing your payment…',
+    payDeclined: "The payment didn't go through and nothing was charged. Try another card.",
     doneTitle: 'Congratulations! Your card is ready', doneSub: 'Save it and send it to your loved ones.', orderNo: 'Order number', finalAlt: 'Your final invitation card',
     save: 'Save to Photos', saved: 'Card saved', longPress: 'Press and hold the card, then choose Save Image.', tryAgain: 'Try again in a moment.',
     share: 'Share', shareText: "You're invited! Here is our invitation card",
@@ -3956,7 +3984,7 @@ function freshState(lang) {
     fields: {}, date: '', timeFrom: '18:00', timeTo: '23:00', venue: '', venueDetail: '', mapLink: '',
     showQR: false, showHijri: true, note: 0, dua: true, duaText: null, nameFont: null, bodyFont: null,
     openingText: null, closingText: null, customOpenings: [], customClosings: [], cardOpening: '', cardClosing: '',
-    confirmed: false, paid: false, orderNo: '', pendingOrder: '', payToken: '', buyerName: '', buyerEmail: ''
+    confirmed: false, paid: false, orderNo: '', pendingOrder: '', payToken: '', buyerName: '', buyerContact: ''
   };
 }
 let state = freshState('ar');
@@ -4620,15 +4648,22 @@ const SCREENS = {
     };
   },
   pay() {
+    // drafts saved before the field took phone numbers too
+    if (state.buyerEmail !== undefined) { state.buyerContact = state.buyerContact || state.buyerEmail; delete state.buyerEmail; }
     return {
       html: `<section class="pay"><h1>${t('payTitle')}</h1>
         <div class="order"><canvas data-preview width="540" height="960"></canvas><div><p class="order-name">${t('orderItem')}</p><p class="hint">${esc(TEMPLATES[state.template].name[state.lang])} · ${esc(occName())}</p><ul class="includes">${t('includes').map(x => `<li>${x}</li>`).join('')}</ul></div></div>
         <div class="total"><span>${t('total')}</span><strong>${t('price', CONFIG.price)}</strong></div>
         <p class="hint">${t('vatIncl')}</p>
         ${CONFIG.payUrl ? `<div class="field"><label for="f_bn">${t('buyerName')}</label><input id="f_bn" data-bind="buyerName" value="${esc(state.buyerName)}" autocomplete="name"></div>
-        <div class="field"><label for="f_be">${t('buyerEmail')}</label><input id="f_be" type="email" inputmode="email" dir="ltr" data-bind="buyerEmail" value="${esc(state.buyerEmail)}" autocomplete="email"><p class="hint">${t('buyerHint')}</p></div>
-        <button class="btn btn-primary" id="payBtn" data-act="pay" data-val="tap" type="button">${t('payNow', CONFIG.price)}</button>
-        <p class="hint">${t('payTapNote')}</p>` : `<div class="stack">
+        <div class="field"><label for="f_be">${t('buyerContact')}</label><input id="f_be" type="text" dir="ltr" data-bind="buyerContact" value="${esc(state.buyerContact)}" autocomplete="email" autocapitalize="off" spellcheck="false"><p class="hint">${t('buyerHint')}</p></div>
+        ${inPagePay() ? `<div class="apple-box" id="applePayBox" hidden><div id="apple-pay-button"></div>
+          <button class="btn btn-apple apple-native" id="applePayGate" data-act="applePayGate" type="button" aria-label="${esc(t('payWith'))} Apple Pay"><span>${t('payWith')}</span><b>Apple&nbsp;Pay</b></button></div>
+        <p class="pay-or" id="payOr" hidden>${t('payOr')}</p>
+        <div id="tapCard" class="tap-card"></div>
+        <button class="btn btn-primary" id="payBtn" data-act="pay" data-val="card" type="button">${t('payNow', CONFIG.price)}</button>
+        <p class="hint">${t('payCardNote')}</p>` : `<button class="btn btn-primary" id="payBtn" data-act="pay" data-val="tap" type="button">${t('payNow', CONFIG.price)}</button>
+        <p class="hint">${t('payTapNote')}</p>`}` : `<div class="stack">
           <button class="btn btn-apple" data-act="pay" data-val="apple" type="button"><span>${t('payWith')}</span><b>Apple&nbsp;Pay</b></button>
           <button class="btn btn-secondary" data-act="pay" data-val="card" type="button">${t('mada')}</button>
         </div>
@@ -4667,6 +4702,7 @@ const AFTER = {
     renderSheet(); viewport();
   },
   review() { observeFonts(); },
+  pay() { if (inPagePay()) mountPayUI(); },
   done() {
     cardFile = null;
     serial(async () => {
@@ -4826,33 +4862,219 @@ function openModal(html, onClose) {
 }
 function closeModal() { const m = $('#modal'); m.hidden = true; m.innerHTML = ''; m.onclick = null; }
 
-/* ================= payment (Tap hosted page) ================= */
+/* ================= payment (Tap) ================= */
+// With CONFIG.tapPublicKey the customer pays on this page: Tap's card form, plus Tap's Apple Pay button on
+// Apple devices. Both hand back a tok_ that tap-checkout charges. Cards may still visit the bank's 3-D Secure
+// page and come back with ?tap_id=, which verifyReturn checks. Without the key, or if Tap's scripts don't
+// load, the pay button sends the customer to Tap's hosted page instead (payTap).
 const payCall = async body => {
   const res = await fetch(CONFIG.payUrl, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || 'payment ' + res.status);
   return data;
 };
-async function payTap(btn) {
-  const name = state.buyerName.trim(), email = state.buyerEmail.trim();
-  const bad = !name ? ['#f_bn', 'payBadName'] : !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? ['#f_be', 'payBadEmail'] : null;
-  if (bad) { toast(t(bad[1])); const el = $(bad[0]); if (el) { el.classList.add('invalid'); el.focus(); } return; }
+// The buyer's email or mobile number, as Tap takes it: { email } or { phone: { country_code, number } }, or null.
+// Arabic digits, spaces and dashes are fine; a Saudi mobile can be 05XXXXXXXX, 5XXXXXXXX or +966/00966/966 5XXXXXXXX.
+// Other GCC mobiles need their country code (+971, +965, +973, +974, +968). The server checks the same rules.
+function parseContact(raw) {
+  const v = String(raw || '').trim()
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+  if (v.includes('@')) return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? { email: v } : null;
+  if (!/^\+?[\d\s().-]+$/.test(v)) return null;
+  let d = v.replace(/[\s().-]/g, '');
+  const intl = /^(\+|00)/.test(d);
+  d = d.replace(/^(\+|00)/, '');
+  if (!intl && /^9665\d{8}$/.test(d)) d = d.slice(3);
+  let cc = '966';
+  if (intl) { cc = ['966', '971', '965', '973', '974', '968'].find(c => d.startsWith(c)); if (!cc) return null; d = d.slice(3); }
+  d = d.replace(/^0/, '');
+  return (cc === '966' ? /^5\d{8}$/ : /^\d{7,9}$/).test(d) ? { phone: { country_code: cc, number: d } } : null;
+}
+const buyerContact = () => parseContact(state.buyerContact);
+// Tap needs the buyer's name and an email or mobile number; with show, point at the first one missing
+function buyerOk(show) {
+  const name = state.buyerName.trim();
+  const bad = !name ? ['#f_bn', 'payBadName'] : !buyerContact() ? ['#f_be', 'payBadContact'] : null;
+  if (bad && show) { toast(t(bad[1])); const el = $(bad[0]); if (el) { el.classList.add('invalid'); el.focus(); } }
+  return !bad;
+}
+// A fresh order number and a secret only this browser holds: the server ties the charge to both,
+// so a paid tap_id can't unlock other cards
+function startOrder() {
   const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   state.pendingOrder = 'KN-' + Array.from(crypto.getRandomValues(new Uint8Array(6)), b => abc[b % abc.length]).join('');
-  // A secret only this browser holds: the server ties the charge to it, so a paid tap_id can't unlock other cards
   state.payToken = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
   save();
+  return {
+    name: state.buyerName.trim(), ...buyerContact(), order: state.pendingOrder, token: state.payToken,
+    returnUrl: location.origin + location.pathname
+  };
+}
+async function payTap(btn) {
+  if (!buyerOk(true)) return;
+  const o = startOrder();
   btn.disabled = true; btn.textContent = t('payOpening');
   try {
-    const r = await payCall({
-      action: 'create', name, email, order: state.pendingOrder, token: state.payToken,
-      returnUrl: location.origin + location.pathname
-    });
+    const r = await payCall({ action: 'create', ...o });
+    if (!r.url) throw new Error('no payment page');
     location.href = r.url;
   } catch (e) {
     console.warn('Kroot pay:', e);
     toast(t('payFail'));
     btn.disabled = false; btn.textContent = t('payNow', CONFIG.price);
+  }
+}
+
+/* --- paying on this page --- */
+let payInPageFailed = false;
+const tapUI = { card: null, cardValid: false, busy: false, timer: 0, apple: false, appleTimer: 0 };
+const inPagePay = () => !!(CONFIG.payUrl && CONFIG.tapPublicKey && !payInPageFailed);
+const scriptCache = {};
+function loadScript(src) {
+  return scriptCache[src] || (scriptCache[src] = new Promise((ok, no) => {
+    const el = document.createElement('script');
+    el.src = src; el.async = true; el.onload = ok;
+    el.onerror = () => { delete scriptCache[src]; el.remove(); no(new Error('could not load ' + src)); };
+    document.head.appendChild(el);
+  }));
+}
+function loadStyle(href) {
+  if ([...document.styleSheets].some(x => x.href === href)) return;
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href; document.head.appendChild(l);
+}
+const darkUI = () => getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() === '#000000';
+// An SDK enum value when the SDK has it, otherwise the plain value its docs show
+const sdkVal = (obj, key, plain) => (obj && obj[key]) || plain;
+// Tap's callbacks don't document where the token sits, so take the first tok_ in what they hand back
+function findTok(v, depth = 0) {
+  if (typeof v === 'string') return /^tok_[A-Za-z0-9]+$/.test(v) ? v : '';
+  if (!v || typeof v !== 'object' || depth > 4) return '';
+  for (const x of Object.values(v)) { const f = findTok(x, depth + 1); if (f) return f; }
+  return '';
+}
+function payFallback(e) {
+  console.warn("Kroot pay: Tap's card form didn't load, using Tap's hosted page", e);
+  payInPageFailed = true;
+  if (state.step === 'pay') renderScreen();
+}
+async function mountPayUI() {
+  tapUI.cardValid = false; tapUI.busy = false; tapUI.apple = false;
+  mountApplePay();
+  try { await loadScript(CONFIG.tapCardSdk); } catch (e) { payFallback(e); return; }
+  const S = window.CardSDK;
+  if (!$('#tapCard') || state.step !== 'pay') return;
+  if (!S || !S.renderTapCard) { payFallback(new Error('Tap card SDK missing')); return; }
+  if (tapUI.card && tapUI.card.unmount) { try { tapUI.card.unmount(); } catch (e) { /* already gone */ } }
+  const ar = state.lang === 'ar';
+  try {
+    tapUI.card = S.renderTapCard('tapCard', {
+      publicKey: CONFIG.tapPublicKey,
+      merchant: { id: CONFIG.tapMerchantId },
+      transaction: { amount: CONFIG.price, currency: sdkVal(S.Currencies, 'SAR', 'SAR') },
+      acceptance: { supportedBrands: ['MADA', 'VISA', 'MASTERCARD'], supportedCards: 'ALL' },
+      fields: { cardHolder: true },
+      addons: { displayPaymentBrands: true, loader: true, saveCard: false },
+      interface: {
+        locale: ar ? sdkVal(S.Locale, 'AR', 'ar') : sdkVal(S.Locale, 'EN', 'en'),
+        theme: darkUI() ? sdkVal(S.Theme, 'DARK', 'dark') : sdkVal(S.Theme, 'LIGHT', 'light'),
+        edges: sdkVal(S.Edges, 'CURVED', 'curved'),
+        direction: ar ? sdkVal(S.Direction, 'RTL', 'rtl') : sdkVal(S.Direction, 'LTR', 'ltr')
+      },
+      // Tap calls both on every change with a flag: onValidInput(isValid), onInvalidInput(!isValid)
+      onValidInput: v => { tapUI.cardValid = typeof v === 'boolean' ? v : true; },
+      onInvalidInput: v => { if (typeof v !== 'boolean' || v) tapUI.cardValid = false; },
+      onError: e => { console.warn('Kroot card:', e); if (tapUI.busy) payDone('payFail'); },
+      onSuccess: d => { const tok = findTok(d); if (tok) chargeToken(tok); else payDone('payFail'); }
+    }) || {};
+  } catch (e) { payFallback(e); }
+}
+// Card: check name, email and the card form, then ask Tap's form for a token (it arrives in onSuccess)
+function payCard(btn) {
+  if (tapUI.busy || !buyerOk(true)) return;
+  if (!tapUI.cardValid) { toast(t('payCardIncomplete')); return; }
+  tapUI.busy = true; btn.disabled = true; btn.textContent = t('payProcessing');
+  clearTimeout(tapUI.timer);
+  tapUI.timer = setTimeout(() => { if (tapUI.busy) payDone('payFail'); }, 45000);
+  try { window.CardSDK.tokenize(); } catch (e) { console.warn('Kroot card:', e); payDone('payFail'); }
+}
+// Charge a token from the card form or Apple Pay
+async function chargeToken(tok) {
+  tapUI.busy = true;
+  const o = startOrder();
+  openModal(`<div class="paying" role="status"><span class="spin"></span><span>${t('payProcessing')}</span></div>`);
+  $('#modal').onclick = null;
+  try {
+    const r = await payCall({ action: 'pay', source: tok, ...o });
+    if (r.url) { location.href = r.url; return; } // the bank's 3-D Secure check, then back here with ?tap_id=
+    closeModal();
+    if (r.unlock && r.order === state.pendingOrder) {
+      clearTimeout(tapUI.timer); tapUI.busy = false;
+      state.paid = true; state.orderNo = r.order; state.pendingOrder = ''; state.payToken = '';
+      save(); go('done');
+      return;
+    }
+    payDone('payDeclined', true);
+  } catch (e) {
+    console.warn('Kroot pay:', e);
+    closeModal(); payDone('payFail');
+  }
+}
+// Back to a ready pay button after an attempt that didn't go through; after a decline the card form starts over
+function payDone(msg, resetCard) {
+  clearTimeout(tapUI.timer); tapUI.busy = false;
+  if (msg) toast(t(msg));
+  const btn = $('#payBtn'); if (btn) { btn.disabled = false; btn.textContent = t('payNow', CONFIG.price); }
+  if (resetCard && window.CardSDK && window.CardSDK.resetCardInputs) {
+    try { window.CardSDK.resetCardInputs(); tapUI.cardValid = false; } catch (e) { /* keep what's typed */ }
+  }
+}
+// Apple Pay shows only where it can be used. Tap's button needs the buyer's name and email up front,
+// so until both are filled a look-alike button stands in and points at what's missing.
+function applePayReady() {
+  try { return !!(CONFIG.applePay && window.ApplePaySession && window.ApplePaySession.canMakePayments()); } catch (e) { return false; }
+}
+function mountApplePay() {
+  const box = $('#applePayBox'); if (!box || !applePayReady()) return;
+  box.hidden = false; $('#payOr').hidden = false;
+  applePayGateCheck();
+}
+async function applePayGateCheck() {
+  if (tapUI.apple || state.step !== 'pay' || !inPagePay() || !applePayReady() || !buyerOk(false)) return;
+  tapUI.apple = true;
+  const ar = state.lang === 'ar', name = state.buyerName.trim(), who = buyerContact() || {};
+  try {
+    loadStyle(CONFIG.tapApplePaySdk + '.css');
+    await loadScript(CONFIG.tapApplePaySdk + '.js');
+    const A = window.TapApplepaySDK;
+    if (!A || !A.render || !$('#apple-pay-button')) throw new Error('Tap Apple Pay SDK missing');
+    A.render({
+      publicKey: CONFIG.tapPublicKey,
+      environment: /^pk_test_/.test(CONFIG.tapPublicKey) ? sdkVal(A.Environment, 'Development', 'development') : sdkVal(A.Environment, 'Production', 'production'),
+      scope: sdkVal(A.Scope, 'TapToken', 'TapToken'),
+      merchant: { domain: location.hostname, id: CONFIG.tapMerchantId },
+      transaction: { currency: 'SAR', amount: String(CONFIG.price) },
+      acceptance: {
+        supportedBrands: [sdkVal(A.SupportedNetworks, 'Mada', 'mada'), sdkVal(A.SupportedNetworks, 'Visa', 'visa'), sdkVal(A.SupportedNetworks, 'MasterCard', 'masterCard')]
+      },
+      customer: {
+        name: [{ lang: ar ? 'ar' : 'en', locale: ar ? 'ar' : 'en', first: name }],
+        contact: who.email ? { email: who.email } : { phone: { countryCode: who.phone.country_code, number: who.phone.number } }
+      },
+      interface: {
+        locale: ar ? sdkVal(A.Locale, 'AR', 'ar') : sdkVal(A.Locale, 'EN', 'en'),
+        theme: darkUI() ? sdkVal(A.ThemeMode, 'LIGHT', 'light') : sdkVal(A.ThemeMode, 'DARK', 'dark'),
+        type: sdkVal(A.ButtonType, 'BUY', 'buy'),
+        edges: sdkVal(A.Edges, 'CURVED', 'curved')
+      },
+      onSuccess: async d => { const tok = findTok(d); if (tok) await chargeToken(tok); else payDone('payFail'); },
+      onError: async e => { console.warn('Kroot Apple Pay:', e); toast(t('payFail')); },
+      onCancel: async () => {}
+    }, 'apple-pay-button');
+    const gate = $('#applePayGate'); if (gate) gate.hidden = true;
+  } catch (e) {
+    console.warn('Kroot Apple Pay:', e);
+    const box = $('#applePayBox'), or = $('#payOr');
+    if (box) box.hidden = true; if (or) or.hidden = true;
   }
 }
 // A charge was paid, but not from the order this browser started: say so and show the order number
@@ -5037,7 +5259,7 @@ const ACTIONS = {
   pickDesign(tp) { const L = state.lang; state = freshState(L); state.template = tp; state.designPicked = true; state.fromGallery = true; draft = null; save(); go('occasion'); },
   aiWord(_, el) { aiWording(el); },
   pay(_, el) {
-    if (CONFIG.payUrl) { payTap(el); return; }
+    if (CONFIG.payUrl) { if (el.dataset.val === 'card') payCard(el); else payTap(el); return; }
     openModal(`<div class="paying" role="status"><span class="spin"></span><span>${t('paying')}</span></div>`);
     $('#modal').onclick = null;
     setTimeout(() => {
@@ -5049,6 +5271,7 @@ const ACTIONS = {
       }, 700);
     }, 1400);
   },
+  applePayGate() { if (buyerOk(true)) applePayGateCheck(); },
   save() { saveCard(); },
   share() { shareCard(); },
   newCard() { const L = state.lang; state = freshState(L); draft = null; save(); go('occasion'); }
@@ -5067,6 +5290,7 @@ document.addEventListener('input', e => {
   if (key === 'date') { const h = $('#hijriHint'); if (h) h.textContent = hijriHint() || t('hijriAuto'); }
   // the QR option appears, switched on, once a map link is in
   if (key === 'mapLink') { const ok = !!mapUrl(state); state.showQR = ok; const r = $('#qrRow'); if (r) { r.hidden = !ok; const c = r.querySelector('input'); if (c) c.checked = ok; } }
+  if (key === 'buyerName' || key === 'buyerContact') { clearTimeout(tapUI.appleTimer); tapUI.appleTimer = setTimeout(applePayGateCheck, 700); }
   if (key === 'dua') { save(); renderSheet(); scheduleRender(); return; }
   if (key.startsWith('fields.') || key === 'venue' || key === 'date') { renderProgress(); refreshDock(); }
   saveSoon(); scheduleRender();
@@ -5092,7 +5316,7 @@ document.addEventListener('keydown', e => {
 let stepSwipe = null;
 document.addEventListener('touchstart', e => {
   if (e.touches.length !== 1) { stepSwipe = null; return; }
-  const skip = e.target.closest('input,textarea,select,#deck,.strip,.ftabs,.gal-row,.gal-filters,.chips,.modal,.editor,.hero-stage');
+  const skip = e.target.closest('input,textarea,select,#tapCard,.apple-box,#deck,.strip,.ftabs,.gal-row,.gal-filters,.chips,.modal,.editor,.hero-stage');
   stepSwipe = skip ? null : { x: e.touches[0].clientX, y: e.touches[0].clientY };
 }, { passive: true });
 document.addEventListener('touchend', e => {
