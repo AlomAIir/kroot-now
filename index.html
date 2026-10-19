@@ -157,8 +157,7 @@ button, input, textarea { font: inherit; color: inherit; }
   font: inherit; font-size: 12.5px; font-weight: 600; color: var(--muted);
   transition: background .3s var(--ease), color .3s var(--ease), box-shadow .3s var(--ease);
 }
-.pstep:disabled { cursor: default; opacity: .45; padding-inline-end: 4px; }
-.pstep:disabled .pstep-name { display: none; }
+.pstep:disabled { cursor: default; opacity: .45; }
 .pstep.is-done:not(.is-cur):hover { background: var(--band-hover); color: var(--ink); }
 .pstep.is-cur { cursor: default; background: var(--accent); color: var(--accent-ink); box-shadow: 0 4px 14px -3px rgba(80, 50, 170, .55); }
 .pstep-dot {
@@ -169,11 +168,6 @@ button, input, textarea { font: inherit; color: inherit; }
 .pstep.is-done .pstep-dot { background: var(--accent-soft); color: var(--accent-text); }
 .pstep.is-cur .pstep-dot { background: rgba(255, 255, 255, .26); color: var(--accent-ink); }
 .pstep-name { white-space: nowrap; }
-@media (max-width: 760px) {
-  .pstep { padding-inline-end: 4px; }
-  .pstep.is-cur { padding-inline-end: 11px; }
-  .pstep:not(.is-cur) .pstep-name { display: none; }
-}
 
 main { flex: 1; outline: none; overflow-x: clip; }
 #screen > .wrap.step { padding-block: 22px 44px; }
@@ -438,25 +432,7 @@ html[lang="ar"] .big { line-height: 1.3; }
 .occ svg { width: 44px; height: 44px; color: var(--accent-text); }
 .occ:hover { border-color: var(--muted); }
 .occ[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); animation: pick .45s var(--ease-out); }
-.grid-style { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
-.style-tile {
-  appearance: none; cursor: pointer; position: relative; display: grid; gap: 10px; padding: 16px 14px 14px; border: 0;
-  background: var(--band); border-radius: 22px; color: var(--ink); text-align: center; box-shadow: inset 0 0 0 1px transparent;
-  transition: box-shadow .2s, transform .5s var(--ease-out); animation: rise .6s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 45ms);
-}
-.style-tile:hover canvas { transform: translateY(-4px); }
-.style-tile canvas { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 10px; background: var(--tile); box-shadow: 0 14px 28px -12px rgba(0, 0, 0, .3); transition: transform .5s var(--ease-out); }
-.style-tile[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--accent); }
-.style-name { font-weight: 600; font-size: 17px; }
 .badge { position: absolute; top: 24px; inset-inline-start: 22px; background: var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
-.edit { display: grid; gap: 22px; }
-.preview { display: grid; justify-items: center; gap: 10px; padding: 26px 14px 16px; border-radius: 28px; background: var(--stage); }
-.preview-btn { appearance: none; border: 0; padding: 0; background: none; cursor: zoom-in; border-radius: 12px; transition: transform .5s var(--ease-out); }
-.preview-btn:hover { transform: scale(1.015); }
-.preview canvas { display: block; height: min(38vh, 420px); width: auto; aspect-ratio: 9 / 16; max-width: 100%; border-radius: 12px; box-shadow: var(--shadow-card); background: var(--tile); }
-.form { display: grid; gap: 18px; min-width: 0; align-content: start; }
-.form h1 { margin-bottom: 0; }
-.form .lead { margin-bottom: 0; }
 .field { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; }
 .field label, .field legend, .choices legend { font-weight: 600; font-size: 15px; padding: 0; color: var(--ink); }
 .opt { font-weight: 400; color: var(--muted); }
@@ -488,37 +464,8 @@ html[lang="ar"] .big { line-height: 1.3; }
 .more summary::after { content: "+"; font-weight: 600; transition: transform .3s var(--ease-out); }
 .more[open] summary::after { transform: rotate(45deg); }
 .more .choices { margin-top: 6px; animation: rise .4s var(--ease-out) both; }
-.font-sec { display: grid; gap: 8px; min-width: 0; }
-.font-sec h2 { font-size: 21px; margin: 6px 0 0; }
-.font-sec h3 { font-size: 14px; font-weight: 600; color: var(--muted); margin: 6px 0 0; }
-.font-row { display: flex; gap: 10px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding-block: 4px 12px; min-width: 0; scrollbar-width: thin; }
-.font-tile {
-  flex: 0 0 150px; scroll-snap-align: start; appearance: none; cursor: pointer; display: grid; gap: 4px; justify-items: center; align-content: center;
-  min-height: 116px; padding: 10px 8px; border-radius: 16px; border: 1px solid var(--line); background: var(--tile); color: var(--ink); transition: border-color .2s, box-shadow .2s;
-}
-.font-tile:hover { border-color: var(--muted); }
-.font-tile-sm { flex-basis: 196px; min-height: 92px; }
-.font-tile[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-.font-sample { font-size: 32px; line-height: 1.6; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.font-tile-sm .font-sample { font-size: 21px; }
-.font-name { font-size: 12px; color: var(--muted); direction: ltr; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.combo-sec { margin-bottom: 10px; }
-.combo-sec .hint { margin: 0; }
-.combo-tile { flex-basis: 168px; min-height: 124px; gap: 2px; }
-.combo-tile .font-sample { font-size: 27px; line-height: 1.5; }
-.combo-tile .combo-body { font-size: 16px; color: var(--muted); }
-.ai-box { border-radius: 18px; padding: 18px; background: var(--accent-soft); display: grid; gap: 10px; }
-.ai-box h2 { font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px; color: var(--accent-text); }
-.ai-box h2 svg, .btn-ghost svg { width: 20px; height: 20px; color: var(--gold); }
+.btn-ghost svg { width: 20px; height: 20px; color: var(--gold); }
 .status { min-height: 1.2em; }
-@media (max-width: 859px) {
-  .edit.pinned .preview {
-    position: sticky; top: calc(53px + env(safe-area-inset-top, 0px)); z-index: 3; padding-block: 10px; border-radius: 0 0 24px 24px;
-    margin-left: calc(-1 * max(20px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(20px, env(safe-area-inset-right, 0px)));
-  }
-  .edit.pinned .preview canvas { height: min(26vh, 250px); }
-  .edit.pinned .preview .hint { display: none; }
-}
 .facts { margin: 0; display: grid; border-top: 1px solid var(--line); }
 .fact { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; padding-block: 14px; border-bottom: 1px solid var(--line); }
 .fact dt { grid-column: 1; color: var(--muted); font-size: 14px; }
@@ -565,9 +512,6 @@ html[lang="ar"] .big { line-height: 1.3; }
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
 }
-.zoom-wrap { display: grid; justify-items: center; gap: 10px; max-height: 100%; cursor: zoom-out; animation: zoomIn .45s var(--ease-out) both; }
-.zoom-wrap img { max-height: calc(100vh - 90px); max-width: 100%; width: auto; border-radius: 12px; }
-.zoom-wrap p { color: #ffffff; margin: 0; font-size: 15px; }
 .sheet { background: var(--tile); color: var(--ink); border-radius: 22px; padding: 24px; width: min(100%, 420px); display: grid; gap: 12px; box-shadow: var(--shadow-card); animation: zoomIn .4s var(--ease-out) both; }
 .sheet h2 { margin: 0; font-size: 24px; }
 .sheet p { margin: 0; color: var(--muted); }
@@ -604,7 +548,6 @@ html[lang="ar"] .big { line-height: 1.3; }
   .cat { flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 34px 20px 28px; }
   .cat > .chev { display: none; }
   .grid-occ { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .grid-style { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (min-width: 860px) {
@@ -617,10 +560,6 @@ html[lang="ar"] .big { line-height: 1.3; }
   .tile.wide { grid-column: span 2; }
   .tile.full { grid-column: 1 / -1; }
   .tile-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
-  .grid-style { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .edit { grid-template-columns: minmax(0, 1fr) 400px; align-items: start; gap: 44px; }
-  .edit .preview { order: 2; position: sticky; top: 80px; padding: 30px 20px 18px; }
-  .preview canvas { height: min(62vh, 620px); }
   .bar .btn { width: auto; min-width: 260px; }
 }
 @media (max-width: 859px) {
@@ -637,29 +576,20 @@ body.in-flow::before {
     radial-gradient(45% 40% at 6% 92%, color-mix(in srgb, var(--gold) 20%, transparent), transparent 70%),
     radial-gradient(40% 35% at 30% 30%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%);
 }
-body.in-flow :is(.cat, .occ, .font-tile, .choice, .check, .chip, .crumb) {
+body.in-flow :is(.cat, .occ, .choice, .check, .chip, .crumb) {
   background: var(--glass-tile); border-color: var(--glass-line);
   box-shadow: inset 0 1px 0 var(--glass-hi);
 }
-body.in-flow :is(.cat, .occ, .font-tile, .choice, .chip):hover { background: var(--glass-tile-hover); border-color: var(--glass-line); }
-body.in-flow .style-tile { background: var(--glass-tile); box-shadow: inset 0 0 0 1px var(--glass-line), inset 0 1px 0 var(--glass-hi); }
-body.in-flow .style-tile:hover { background: var(--glass-tile-hover); }
-body.in-flow :is(.cat, .occ, .font-tile)[aria-pressed="true"],
+body.in-flow :is(.cat, .occ, .choice, .chip):hover { background: var(--glass-tile-hover); border-color: var(--glass-line); }
+body.in-flow :is(.cat, .occ)[aria-pressed="true"],
 body.in-flow :is(.choice, .check):has(input:checked) {
   border-color: var(--accent);
   box-shadow: inset 0 0 0 1px var(--accent), 0 10px 28px -14px color-mix(in srgb, var(--accent) 70%, transparent);
 }
-body.in-flow .style-tile[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--accent), 0 14px 32px -16px color-mix(in srgb, var(--accent) 75%, transparent); }
 body.in-flow .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
 body.in-flow .crumb[aria-current="step"] { background: var(--accent-soft); border-color: var(--accent); }
 body.in-flow :is(.field input, .field textarea) { background: var(--glass-tile); border-color: var(--glass-line); box-shadow: inset 0 1px 0 var(--glass-hi); }
 body.in-flow :is(.field input, .field textarea):focus { background: var(--glass-tile-hover); border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
-body.in-flow .preview {
-  background: var(--glass); border: 1px solid var(--glass-line);
-  -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px);
-  box-shadow: inset 0 1px 0 var(--glass-hi);
-}
-body.in-flow .ai-box { background: var(--glass-tile); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); box-shadow: inset 0 1px 0 var(--glass-hi); }
 /* review: an inset grouped list, like iOS Settings */
 body.in-flow .facts { border: 1px solid var(--glass-line); border-radius: 20px; background: var(--glass-tile); padding-inline: 18px; box-shadow: inset 0 1px 0 var(--glass-hi); }
 body.in-flow .fact:last-child { border-bottom: 0; }
@@ -679,30 +609,99 @@ body.in-flow .bar-in .btn-primary { box-shadow: 0 8px 22px -10px color-mix(in sr
 @media (min-width: 860px) {
   body.in-flow .bar-in { width: fit-content; }
 }
-/* ---------- skipped steps: anything still showing sample content is purple ---------- */
-.pstep.is-default { color: var(--accent-text); }
-.pstep.is-default .pstep-dot { background: var(--accent-soft); color: var(--accent-text); box-shadow: inset 0 0 0 1.5px var(--accent); }
-.pstep.is-default:hover { background: var(--accent-soft); }
-.field input[data-def]:placeholder-shown {
-  border-style: dashed; border-color: color-mix(in srgb, var(--accent) 60%, transparent);
-  background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
-}
-.field input[data-def]::placeholder { color: var(--accent-text); opacity: .85; }
-.def-hint { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; color: var(--accent-text); }
-.def-hint::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-.form:not(:has(input[data-def]:placeholder-shown)) .def-hint { display: none; }
-.def-note {
-  margin: 0; padding: 12px 14px; border-radius: 14px; font-size: 15px; line-height: 1.5;
-  background: var(--accent-soft); color: var(--accent-text); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-}
-.fact.is-default dd { color: var(--accent-text); }
-.def-tag { display: inline-block; margin-inline-start: 6px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.7; vertical-align: 1px; background: var(--accent); color: var(--accent-ink); }
-body.in-flow .fact.is-default { background: color-mix(in srgb, var(--accent-soft) 60%, transparent); margin-inline: -18px; padding-inline: 18px; }
 .bar-in { gap: 8px; align-items: center; }
-.bar .bar-in .btn-skip { width: auto; flex: none; min-width: 0; min-height: 56px; padding-inline: 24px; background: var(--glass-tile); border-color: var(--glass-line); }
+/* ---------- edit step: one big card, tap a part to edit it, sheets rise from the bottom ----------
+   The app is pinned to the visual viewport here, so the phone keyboard shrinks it instead of covering it. */
+body.editing { overflow: hidden; }
+body.editing .app { position: fixed; top: var(--vvt, 0px); left: 0; right: 0; height: var(--vvh, 100dvh); min-height: 0; }
+body.editing main { min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.editor { flex: 1; min-height: 0; display: flex; flex-direction: column; width: 100%; max-width: 1024px; margin-inline: auto; }
+.ed-stage { flex: 1; min-height: 0; position: relative; display: grid; place-items: center; padding: 6px 12px 8px; }
+.card-wrap { position: relative; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-card); background: var(--tile); transition: width .25s var(--ease), height .25s var(--ease); }
+.card-xf { position: absolute; top: 0; left: 0; transition: transform .25s var(--ease); }
+.card-wrap.focus .card-xf { will-change: transform; }
+.card-xf canvas { display: block; width: 100%; height: 100%; }
+/* invisible buttons over the card's text blocks, scaled with the preview */
+.hits { position: absolute; inset: 0; }
+.hit { position: absolute; appearance: none; border: 0; padding: 0; background: transparent; border-radius: 10px; cursor: pointer; }
+.hit::before { content: ""; position: absolute; inset: -4px; border-radius: 12px; border: 2px solid transparent; transition: border-color .15s, background-color .15s; }
+.hit:active::before, .hit.is-active::before { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+/* one call-out at a time, sitting on the next empty slot so it never covers written text; hidden while a sheet is open */
+.pin { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); white-space: nowrap; background: var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 700; line-height: 1; padding: 7px 10px; border-radius: 999px; box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 35%, transparent); pointer-events: none; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.06); } }
+body.sheet-open .pin { display: none; }
+.focus-label { position: absolute; top: 8px; right: 12px; left: 12px; display: flex; justify-content: center; pointer-events: none; }
+.focus-label span { background: var(--toast-bg); color: var(--toast-ink); font-size: 12px; padding: 5px 10px; border-radius: 999px; }
+.tip { position: absolute; left: 14px; right: 14px; bottom: 10px; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--toast-bg); color: var(--toast-ink); font-size: 14px; box-shadow: var(--shadow-sm); animation: rise .5s var(--ease-out) both; }
+.tip svg { width: 22px; height: 22px; flex: none; }
+.tip span { flex: 1; }
+.tip button { appearance: none; border: 0; cursor: pointer; background: rgba(127, 127, 127, .3); color: inherit; border-radius: 999px; padding: 6px 12px; font: inherit; font-weight: 700; font-size: 13px; }
+body.sheet-open .tip { display: none; }
+/* the sheet: fields for the tapped part, the design strip or the font grid */
+.ed-sheet { flex: none; background: var(--glass-strong); border-top: 1px solid var(--glass-line); border-radius: 18px 18px 0 0; box-shadow: 0 -8px 30px rgba(0, 0, 0, .08); display: grid; grid-template-rows: auto minmax(0, 1fr); max-height: calc(var(--vvh, 100dvh) * .5); animation: rise .35s var(--ease-out) both; -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px); }
+.ed-sheet.tall { max-height: calc(var(--vvh, 100dvh) * .62); }
+.ed-head { display: flex; align-items: center; gap: 10px; padding: 10px 16px 6px; }
+.ed-head h2 { flex: 1; font-size: 18px; font-weight: 700; margin: 0; min-width: 0; }
+.ed-head .sub { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+.btn-done { width: auto; min-height: 38px; padding: 0 16px; font-size: 15px; }
+.ed-body { overflow: auto; -webkit-overflow-scrolling: touch; padding: 4px 16px calc(14px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 12px; align-content: start; }
+.ed-body .field input, .ed-body .field textarea { min-height: 48px; padding: 10px 14px; font-size: 17px; }
+.ed-body .field input[type="date"], .ed-body .field input[type="time"] { min-height: 48px; }
+.ed-body .check { padding: 10px 12px; font-size: 15px; }
+.ed-body .choice { padding: 10px 12px; font-size: 15px; }
+.ed-body .chip { min-height: 38px; padding: 6px 12px; font-size: 14px; }
+.ed-body .link { appearance: none; border: 0; background: none; cursor: pointer; color: var(--accent-text); font-weight: 700; font-size: 14px; padding: 4px 0; text-align: start; display: inline-flex; align-items: center; gap: 6px; }
+.ed-body .link svg { width: 16px; height: 16px; color: var(--gold); }
+/* segmented control and font grid: the sample is the label */
+.seg { display: flex; background: var(--band); border-radius: 12px; padding: 3px; gap: 2px; }
+.seg button { flex: 1; min-height: 34px; appearance: none; border: 0; border-radius: 10px; background: none; cursor: pointer; font: inherit; font-weight: 700; font-size: 14px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--tile); color: var(--ink); box-shadow: 0 1px 4px rgba(0, 0, 0, .12); }
+/* scroll rows need a min-height: inside an overflowing grid their auto row would otherwise collapse to 0 */
+.ftabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; min-height: 42px; }
+.ftabs::-webkit-scrollbar { display: none; }
+.ftabs .chip { flex: none; }
+.fgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.fgrid.body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ftile { appearance: none; cursor: pointer; border: 1px solid var(--line); background: var(--glass-tile); border-radius: 12px; min-height: 64px; display: grid; place-items: center; padding: 4px 6px; overflow: hidden; color: var(--ink); }
+.ftile span { font-size: 24px; line-height: 1.25; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.ftile.small span { font-size: 17px; }
+.ftile[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+/* design strip: this card drawn in every design */
+.strip { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x proximity; padding: 4px 2px 6px; margin: 0 -4px; scrollbar-width: none; min-height: 226px; }
+.strip::-webkit-scrollbar { display: none; }
+.d-tile { flex: none; width: 104px; appearance: none; border: 0; background: none; padding: 0; display: grid; gap: 5px; justify-items: center; scroll-snap-align: start; position: relative; cursor: pointer; color: var(--ink); }
+.d-tile canvas { display: block; width: 104px; height: 185px; border-radius: 10px; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); border: 3px solid transparent; background: var(--band); }
+.d-tile[aria-pressed="true"] canvas { border-color: var(--accent); }
+.d-tile .d-name { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 104px; }
+.d-tile[aria-pressed="true"] .d-name { color: var(--ink); font-weight: 700; }
+.d-tile .d-tick { position: absolute; top: 6px; inset-inline-end: 6px; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+.d-tile .badge { top: 6px; inset-inline-start: 6px; font-size: 11px; padding: 2px 8px; }
+/* the dock: design · font · review */
+.dock { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 8px; width: 100%; }
+.dock .tool { appearance: none; cursor: pointer; min-height: 56px; min-width: 64px; padding: 0 10px; border: 1px solid var(--glass-line); border-radius: 18px; background: var(--glass-tile); display: grid; justify-items: center; align-content: center; gap: 2px; font: inherit; font-size: 11px; font-weight: 700; color: var(--ink); }
+.dock .tool svg { width: 20px; height: 20px; }
+.dock .tool[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); }
+.dock .go { flex-direction: column; gap: 0; padding: 8px 12px; line-height: 1.15; font-size: 17px; }
+.dock .go small { font-size: 12px; font-weight: 500; opacity: .85; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* review: the card is tappable here too, missing pieces are red */
+.review-card { display: grid; justify-items: center; margin-block: 6px 18px; }
+.review-card .card-wrap { width: min(64%, 300px); aspect-ratio: 9 / 16; }
+.review-card .card-xf { inset: 0; width: 100%; height: 100%; }
+.missing-box { border: 1px solid var(--bad); background: color-mix(in srgb, var(--bad) 7%, transparent); border-radius: 14px; padding: 10px 14px; font-size: 15px; display: grid; gap: 6px; margin-bottom: 14px; }
+.missing-box b { color: var(--bad); }
+.missing-box .link { appearance: none; border: 0; background: none; cursor: pointer; color: var(--accent-text); font: inherit; font-weight: 700; padding: 0 2px; }
+.fact.is-missing dd { color: var(--bad); }
+.fact dd .hint { font-size: 13px; }
+.pay-row { display: grid; gap: 6px; width: 100%; }
+.pay-row .check { padding: 8px 12px; font-size: 14px; line-height: 1.4; }
+.pay-row .check.nudge { animation: nudge .4s var(--ease); border-color: var(--accent); }
+@media (min-width: 860px) {
+  .pay-row { width: min(100%, 520px); }
+  .ed-sheet { width: min(100%, 560px); margin-inline: auto; }
+}
 @media (prefers-reduced-transparency: reduce) {
-  body.in-flow :is(.cat, .occ, .font-tile, .choice, .check, .chip, .style-tile, .field input, .field textarea, .facts) { background: var(--tile); }
-  body.in-flow :is(.preview, .bar-in, .pbar, .asst-panel, .asst-btn) { background: var(--tile); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  body.in-flow :is(.cat, .occ, .choice, .check, .chip, .ftile, .field input, .field textarea, .facts) { background: var(--tile); }
+  body.in-flow :is(.ed-sheet, .bar-in, .pbar, .asst-panel, .asst-btn) { background: var(--tile); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 </style>
 
@@ -785,7 +784,8 @@ const KN_WORD = {
 function wordmarkSVG(filter) {
   return `<svg class="wordmark" viewBox="${KN_WORD.vb}" aria-hidden="true" focusable="false"><g filter="url(#${filter})"><path class="kn-ink" d="${KN_WORD.ink}"/><path class="kn-damma" d="${KN_WORD.damma}"/></g></svg>`;
 }
-const FLOW = ['occasion', 'style', 'names', 'when', 'where', 'wording', 'fonts', 'review'];
+// The three stages the home page promises: choose the occasion, write the card on one screen, review and send
+const FLOW = ['occasion', 'edit', 'review'];
 // Arabic-Indic digits for numbers shown in Arabic copy (the price), matching the digits on the cards
 function arNum(n) { return String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); }
 
@@ -824,10 +824,7 @@ const I18N = {
     price: p => `${arNum(p)} ر.س`, vatIncl: 'شامل ضريبة القيمة المضافة',
     start: 'ابدئي التصميم', startNew: 'ابدئي كرت جديد', haveCard: 'عندي كرت أعجبني', resume: 'كمّلي تصميمك السابق',
     stepOf: (i, n) => `الخطوة ${i} من ${n}`,
-    stepNames: ['المناسبة', 'التصميم', 'الأسماء', 'الموعد', 'المكان', 'النص', 'الخط', 'المراجعة'], stepsAria: 'خطوات الطلب',
-    skip: 'تخطي', defTag: 'افتراضي',
-    defHint: 'الخانات البنفسجية فاضية، فتطلع مكانها في الكرت قيمة افتراضية.',
-    defNote: 'الأجزاء البنفسجية تستخدم القيم الافتراضية. عدّليها قبل الدفع إذا ما تناسبك.',
+    stepNames: ['اختاري', 'اكتبي', 'أرسلي'], stepsAria: 'خطوات الطلب',
     tashkeelToggle: 'تشكيل الأسماء تلقائيًا، مثل عبداللّٰه',
     occTitle: 'وش المناسبة؟',
     occPath: 'مسار الاختيار', crumbRoot: 'المناسبات',
@@ -835,29 +832,24 @@ const I18N = {
     subTitle: { wedding: 'لمن الحفل؟', newborn: 'ألف مبروك! وش عندكم؟', events: 'وش مناسبتكم؟' },
     eidTitle: 'أي عيد؟', eidName: 'العيد', eidSub: 'الفطر والأضحى',
     deckHint: 'تقدرين تسحبين يمين ويسار للتنقل بين الخيارات',
-    styleTitle: 'اختاري التصميم', styleSub: 'تقدرين تغيّرينه في أي وقت.', recommended: 'مقترح', matched: 'الأقرب لكرتك',
-    comboTitle: 'تنسيق الخطوط', comboSub: 'جرّبي تنسيقًا، وشوفي كل التصاميم فيه.', comboDefault: 'خطوط التصميم',
+    designTitle: 'التصميم', pickDesignTitle: 'اختاري التصميم', designSub: 'تقدرين تغيّرينه في أي وقت من زر «التصميم»', matched: 'الأقرب لكرتك',
     namesTitle: { weddingMen: 'أسماء أهل الفرح', weddingWomen: 'أسماء العروسين', babyGirl: 'اسم المولودة', babyBoy: 'اسم المولود', twins: 'أسماء التوأم', eidFitr: 'تفاصيل المعايدة', eidAdha: 'تفاصيل المعايدة', graduation: 'اسم الخريجة أو الخريج', ceremony: 'تفاصيل الحفل', other: 'تفاصيل المناسبة' },
-    namesSub: 'اكتبي الأسماء مثل ما تبينها تطلع في الكرت.',
     optional: '(اختياري)',
-    quickTitle: 'أسرع طريقة',
-    quickSub: 'اكتبي كل التفاصيل برسالة وحدة ونرتبها لك في الكرت. تقدرين تتكلمين بمايك الكيبورد بدل الكتابة.',
-    quickPh: 'مثال: حفل مولودتي نورة بنت فيصل السالم، يوم الخميس الجاي من ٧ إلى ١١ مساءً في قاعة الياسمين، الدور الثاني',
-    quickBtn: 'رتّبيها لي', quickEmpty: 'اكتبي التفاصيل أولاً', working: 'جاري الترتيب…', filled: 'عبّينا التفاصيل، راجعيها في كل خطوة',
+    quickLink: 'أو اكتبي كل التفاصيل برسالة وحدة ونرتبها لك',
     aiFail: 'ما قدرنا نرتبها هالمرة. جربي مرة ثانية أو عبّي الخانات بنفسك.', aiBusy: 'الخدمة مشغولة الحين، جربي بعد شوي.',
-    whenTitle: 'متى المناسبة؟', date: 'التاريخ', from: 'من الساعة', to: 'إلى الساعة', showHijri: 'أظهري التاريخ الهجري في الكرت',
+    whenTitle: 'متى المناسبة؟', date: 'التاريخ', from: 'من الساعة', to: 'إلى الساعة', showHijri: 'أظهري التاريخ الهجري في الكرت', hijriAuto: 'اختاري التاريخ الميلادي، ونضيف الهجري تلقائياً.',
     whereTitle: 'وين المناسبة؟', venue: 'اسم المكان', venuePh: 'قاعة الياسمين للاحتفالات', venueDetail: 'تفاصيل إضافية', venueDetailPh: 'الدور الحادي عشر - جناح 1121',
     mapLink: 'رابط الموقع من خرائط قوقل', mapHint: 'إذا أضفتيه نحط في الكرت باركود يفتح الموقع.', showQR: 'أضيفي باركود الموقع للكرت', qrCaption: 'موقع المناسبة',
     noteTitle: 'ملاحظة في أسفل الكرت',
-    wordTitle: 'اختاري العبارات', opening: 'عبارة البداية', closing: 'عبارة الختام', noClosing: 'بدون عبارة ختامية', dua: 'أضيفي الدعاء في أعلى الكرت',
+    wordTitle: 'عبارات الكرت', opening: 'عبارة البداية', closing: 'عبارة الختام', noClosing: 'بدون عبارة ختامية', dua: 'أضيفي الدعاء في أعلى الكرت',
     aiSuggest: 'اقترحي عبارات جديدة', aiWorking: 'نكتب لك عبارات جديدة…', fromCard: 'من كرتك', newTag: 'جديدة',
     moreWording: n => `عبارات أكثر (${n})`, duaPick: 'الدعاء',
-    fontTitle: 'اختاري الخط', fontSub: 'اضغطي على أي خط وتشوفينه في الكرت فوراً. اسحبي يمين ويسار لخطوط أكثر.',
+    fontTitle: 'الخط', fontAll: 'الكل', fontCustom: 'خط مختار',
     nameFont: 'خط الأسماء', bodyFont: 'خط باقي النص', designFont: 'خط التصميم', bodySample: 'يسعدنا ويشرفنا', factFont: 'الخط',
-    fontLicense: 'كل الخطوط مجانية ومرخصة للاستخدام التجاري (رخصة SIL Open Font License).',
     reviewTitle: 'راجعي كرتك', reviewSub: 'تأكدي من كل اسم وتاريخ. بعد الدفع تستلمين الكرت بدون العلامة المائية.',
     confirm: 'راجعت الأسماء والتاريخ والمكان، وكلها صحيحة', edit: 'تعديل', toPay: 'متابعة للدفع', next: 'التالي',
-    factStyle: 'التصميم', factDate: 'التاريخ', factTime: 'الوقت', factPlace: 'المكان',
+    factStyle: 'التصميم', factDate: 'التاريخ', factTime: 'الوقت', factPlace: 'المكان', factWording: 'العبارات', factNote: 'الملاحظة',
+    missingVal: 'ناقص', complete: 'أكملي', missingBefore: 'باقي قبل الدفع:', wmNote: 'العلامة المائية تختفي بعد الدفع.',
     payTitle: 'الدفع', orderItem: 'كرت دعوة رقمي', includes: ['صورة عالية الجودة جاهزة للإرسال', 'بدون علامة مائية'], total: 'الإجمالي',
     payWith: 'ادفعي بـ', mada: 'مدى أو بطاقة ائتمانية', demoPay: 'وضع تجريبي: لن يُخصم أي مبلغ.',
     paying: 'جاري الدفع…', paid: 'تم الدفع',
@@ -876,7 +868,12 @@ const I18N = {
     saveIosHint: 'من القائمة اختاري «حفظ الصورة» لتنحفظ في الصور.',
     shareHint: 'المشاركة تفتح خيارات جوالك: واتساب، الرسائل، البريد وغيرها.',
     whatsapp: 'إرسال على واتساب', waNote: 'احفظي الكرت أولاً، ثم أرفقيه في محادثة واتساب.', waText: 'يسعدنا دعوتكم، وهذا كرت الدعوة', newCard: 'تصميم كرت جديد',
-    tapToZoom: 'اضغطي على الكرت لتكبيره', zoom: 'تكبير الكرت', closeZoom: 'اضغطي في أي مكان للإغلاق',
+    previewAlt: 'معاينة الكرت', cropNote: 'جزء من الكرت · يرجع كامل بعد الكتابة', done: 'تم',
+    tip: 'اضغطي على أي جزء في الكرت لتعديله', tipOk: 'فهمت',
+    pinName: 'اضغطي لكتابة الاسم', pinParent: 'اكتبي اسم الأب', pinDate: 'اختاري التاريخ', pinVenue: 'اكتبي المكان', slotDate: 'اختاري التاريخ', slotVenue: 'اسم المكان',
+    editName: l => `عدّلي ${l}`, editWhen: 'عدّلي الموعد', editWhere: 'عدّلي المكان', editWording: 'عدّلي العبارات',
+    dockDesign: 'التصميم', dockFont: 'الخط', reviewBtn: 'راجعي الكرت', allSet: 'كل شي جاهز',
+    leftOne: l => `باقي: ${l}`, leftN: n => n === 2 ? 'باقي خانتين' : `باقي ${arNum(n)} خانات`, left: l => `باقي: ${l}`, listSep: '، ',
     uploadTitle: 'ارفعي الكرت اللي أعجبك', uploadSub: 'نقرأ ستايله وعباراته، ونصمم لك كرت جديد بنفس الروح وبأسمائك أنتِ.',
     uploadBtn: 'اختاري صورة الكرت من جوالك', changePhoto: 'اضغطي لتغيير الصورة',
     reading: 'نقرأ الكرت…', readDone: 'قرأنا كرتك', readOcc: 'المناسبة', readStyle: 'أقرب تصميم عندنا', readWording: 'عبارة البداية',
@@ -926,10 +923,7 @@ const I18N = {
     price: p => `SAR ${p}`, vatIncl: 'VAT included',
     start: 'Start designing', startNew: 'Start a new card', haveCard: 'I have a card I like', resume: 'Continue my last card',
     stepOf: (i, n) => `Step ${i} of ${n}`,
-    stepNames: ['Occasion', 'Design', 'Names', 'Date', 'Place', 'Wording', 'Font', 'Review'], stepsAria: 'Order steps',
-    skip: 'Skip', defTag: 'Default',
-    defHint: 'Purple fields are empty, so the card shows a sample value there.',
-    defNote: 'Purple items are using defaults. Change them before you pay if they don\'t fit.',
+    stepNames: ['Choose', 'Write', 'Send'], stepsAria: 'Order steps',
     tashkeelToggle: 'Add Arabic diacritics to names like Abdullah automatically',
     occTitle: "What's the occasion?",
     occPath: 'Selection path', crumbRoot: 'Occasions',
@@ -937,29 +931,24 @@ const I18N = {
     subTitle: { wedding: 'Whose celebration?', newborn: 'Congratulations! Who arrived?', events: "What's the occasion?" },
     eidTitle: 'Which Eid?', eidName: 'Eid', eidSub: 'Fitr & Adha',
     deckHint: 'Swipe sideways to move between the options',
-    styleTitle: 'Choose a design', styleSub: 'You can change it any time.', recommended: 'Suggested', matched: 'Closest to your card',
-    comboTitle: 'Font pairing', comboSub: 'Pick a pairing and see every design in it.', comboDefault: "Design's fonts",
+    designTitle: 'Design', pickDesignTitle: 'Choose a design', designSub: 'You can change it any time from «Design»', matched: 'Closest to your card',
     namesTitle: { weddingMen: 'Family names', weddingWomen: 'Couple names', babyGirl: "Baby's name", babyBoy: "Baby's name", twins: "Twins' names", eidFitr: 'Eid details', eidAdha: 'Eid details', graduation: "Graduate's name", ceremony: 'Ceremony details', other: 'Event details' },
-    namesSub: 'Write the names exactly as they should appear on the card.',
     optional: '(optional)',
-    quickTitle: 'Fastest way',
-    quickSub: "Write all the details in one message and we'll place them on the card. You can use your keyboard's microphone instead of typing.",
-    quickPh: 'Example: Our baby girl Noura, daughter of Faisal Al-Salem, next Thursday 7 to 11 pm at Al-Yasmin Hall, 2nd floor',
-    quickBtn: 'Fill it in for me', quickEmpty: 'Write the details first', working: 'Filling in…', filled: 'Details filled in. Check them in each step.',
+    quickLink: "Or write all the details in one message and we'll place them",
     aiFail: "We couldn't read that this time. Try again or fill in the fields yourself.", aiBusy: 'The service is busy right now. Try again shortly.',
-    whenTitle: 'When is it?', date: 'Date', from: 'From', to: 'Until', showHijri: 'Show the Hijri date on the card',
+    whenTitle: 'When is it?', date: 'Date', from: 'From', to: 'Until', showHijri: 'Show the Hijri date on the card', hijriAuto: 'Pick the Gregorian date and we add the Hijri date.',
     whereTitle: 'Where is it?', venue: 'Venue name', venuePh: 'Al-Yasmin Hall', venueDetail: 'Extra details', venueDetailPh: '11th floor, Suite 1121',
     mapLink: 'Google Maps link', mapHint: 'If you add it, we put a QR code on the card that opens the location.', showQR: 'Add a location QR code to the card', qrCaption: 'Location',
     noteTitle: 'Note at the bottom of the card',
-    wordTitle: 'Choose the wording', opening: 'Opening line', closing: 'Closing line', noClosing: 'No closing line', dua: 'Add the blessing at the top of the card',
+    wordTitle: 'Card wording', opening: 'Opening line', closing: 'Closing line', noClosing: 'No closing line', dua: 'Add the blessing at the top of the card',
     aiSuggest: 'Suggest new wording', aiWorking: 'Writing new wording…', fromCard: 'From your card', newTag: 'New',
     moreWording: n => `More options (${n})`, duaPick: 'Blessing',
-    fontTitle: 'Choose the font', fontSub: 'Tap any font to see it on your card. Swipe sideways for more.',
+    fontTitle: 'Font', fontAll: 'All', fontCustom: 'Your pick',
     nameFont: 'Font for names', bodyFont: 'Font for the other text', designFont: "Design's font", bodySample: 'You are invited', factFont: 'Font',
-    fontLicense: 'All fonts are free for commercial use under the SIL Open Font License.',
     reviewTitle: 'Check your card', reviewSub: "Check every name and date. After payment you'll receive the card without the watermark.",
     confirm: 'I checked the names, date and place, and they are correct', edit: 'Edit', toPay: 'Continue to payment', next: 'Next',
-    factStyle: 'Design', factDate: 'Date', factTime: 'Time', factPlace: 'Place',
+    factStyle: 'Design', factDate: 'Date', factTime: 'Time', factPlace: 'Place', factWording: 'Wording', factNote: 'Note',
+    missingVal: 'Missing', complete: 'Add', missingBefore: 'Still needed before payment:', wmNote: 'The watermark disappears after payment.',
     payTitle: 'Payment', orderItem: 'Digital invitation card', includes: ['High-quality image ready to send', 'No watermark'], total: 'Total',
     payWith: 'Pay with', mada: 'mada or credit card', demoPay: 'Prototype: nothing will be charged.',
     paying: 'Processing payment…', paid: 'Paid',
@@ -978,7 +967,12 @@ const I18N = {
     saveIosHint: 'Choose "Save Image" to add it to Photos.',
     shareHint: "Share opens your phone's options: WhatsApp, Messages, email and more.",
     whatsapp: 'Send on WhatsApp', waNote: 'Save the card first, then attach it in your WhatsApp chat.', waText: "You're invited! Here is our invitation card", newCard: 'Design a new card',
-    tapToZoom: 'Tap the card to enlarge it', zoom: 'Enlarge card', closeZoom: 'Tap anywhere to close',
+    previewAlt: 'Card preview', cropNote: 'Part of the card · the whole card returns when you finish', done: 'Done',
+    tip: 'Tap any part of the card to edit it', tipOk: 'Got it',
+    pinName: 'Tap to write the name', pinParent: "Write the father's name", pinDate: 'Pick the date', pinVenue: 'Write the place', slotDate: 'Pick the date', slotVenue: 'Venue name',
+    editName: l => `Edit ${l}`, editWhen: 'Edit the date and time', editWhere: 'Edit the place', editWording: 'Edit the wording',
+    dockDesign: 'Design', dockFont: 'Font', reviewBtn: 'Review the card', allSet: 'All set',
+    leftOne: l => `Still needed: ${l}`, leftN: n => `${n} things left`, left: l => `Still needed: ${l}`, listSep: ', ',
     uploadTitle: 'Upload the card you like', uploadSub: 'We read its style and wording, then design a new card in the same spirit with your own names.',
     uploadBtn: 'Choose the card photo', changePhoto: 'Tap to change the photo',
     reading: 'Reading your card…', readDone: 'We read your card', readOcc: 'Occasion', readStyle: 'Closest design', readWording: 'Opening line',
@@ -1113,7 +1107,7 @@ const WORDING = {
   babyBoy: {
     ar: {
       openings: ['يسعدنا ويشرفنا استقبالكم بمناسبة قدوم مولودنا', 'بكل الحب نستقبلكم احتفاءً بقدوم مولودنا', 'أشرق بيتنا بنور جديد ويسعدنا استقبالكم بمناسبة قدوم مولودنا', 'بقلوب ملؤها الفرح والامتنان نحتفل بقدوم مولودنا', 'الحمد لله الذي وهبنا، ويسعدنا استقبالكم بمناسبة قدوم مولودنا', 'رزقنا الله نعمة جديدة، ويسعدنا استقبالكم احتفاءً بقدومه', 'تشرفنا زيارتكم للتهنئة بقدوم مولودنا'],
-      of: 'ابن', closings: [...AR_CLOSE, 'أنبته الله نباتاً حسناً', 'جعله الله قرة عين لوالديه']
+      of: 'بن', closings: [...AR_CLOSE, 'أنبته الله نباتاً حسناً', 'جعله الله قرة عين لوالديه']
     },
     en: {
       openings: ['We are delighted to welcome you to celebrate the arrival of our son', 'With hearts full of love, please join us to celebrate our baby boy', 'Our home is brighter. Please join us to welcome our son', 'With grateful hearts, we celebrate the arrival of our son', 'Allah has blessed us with a baby boy. Please join us to celebrate', 'Please visit us to welcome our son'],
@@ -1258,25 +1252,6 @@ const FONT_GROUPS = {
 const BODY_FONTS = {
   ar: ['Tajawal', 'Cairo', 'Almarai', 'El Messiri', 'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', 'Markazi Text', 'Readex Pro', 'IBM Plex Sans Arabic', 'Changa', 'Lateef', 'Mirza', 'Zain', 'Beiruti', 'Reem Kufi', 'Harmattan', 'Aref Ruqaa'],
   en: ['Cormorant Garamond', 'Playfair Display', 'EB Garamond', 'Lora', 'Marcellus', 'Montserrat', 'Cinzel', 'Bodoni Moda']
-};
-// Curated name+body pairings offered on the design step; every family is already in the catalogue above
-const FONT_COMBOS = {
-  ar: [
-    { name: 'Aref Ruqaa', body: 'Tajawal', ar: 'كلاسيكي', en: 'Classic' },
-    { name: 'Amiri', body: 'Noto Naskh Arabic', ar: 'تقليدي', en: 'Traditional' },
-    { name: 'Reem Kufi', body: 'Almarai', ar: 'كوفي', en: 'Kufi' },
-    { name: 'El Messiri', body: 'Cairo', ar: 'عصري', en: 'Modern' },
-    { name: 'Rakkas', body: 'Harmattan', ar: 'مزخرف', en: 'Ornate' },
-    { name: 'Lalezar', body: 'Tajawal', ar: 'مرح', en: 'Playful' }
-  ],
-  en: [
-    { name: 'Great Vibes', body: 'Cormorant Garamond', ar: 'رومانسي', en: 'Romantic' },
-    { name: 'Playfair Display', body: 'EB Garamond', ar: 'كلاسيكي', en: 'Classic' },
-    { name: 'Cinzel', body: 'Montserrat', ar: 'فخم', en: 'Stately' },
-    { name: 'Pinyon Script', body: 'Lora', ar: 'أنيق', en: 'Elegant' },
-    { name: 'Italiana', body: 'Marcellus', ar: 'بسيط', en: 'Minimal' },
-    { name: 'Dancing Script', body: 'Montserrat', ar: 'مرح', en: 'Playful' }
-  ]
 };
 const ONLY_400 = new Set(['Great Vibes', 'Alkalami', 'Katibeh', 'Rakkas', 'Gulzar', 'Qahiri', 'Blaka', 'Blaka Hollow', 'Lalezar', 'Jomhuria', 'Badeen Display', 'Vibes', 'Oi', 'Pinyon Script', 'Parisienne', 'Allura', 'Alex Brush', 'Marcellus', 'Italiana']);
 function famOf(k) { return FONT_NAME[k] || k; }
@@ -3247,13 +3222,14 @@ const TASHKEEL_RULES = [
   [new RegExp(`(^|[^${AR_L}])داود(?![${AR_L}])`, 'g'), '$1داوُد']
 ];
 function addTashkeel(s) { return TASHKEEL_RULES.reduce((acc, [re, rep]) => acc.replace(re, rep), s); }
+// « ابن » between two names is written « بن » on cards; a leading «ابن» (a title) is left as typed
+function fixIbn(s) { return String(s).replace(/(\s)ابن(?=\s)/g, '$1بن'); }
+// Empty fields stay empty: the card shows a grey slot there, never a sample value
 function fieldVal(st, k) {
-  const v = (st.fields[k] || '').trim();
-  const d = fieldDef(st.occasion, k);
-  const out = v || (d && !d.opt ? d.ph[st.lang] : '');
-  return st.tashkeel === false ? out : addTashkeel(out);
+  const v = fixIbn((st.fields[k] || '').trim());
+  return st.tashkeel === false ? v : addTashkeel(v);
 }
-function venueVal(st) { return st.venue.trim() || I18N[st.lang].venuePh; }
+function venueVal(st) { return st.venue.trim(); }
 function toDigits(s, tpl, L) { return (L === 'ar' && tpl.digits === 'arab') ? String(s).replace(/[0-9]/g, c => '٠١٢٣٤٥٦٧٨٩'[c]) : s; }
 function openingsList(st) {
   const base = WORDING[st.occasion][st.lang].openings.map(text => ({ text }));
@@ -3326,62 +3302,49 @@ function mapUrl(st) {
   if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
   return /^https?:\/\/[^\s.]+\.[^\s]+$/i.test(s) ? s : '';
 }
+// Every detail item carries slot + k (the sheet and field a tap on it opens) and `missing` while it is still empty
+function whenItem(st, d, lines) { return d ? { icon: 'cal', lines, slot: 'when', k: 'date' } : { icon: 'cal', lines: [I18N[st.lang].slotDate], slot: 'when', k: 'date', missing: true }; }
+function whereItem(st) { const ven = venueVal(st); return ven ? { icon: 'pin', lines: [ven], slot: 'where', k: 'venue' } : { icon: 'pin', lines: [I18N[st.lang].slotVenue], slot: 'where', k: 'venue', missing: true }; }
+function detailItem(st) { const v = st.venueDetail.trim(); return v ? { icon: 'door', lines: [v], slot: 'where', k: 'venueDetail' } : null; }
+function withDigits(items, tpl, L) { return items.filter(Boolean).map(it => ({ ...it, lines: it.lines.map(x => toDigits(x, tpl, L)) })); }
 function rowItems(st, tpl, d) {
-  const L = st.lang, items = [];
-  if (d) {
-    const lines = L === 'ar' ? [`يوم ${d.wd}`, d.gNum] : [d.wd, d.gLong];
-    if (st.showHijri && d.hijri) lines.push(d.hijri);
-    items.push({ icon: 'cal', lines });
-  }
-  items.push({ icon: 'pin', lines: [venueVal(st)] });
-  if (st.venueDetail.trim()) items.push({ icon: 'door', lines: [st.venueDetail.trim()] });
-  const t = timeText(st);
-  if (t) items.push({ icon: 'clock', lines: t.lead ? [t.lead, t.main] : [t.main] });
-  return items.map(it => ({ ...it, lines: it.lines.map(x => toDigits(x, tpl, L)) }));
+  const L = st.lang, lines = [], tt = timeText(st);
+  if (d) { lines.push(...(L === 'ar' ? [`يوم ${d.wd}`, d.gNum] : [d.wd, d.gLong])); if (st.showHijri && d.hijri) lines.push(d.hijri); }
+  const time = tt ? { icon: 'clock', lines: tt.lead ? [tt.lead, tt.main] : [tt.main], slot: 'when', k: 'timeFrom' } : null;
+  return withDigits([whenItem(st, d, lines), whereItem(st), detailItem(st), time], tpl, L);
 }
 function lineItems(st, tpl, d) {
-  const L = st.lang, Wd = WORDING[st.occasion][L], out = [];
-  if (isWedding(st.occasion) && Wd.will) out.push(Wd.will);
-  const t = timeText(st);
+  const L = st.lang, Wd = WORDING[st.occasion][L], out = [], tt = timeText(st);
+  if (isWedding(st.occasion) && Wd.will) out.push({ t: 'line', text: Wd.will });
   if (d) {
     if (L === 'ar') {
       const eve = st.timeFrom && hm(st.timeFrom).h >= 18 ? 'مساء ' : '';
-      out.push(st.showHijri && d.hijri ? `${eve}يوم ${d.wd} ${d.hijri} الموافق ${d.gLong}م` : `${eve}يوم ${d.wd} ${d.gLong}م`);
-    } else {
-      out.push(`${d.wd}, ${d.gLong}` + (st.showHijri && d.hijri ? ` · ${d.hijri}` : ''));
-    }
-  }
-  const detail = st.venueDetail.trim();
-  const venue = venueVal(st) + (detail ? (L === 'ar' ? ' - ' : ', ') + detail : '');
-  out.push(L === 'ar' ? `في ${venue}` : `at ${venue}`);
-  if (t) out.push(L === 'ar' ? `${t.lead} ${t.main}` : t.main);
+      out.push({ t: 'line', text: st.showHijri && d.hijri ? `${eve}يوم ${d.wd} ${d.hijri} الموافق ${d.gLong}م` : `${eve}يوم ${d.wd} ${d.gLong}م`, slot: 'when', k: 'date' });
+    } else out.push({ t: 'line', text: `${d.wd}, ${d.gLong}` + (st.showHijri && d.hijri ? ` · ${d.hijri}` : ''), slot: 'when', k: 'date' });
+  } else out.push({ t: 'line', text: I18N[L].slotDate, slot: 'when', k: 'date', missing: true });
+  const detail = st.venueDetail.trim(), ven = venueVal(st);
+  if (ven) out.push({ t: 'line', text: L === 'ar' ? `في ${ven}${detail ? ' - ' + detail : ''}` : `at ${ven}${detail ? ', ' + detail : ''}`, slot: 'where', k: 'venue' });
+  else out.push({ t: 'line', text: I18N[L].slotVenue, slot: 'where', k: 'venue', missing: true });
+  if (tt) out.push({ t: 'line', text: L === 'ar' ? `${tt.lead} ${tt.main}` : tt.main, slot: 'when', k: 'timeFrom' });
   return out;
 }
 // Date, place and time as separate groups for the framed details box
 function boxGroups(st, tpl, d) {
-  const L = st.lang, g = [], t = timeText(st);
-  if (d) {
-    const lines = [L === 'ar' ? `يوم ${d.wd} ${d.gLong}م` : `${d.wd}, ${d.gLong}`];
-    if (st.showHijri && d.hijri) lines.push(d.hijri);
-    g.push(lines);
-  }
-  const detail = st.venueDetail.trim();
-  g.push([venueVal(st) + (detail ? (L === 'ar' ? ' - ' : ', ') + detail : '')]);
-  if (t) g.push([L === 'ar' ? `${t.lead} ${t.main}` : t.main]);
-  return g.map(lines => lines.map(x => toDigits(x, tpl, L)));
+  const L = st.lang, g = [], tt = timeText(st);
+  if (d) { const lines = [L === 'ar' ? `يوم ${d.wd} ${d.gLong}م` : `${d.wd}, ${d.gLong}`]; if (st.showHijri && d.hijri) lines.push(d.hijri); g.push({ lines, slot: 'when', k: 'date' }); }
+  else g.push({ lines: [I18N[L].slotDate], slot: 'when', k: 'date', missing: true });
+  const detail = st.venueDetail.trim(), ven = venueVal(st);
+  if (ven) g.push({ lines: [ven + (detail ? (L === 'ar' ? ' - ' : ', ') + detail : '')], slot: 'where', k: 'venue' });
+  else g.push({ lines: [I18N[L].slotVenue], slot: 'where', k: 'venue', missing: true });
+  if (tt) g.push({ lines: [L === 'ar' ? `${tt.lead} ${tt.main}` : tt.main], slot: 'when', k: 'timeFrom' });
+  return withDigits(g, tpl, L);
 }
 // One row per detail, each with its own icon, for the vertical details list
 function listItems(st, tpl, d) {
-  const L = st.lang, items = [], t = timeText(st);
-  if (d) {
-    const lines = [L === 'ar' ? `يوم ${d.wd} ${d.gLong}` : `${d.wd}, ${d.gLong}`];
-    if (st.showHijri && d.hijri) lines.push(d.hijri);
-    items.push({ icon: 'cal', lines });
-  }
-  items.push({ icon: 'pin', lines: [venueVal(st)] });
-  if (st.venueDetail.trim()) items.push({ icon: 'door', lines: [st.venueDetail.trim()] });
-  if (t) items.push({ icon: 'clock', lines: [L === 'ar' ? `${t.lead} ${t.main}` : t.main] });
-  return items.map(it => ({ ...it, lines: it.lines.map(x => toDigits(x, tpl, L)) }));
+  const L = st.lang, lines = [], tt = timeText(st);
+  if (d) { lines.push(L === 'ar' ? `يوم ${d.wd} ${d.gLong}` : `${d.wd}, ${d.gLong}`); if (st.showHijri && d.hijri) lines.push(d.hijri); }
+  const time = tt ? { icon: 'clock', lines: [L === 'ar' ? `${tt.lead} ${tt.main}` : tt.main], slot: 'when', k: 'timeFrom' } : null;
+  return withDigits([whenItem(st, d, lines), whereItem(st), detailItem(st), time], tpl, L);
 }
 // Adds the graduation emblem and the section dividers some designs use
 function decorate(blocks, tpl, st) {
@@ -3402,56 +3365,48 @@ function decorate(blocks, tpl, st) {
   }
   return out;
 }
+// Every block carries slot + k so a tap on the card knows which sheet to open; a required field
+// that is still empty becomes a `missing` block, drawn as a grey slot labelled with the field name
 function buildBlocks(st, tpl) {
-  const L = st.lang, oc = st.occasion, Wd = WORDING[oc][L], v = k => fieldVal(st, k), B = [];
-  const opening = currentOpening(st), closing = currentClosing(st);
+  const L = st.lang, oc = st.occasion, Wd = WORDING[oc][L], B = [];
+  const push = b => { if (b) B.push(b); };
+  const v = k => fieldVal(st, k);
+  const slot = (t, k, lead) => {
+    const val = v(k), d = fieldDef(oc, k);
+    if (val) return { t, text: lead ? `${lead} ${val}` : val, slot: 'names', k };
+    return d && !d.opt ? { t, text: d[L], slot: 'names', k, missing: true } : null;
+  };
+  const opening = { t: 'opening', text: currentOpening(st), slot: 'wording', k: 'opening' };
+  const dua = () => st.dua ? { t: 'dua', text: currentDua(st), slot: 'wording', k: 'dua' } : null;
+  const and = { t: 'link', text: L === 'ar' ? 'و' : '&' };
   if (oc === 'weddingMen') {
-    if (st.dua) B.push({ t: 'dua', text: currentDua(st) });
-    B.push({ t: 'opening', text: opening });
-    B.push({ t: 'name2', text: v('host1') });
-    B.push({ t: 'link', text: L === 'ar' ? 'و' : '&' });
-    B.push({ t: 'name2', text: v('host2') });
-    B.push({ t: 'link', text: Wd.invite });
-    if (Wd.son) B.push({ t: 'small', text: Wd.son });
-    B.push({ t: 'name', text: v('main') });
-    B.push({ t: 'sub', text: `${Wd.daughterOf} ${v('host2')}` });
+    push(dua()); push(opening);
+    push(slot('name2', 'host1')); push(and); push(slot('name2', 'host2'));
+    push({ t: 'link', text: Wd.invite }); if (Wd.son) push({ t: 'small', text: Wd.son });
+    push(slot('name', 'main')); push(slot('sub', 'host2', Wd.daughterOf));
   } else if (oc === 'weddingWomen') {
-    if (st.dua) B.push({ t: 'dua', text: currentDua(st) });
-    B.push({ t: 'opening', text: opening });
-    B.push({ t: 'name', text: v('main') });
-    if (v('partner')) {
-      B.push({ t: 'link', text: L === 'ar' ? 'و' : '&' });
-      B.push({ t: 'name2', text: v('partner') });
-    }
-    if (v('host1')) B.push({ t: 'small', text: `${Wd.hostedBy}: ${v('host1')}` });
+    push(dua()); push(opening); push(slot('name', 'main'));
+    if (v('partner')) { push(and); push(slot('name2', 'partner')); }
+    if (v('host1')) push(slot('small', 'host1', `${Wd.hostedBy}:`));
   } else if (oc === 'twins') {
-    B.push({ t: 'opening', text: opening });
-    B.push({ t: 'name', text: v('main') });
-    B.push({ t: 'link', text: L === 'ar' ? 'و' : '&' });
-    B.push({ t: 'name', text: v('main2') });
-    B.push({ t: 'sub', text: `${Wd.of} ${v('parent')}` });
+    push(opening); push(slot('name', 'main')); push(and); push(slot('name', 'main2')); push(slot('sub', 'parent', Wd.of));
   } else if (oc === 'babyGirl' || oc === 'babyBoy') {
-    B.push({ t: 'opening', text: opening });
-    B.push({ t: 'name', text: v('main') });
-    B.push({ t: 'sub', text: `${Wd.of} ${v('parent')}` });
+    push(opening); push(slot('name', 'main')); push(slot('sub', 'parent', Wd.of));
   } else if (oc === 'graduation') {
-    B.push({ t: 'opening', text: opening });
-    B.push({ t: 'name', text: v('main') });
-    if (v('school')) B.push({ t: 'sub', text: v('school') });
-    if (v('host1')) B.push({ t: 'small', text: `${Wd.hostedBy} ${v('host1')}` });
+    push(opening); push(slot('name', 'main'));
+    if (v('school')) push(slot('sub', 'school')); if (v('host1')) push(slot('small', 'host1', Wd.hostedBy));
   } else {
-    B.push({ t: 'opening', text: opening });
-    B.push({ t: 'name', text: v('main') });
-    if (v('host1')) B.push({ t: 'sub', text: `${Wd.hostedBy} ${v('host1')}` });
+    push(opening); push(slot('name', 'main')); if (v('host1')) push(slot('sub', 'host1', Wd.hostedBy));
   }
   const d = dateInfo(st);
-  if (tpl.info === 'row') B.push({ t: 'info', items: rowItems(st, tpl, d) });
-  else if (tpl.info === 'box') B.push({ t: 'infobox', groups: boxGroups(st, tpl, d) });
-  else if (tpl.info === 'list') B.push({ t: 'infolist', items: listItems(st, tpl, d) });
-  else lineItems(st, tpl, d).forEach(text => B.push({ t: 'line', text }));
-  if (st.note > 0 && NOTES[L][st.note]) B.push({ t: 'note', text: NOTES[L][st.note] });
-  if (closing) B.push({ t: 'closing', text: closing });
-  if (tpl.qr !== 'corner' && st.showQR && mapUrl(st)) B.push({ t: 'qr' });
+  if (tpl.info === 'row') push({ t: 'info', items: rowItems(st, tpl, d) });
+  else if (tpl.info === 'box') { const g = boxGroups(st, tpl, d); push({ t: 'infobox', groups: g.map(x => x.lines), meta: g }); }
+  else if (tpl.info === 'list') push({ t: 'infolist', items: listItems(st, tpl, d) });
+  else lineItems(st, tpl, d).forEach(push);
+  if (st.note > 0 && NOTES[L][st.note]) push({ t: 'note', text: NOTES[L][st.note], slot: 'where', k: 'note' });
+  const closing = currentClosing(st);
+  if (closing) push({ t: 'closing', text: closing, slot: 'wording', k: 'closing' });
+  if (tpl.qr !== 'corner' && st.showQR && mapUrl(st)) push({ t: 'qr', slot: 'where', k: 'mapLink' });
   return B.map(b => b.text != null ? { ...b, text: toDigits(b.text, tpl, L) } : b);
 }
 
@@ -3534,9 +3489,12 @@ function drawInfo(ctx, tpl, items, L, y, m) {
         ctx.beginPath(); ctx.moveTo(sx, y + 6); ctx.lineTo(sx, y + m.h - 6); ctx.stroke();
       }
     }
-    setFont(ctx, st, L, m.size); ctx.fillStyle = P[st.color] || P.text;
+    setFont(ctx, st, L, m.size); ctx.fillStyle = it.missing ? MISS_INK : (P[st.color] || P.text);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    m.wrapped[i].forEach((line, j) => ctx.fillText(line, x, y + m.iconH + m.gapIn + m.lh * (j + 0.5)));
+    const top0 = y + m.iconH + m.gapIn;
+    m.wrapped[i].forEach((line, j) => ctx.fillText(line, x, top0 + m.lh * (j + 0.5)));
+    if (it.missing) { const tw = widest(ctx, m.wrapped[i]); dashBox(ctx, x - tw / 2 - 16, top0 - 6, tw + 32, m.wrapped[i].length * m.lh + 12); }
+    hit(it, x - m.colW / 2, y, x + m.colW / 2, y + m.h);
   });
   ctx.restore();
 }
@@ -3611,7 +3569,29 @@ function drawTextLine(ctx, tpl, st, line, x, y, size) {
     ctx.restore();
   }
 }
+// Tap targets: while the card is drawn, every block with a slot records its box in card pixels (1080x1920).
+// The edit screen lays invisible buttons over the preview at those boxes.
+const MISS_INK = 'rgba(112, 100, 128, 0.62)';
+let LAST_HITS = [];
+function hit(b, x0, y0, x1, y1) { if (b && b.slot) LAST_HITS.push({ slot: b.slot, k: b.k, missing: !!b.missing, x: x0, y: y0, w: x1 - x0, h: y1 - y0 }); }
+function dashBox(ctx, x, y, w, h) { ctx.save(); ctx.strokeStyle = MISS_INK; ctx.lineWidth = 3; ctx.setLineDash([16, 12]); rr(ctx, x, y, w, h, 18); ctx.stroke(); ctx.restore(); }
+function widest(ctx, lines) { let tw = 0; lines.forEach(l => { tw = Math.max(tw, ctx.measureText(l).width); }); return tw; }
+// An empty required slot: the field's label in grey inside a dashed box the size the real text would take
+function drawMissing(ctx, it, y) {
+  const size = Math.min(it.size, 58), maxW = it.st.maxW || 880, label = it.lines.join(' ');
+  ctx.save();
+  ctx.font = `500 ${Math.round(size)}px ${FONTS.tajawal}`;
+  const tw = ctx.measureText(label).width;
+  const bw = Math.min(maxW, Math.max(tw + 120, 440)), bh = Math.max(Math.min(it.h - 16, size * 2.2), size * 1.5), by = y + (it.h - bh) / 2;
+  ctx.strokeStyle = MISS_INK; ctx.lineWidth = 3; ctx.setLineDash([16, 12]);
+  rr(ctx, W / 2 - bw / 2, by, bw, bh, 24); ctx.stroke();
+  ctx.setLineDash([]); ctx.fillStyle = MISS_INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, W / 2, y + it.h / 2);
+  ctx.restore();
+  return { x0: W / 2 - bw / 2, x1: W / 2 + bw / 2 };
+}
 function drawBlocks(ctx, tpl, blocks, st) {
+  LAST_HITS = [];
   const L = st.lang;
   blocks = decorate(blocks, tpl, st);
   const [top, bottom] = (tpl.qr === 'corner' && st.showQR && mapUrl(st) && tpl.regionQR) ? tpl.regionQR : tpl.region;
@@ -3622,33 +3602,36 @@ function drawBlocks(ctx, tpl, blocks, st) {
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = L === 'ar' ? 'rtl' : 'ltr';
   for (const it of lay.items) {
     y += it.gap;
-    if (it.b.t === 'info') drawInfo(ctx, tpl, it.b.items, L, y, it.m);
-    else if (it.b.t === 'divider') tpl.divider(ctx, W / 2, y + it.h / 2, it.s);
-    else if (it.b.t === 'infolist') {
-      const P = tpl.palette, rtl = L === 'ar', left = W / 2 - it.groupW / 2, right = W / 2 + it.groupW / 2;
+    const b = it.b, P = tpl.palette;
+    if (b.t === 'info') drawInfo(ctx, tpl, b.items, L, y, it.m);
+    else if (b.t === 'divider') tpl.divider(ctx, W / 2, y + it.h / 2, it.s);
+    else if (b.t === 'infolist') {
+      const rtl = L === 'ar', left = W / 2 - it.groupW / 2, right = W / 2 + it.groupW / 2;
       if (it.st.panel) {
         ctx.save(); ctx.fillStyle = P.panel || 'rgba(255,255,255,0.6)'; ctx.strokeStyle = P.panelLine || P.line; ctx.lineWidth = 2;
         rr(ctx, left - it.pad, y, it.groupW + it.pad * 2, it.h, 28); ctx.fill(); ctx.stroke(); ctx.restore();
       }
       let yy = y + it.pad;
       it.rows.forEach((r, i) => {
-        const rh = it.rowsH[i], cy = yy + rh / 2;
+        const rh = it.rowsH[i], cy = yy + rh / 2, src = b.items[i];
         drawIcon(ctx, r.icon, rtl ? right - it.icon / 2 : left + it.icon / 2, cy, it.icon * 0.9, P.accent);
-        setFont(ctx, it.st, L, it.size); ctx.fillStyle = P[it.st.color] || P.text; ctx.textBaseline = 'middle';
+        setFont(ctx, it.st, L, it.size); ctx.fillStyle = src.missing ? MISS_INK : (P[it.st.color] || P.text); ctx.textBaseline = 'middle';
         ctx.textAlign = rtl ? 'right' : 'left';
         const tx = rtl ? right - it.icon - it.gapX : left + it.icon + it.gapX, top0 = cy - r.lines.length * it.lh / 2;
         r.lines.forEach((line, j) => ctx.fillText(line, tx, top0 + it.lh * (j + 0.5)));
+        if (src.missing) { const tw = widest(ctx, r.lines); dashBox(ctx, rtl ? tx - tw - 14 : tx - 14, top0 - 6, tw + 28, r.lines.length * it.lh + 12); }
         ctx.textAlign = 'center';
         if (it.st.rules && i < it.rows.length - 1) {
           const ly = yy + rh + it.rowGap / 2;
           ctx.save(); ctx.strokeStyle = P.line; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(left, ly); ctx.lineTo(right, ly); ctx.stroke(); ctx.restore();
         }
+        hit(src, left - it.pad, yy, right + it.pad, yy + rh);
         yy += rh + it.rowGap;
       });
     }
-    else if (it.b.t === 'emblem') tpl.emblem(ctx, W / 2, y + it.h / 2, it.h);
-    else if (it.b.t === 'infobox') {
-      const x0 = W / 2 - it.boxW / 2, c = tpl.palette.boxLine || tpl.palette.line;
+    else if (b.t === 'emblem') tpl.emblem(ctx, W / 2, y + it.h / 2, it.h);
+    else if (b.t === 'infobox') {
+      const x0 = W / 2 - it.boxW / 2, c = P.boxLine || P.line;
       ctx.save(); ctx.strokeStyle = c; ctx.lineWidth = 2; rr(ctx, x0, y, it.boxW, it.h, 18); ctx.stroke();
       ctx.lineWidth = 1; ctx.globalAlpha = 0.7; rr(ctx, x0 + 10, y + 10, it.boxW - 20, it.h - 20, 12); ctx.stroke(); ctx.restore();
       setFont(ctx, it.st, L, it.size);
@@ -3662,17 +3645,30 @@ function drawBlocks(ctx, tpl, blocks, st) {
           ctx.restore(); setFont(ctx, it.st, L, it.size);
           yy += it.sep;
         }
-        g.forEach(line => { drawTextLine(ctx, tpl, it.st, line, W / 2, yy + it.lh / 2, it.size); yy += it.lh; });
+        const meta = b.meta[gi], gy = yy;
+        g.forEach(line => {
+          if (meta.missing) { ctx.save(); ctx.fillStyle = MISS_INK; ctx.fillText(line, W / 2, yy + it.lh / 2); ctx.restore(); }
+          else drawTextLine(ctx, tpl, it.st, line, W / 2, yy + it.lh / 2, it.size);
+          yy += it.lh;
+        });
+        if (meta.missing) { const tw = widest(ctx, g); dashBox(ctx, W / 2 - tw / 2 - 16, gy - 4, tw + 32, g.length * it.lh + 8); }
+        hit(meta, x0, gy - 8, x0 + it.boxW, yy + 8);
       });
     }
-    else if (it.b.t === 'qr') {
+    else if (b.t === 'qr') {
       drawQR(ctx, tpl, W / 2 - it.sz / 2, y, it.sz, mapUrl(st));
-      ctx.save(); ctx.font = `500 ${Math.round(30 * it.s)}px ${FONTS.tajawal}`; ctx.fillStyle = tpl.palette.soft || tpl.palette.text;
+      ctx.save(); ctx.font = `500 ${Math.round(30 * it.s)}px ${FONTS.tajawal}`; ctx.fillStyle = P.soft || P.text;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = L === 'ar' ? 'rtl' : 'ltr';
       ctx.fillText(I18N[L].qrCaption, W / 2, y + it.sz + 30 * it.s); ctx.restore();
+      hit(b, W / 2 - it.sz / 2, y, W / 2 + it.sz / 2, y + it.h);
     } else {
       setFont(ctx, it.st, L, it.size);
-      it.lines.forEach((line, i) => drawTextLine(ctx, tpl, it.st, line, W / 2, y + it.lh * (i + 0.5), it.size));
+      if (b.missing) { const r = drawMissing(ctx, it, y); hit(b, r.x0, y, r.x1, y + it.h); }
+      else {
+        const tw = widest(ctx, it.lines), pad = Math.max(20, it.size * 0.2);
+        it.lines.forEach((line, i) => drawTextLine(ctx, tpl, it.st, line, W / 2, y + it.lh * (i + 0.5), it.size));
+        hit(b, W / 2 - tw / 2 - pad, y, W / 2 + tw / 2 + pad, y + it.h);
+      }
     }
     y += it.h;
   }
@@ -3782,8 +3778,9 @@ function refreshAI() {
   document.querySelectorAll('[data-ai]').forEach(el => { el.hidden = !AI.on(); });
   const btn = $('#asstBtn'), panel = $('#asstPanel');
   if (!btn) return;
-  // the floating button shows on the design steps; the panel itself can also be opened from Help on the home page
-  const ok = AI.on() && FLOW.includes(state.step);
+  // the floating button shows on the occasion screen; on the edit and review screens it would sit on the card
+  // or the pay tray, so there Help in the header (and the link in the names sheet) opens the panel
+  const ok = AI.on() && state.step === 'occasion';
   const panelOk = AI.on() && !['pay', 'done'].includes(state.step);
   btn.hidden = !ok || asst.open;
   if (ok) btn.innerHTML = `${ICON.sparkle}<span>${t('asstBtn')}</span>`;
@@ -3794,38 +3791,6 @@ function aiError(e) { return e && e.code === 'rate_limited' ? t('aiBusy') : t('a
 const cleanStr = (x, max) => typeof x === 'string' ? x.trim().slice(0, max || 160) : '';
 const isArabic = s => /[؀-ۿ]/.test(s);
 
-async function aiFill(btn) {
-  const box = $('#quickText'), status = $('#aiFillStatus');
-  const txt = box ? box.value.trim() : '';
-  if (!txt) { toast(t('quickEmpty')); box && box.focus(); return; }
-  const oc = state.occasion;
-  const keys = FIELDS[oc].map(f => `"${f.k}": "${f.en}"`).join(', ');
-  const prompt = `You fill in an invitation card form for a Saudi ${OCC_EN[oc]} event. Today is ${todayISO()}; use it to resolve phrases like "next Thursday".
-The customer wrote (Arabic or English):
-"""${txt.slice(0, 2000)}"""
-Reply with only one JSON object of this shape, using empty strings for anything not mentioned. Keep names exactly as written, in the language she used.
-{"fields": {${keys}}, "date": "YYYY-MM-DD (Gregorian)", "timeFrom": "HH:MM 24-hour", "timeTo": "HH:MM 24-hour", "venue": "venue name only", "venueDetail": "floor, room or suite"}
-For a baby, "parent" is the father's name and family name without بنت or ابن.`;
-  btn.disabled = true; status.textContent = t('working');
-  try {
-    const r = await AI.json(prompt);
-    if (r && typeof r === 'object') {
-      const f = r.fields || {};
-      FIELDS[oc].forEach(d => { const v = cleanStr(f[d.k], 80); if (v) state.fields[d.k] = v; });
-      if (/^\d{4}-\d{2}-\d{2}$/.test(r.date || '')) state.date = r.date;
-      if (/^\d{1,2}:\d{2}$/.test(r.timeFrom || '')) state.timeFrom = r.timeFrom.padStart(5, '0');
-      if (/^\d{1,2}:\d{2}$/.test(r.timeTo || '')) state.timeTo = r.timeTo.padStart(5, '0');
-      if (cleanStr(r.venue)) state.venue = cleanStr(r.venue, 80);
-      if (cleanStr(r.venueDetail)) state.venueDetail = cleanStr(r.venueDetail, 80);
-      save(); renderScreen(); toast(t('filled'));
-      return;
-    }
-    status.textContent = t('aiFail');
-  } catch (e) {
-    if (e && e.code === 'cancelled') return;
-    status.textContent = aiError(e);
-  } finally { btn.disabled = false; }
-}
 const OPEN_RULE = {
   weddingMen: 'the short phrase that comes right BEFORE the two fathers\' names, like "يتشرف" or "بقلوب ملؤها الفرح يتشرف" (at most 6 words)',
   weddingWomen: 'one phrase inviting guests to the women\'s wedding celebration, ending right BEFORE the bride\'s name, like "يسعدنا ويشرفنا دعوتكم لمشاركتنا حفل زواج" (at most 10 words)',
@@ -3893,7 +3858,7 @@ function asstSystem() {
   // Everything per occasion up front, so a first message that names the occasion can also fill in names and pick a design
   const perOcc = occIds.map(oc => `- ${oc}: fields {${FIELDS[oc].map(f => `${f.k}: ${f.en}${f.opt ? ' (optional)' : ''}`).join('; ')}}; designs allowed: ${allowedFor(oc).join(', ')}`).join('\n');
   const designNames = TEMPLATE_IDS.map(id => `${id} = «${TEMPLATES[id].name[L]}»`).join(', ');
-  return `You are the in-app assistant of "${CONFIG.brand.en}", a Saudi occasion-card builder. The customer designs one card through these steps: ${FLOW.join(' > ')}. Be warm, brief and practical; in Arabic address the customer as a Saudi woman (feminine). Guide her to the next missing piece (occasion, then design, names, date, place), one question at a time, and apply what she asks for right away.
+  return `You are the in-app assistant of "${CONFIG.brand.en}", a Saudi occasion-card builder. The customer picks the occasion, then designs the card on one edit screen (design, fonts, names, date, place and wording; she taps a part of the card to edit it), then reviews it and pays. Be warm, brief and practical; in Arabic address the customer as a Saudi woman (feminine). Guide her to the next missing piece (occasion, then design, names, date, place), one question at a time, and apply what she asks for right away.
 Today: ${todayISO()}.
 Current card state: ${JSON.stringify(snap)}
 Occasions: weddingMen (men's wedding), weddingWomen (women's wedding), babyGirl, babyBoy, twins, eidFitr, eidAdha, graduation, ceremony, other.
@@ -3905,20 +3870,17 @@ Name fonts: ${FONT_GROUPS[L].flatMap(g => g.fonts).join(', ')}. Body fonts: ${BO
 Reply with only one JSON object:
 {"say": "your reply to the customer in her language (at most 60 words, plain text)",
  "apply": {"occasion": "", "template": "", "nameFont": "", "bodyFont": "", "fields": {}, "date": "YYYY-MM-DD", "timeFrom": "HH:MM", "timeTo": "HH:MM", "venue": "", "venueDetail": "", "opening": "", "closing": "", "goStep": ""}}
-Every "apply" key is optional: include only what should change, and omit "apply" entirely when nothing changes. "goStep" moves her to that step so she sees the change (e.g. "style" after you pick a template).
-The date and times in the card state start as placeholders (two weeks from today, the occasion's usual hours) and the venue starts empty: treat them as not given until she tells you, and ask for them instead of calling them ready.
+Every "apply" key is optional: include only what should change, and omit "apply" entirely when nothing changes. "goStep" moves her to that screen: "occasion", "edit" or "review".
+The date and the venue start empty and the times start at the occasion's usual hours: treat the times as not given until she tells you, and ask for the date and place instead of calling the card ready.
 Whenever she mentions a name, put it in apply.fields right away, using the field keys of the occasion you set in this same reply (or the current one); keep names exactly as she wrote them.
 She may also ask how the site works, since this panel is the site's Help: a card costs ${CONFIG.price} SAR including VAT, there's no sign-up, she sees the whole card (with a watermark) before paying, pays online through Tap, and then saves the finished image and shares it on WhatsApp. If she wants to talk to a person, say WhatsApp support is coming soon. Answer briefly, then offer to start her card.
-In Arabic, call the card «كرت», never «بطاقة».
+In Arabic, call the card «كرت», never «بطاقة», and in names write «بن» between a name and the father's name, never «ابن».
 Template ids, occasion ids and field keys go only inside "apply". In "say", call a design by the name she sees (for example «${TEMPLATES.bisht.name[L]}»), never by its id, and never show ids or English code words. Use ids and font names exactly as listed; never invent them.`;
 }
 function asstApply(a) {
   if (!a || typeof a !== 'object') return;
   if (a.occasion && FIELDS[a.occasion]) setOccasion(a.occasion);
-  if (a.template && TEMPLATES[a.template] && (!state.occasion || allowedFor(state.occasion).includes(a.template))) { state.template = a.template; state.styleAuto = false; }
-  if (a.date || a.timeFrom || a.timeTo) unskip('when');
-  if (a.nameFont || a.bodyFont) unskip('fonts');
-  if (a.opening || a.closing) unskip('wording');
+  if (a.template && TEMPLATES[a.template] && (!state.occasion || allowedFor(state.occasion).includes(a.template))) { state.template = a.template; state.designPicked = true; }
   const fams = new Set([...FONT_GROUPS.ar, ...FONT_GROUPS.en].flatMap(g => g.fonts).concat(BODY_FONTS.ar, BODY_FONTS.en));
   if (typeof a.nameFont === 'string' && fams.has(a.nameFont)) state.nameFont = a.nameFont;
   if (typeof a.bodyFont === 'string' && fams.has(a.bodyFont)) state.bodyFont = a.bodyFont;
@@ -3932,15 +3894,13 @@ function asstApply(a) {
   if (cleanStr(a.venueDetail)) state.venueDetail = cleanStr(a.venueDetail, 80);
   if (cleanStr(a.opening)) { state.customOpenings = [cleanStr(a.opening, 140)]; state.openingText = state.customOpenings[0]; }
   if (cleanStr(a.closing)) { state.customClosings = [cleanStr(a.closing, 80)]; state.closingText = state.customClosings[0]; }
+  if (state.occasion && !state.template) state.template = styleOrder()[0];
   save();
   let target = FLOW.includes(a.goStep) ? a.goStep : null;
-  // opened from Help on the home or upload page: once there's an occasion, take her into the design steps
-  if (!target && !FLOW.includes(state.step) && state.occasion) target = state.template ? 'names' : 'style';
-  if (target) {
-    if (!state.occasion) target = 'occasion';
-    else if (!state.template && FLOW.indexOf(target) > FLOW.indexOf('style')) target = 'style';
-    go(target);
-  } else renderScreen();
+  // opened from Help on the home or upload page: once there's an occasion, take her to the card
+  if (!target && !FLOW.includes(state.step) && state.occasion) target = 'edit';
+  if (target && !state.occasion) target = 'occasion';
+  if (target && target !== state.step) go(target); else renderScreen();
 }
 function asstRender() {
   const panel = $('#asstPanel'); if (panel.hidden) return;
@@ -4016,10 +3976,11 @@ function todayISO() { const d = new Date(); return `${d.getFullYear()}-${String(
 function isoPlus(days) { const d = new Date(); d.setDate(d.getDate() + days); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 function freshState(lang) {
   return {
-    lang: lang || 'ar', step: 'welcome', occasion: null, template: null, matched: null, fromUpload: false, reached: 0,
-    skipped: [], styleAuto: false, tashkeel: true,
-    fields: {}, date: isoPlus(14), timeFrom: '18:00', timeTo: '23:00', venue: '', venueDetail: '', mapLink: '',
-    showQR: true, showHijri: true, note: 0, dua: true, duaText: null, nameFont: null, bodyFont: null,
+    lang: lang || 'ar', step: 'welcome', occasion: null, template: null, designPicked: false, matched: null, fromUpload: false,
+    tashkeel: true,
+    // the date and venue start empty: the card shows a slot there until she fills them in
+    fields: {}, date: '', timeFrom: '18:00', timeTo: '23:00', venue: '', venueDetail: '', mapLink: '',
+    showQR: false, showHijri: true, note: 0, dua: true, duaText: null, nameFont: null, bodyFont: null,
     openingText: null, closingText: null, customOpenings: [], customClosings: [], cardOpening: '', cardClosing: '',
     confirmed: false, paid: false, orderNo: '', pendingOrder: '', payToken: '', buyerName: '', buyerContact: ''
   };
@@ -4044,10 +4005,11 @@ function loadDraft() {
       const MIG = { wedding: 'weddingMen', milka: 'weddingWomen', gathering: 'other' };
       if (MIG[d.occasion]) d.occasion = MIG[d.occasion];
       if (d.occasion && !FIELDS[d.occasion]) d.occasion = null;
-      if (d.occasion && d.template && !allowedFor(d.occasion).includes(d.template)) {
-        d.template = null; d.matched = null;
-        if (FLOW.indexOf(d.step) > FLOW.indexOf('style')) d.step = 'style';
-      }
+      if (d.occasion && d.template && !allowedFor(d.occasion).includes(d.template)) { d.template = null; d.matched = null; d.designPicked = false; }
+      // drafts from the eight-step flow: every design step is now the one edit screen
+      if (['style', 'names', 'when', 'where', 'wording', 'fonts'].includes(d.step)) d.step = 'edit';
+      if (d.designPicked == null) d.designPicked = !!d.template && !d.styleAuto;
+      delete d.skipped; delete d.styleAuto; delete d.reached;
     }
     return d;
   } catch (e) { return null; }
@@ -4058,7 +4020,7 @@ function setOccasion(id) {
   state.openingText = null; state.closingText = null; state.customOpenings = []; state.customClosings = [];
   const [a, b] = DEFAULT_TIMES[id]; state.timeFrom = a; state.timeTo = b;
   state.dua = isWedding(id); state.confirmed = false;
-  if (state.template && !allowedFor(id).includes(state.template)) { state.template = null; state.matched = null; }
+  if (state.template && !allowedFor(id).includes(state.template)) { state.template = null; state.matched = null; state.designPicked = false; }
 }
 
 /* ================= UI helpers ================= */
@@ -4105,10 +4067,13 @@ function occsFor(tp) {
 }
 let homeCleanup = null;
 // A card filled with sample details, used on the home page
+// Home page cards show a complete sample: the sample names, a date two weeks out and the sample venue
 function sampleState(template, occasion) {
-  const s = freshState(state.lang);
-  s.template = template; s.occasion = occasion; s.dua = isWedding(occasion); s.showQR = false;
+  const s = freshState(state.lang), L = s.lang;
+  s.template = template; s.occasion = occasion; s.dua = isWedding(occasion);
   const [a, b] = DEFAULT_TIMES[occasion]; s.timeFrom = a; s.timeTo = b;
+  FIELDS[occasion].forEach(f => { if (!f.opt) s.fields[f.k] = f.ph[L]; });
+  s.date = isoPlus(14); s.venue = I18N[L].venuePh;
   return s;
 }
 function lazyPaint(sel, attr) {
@@ -4179,19 +4144,10 @@ function setupHome() {
 }
 
 /* ================= screens ================= */
-function skipBtn() { return `<button class="btn btn-ghost btn-skip" data-act="skip" type="button">${t('skip')}</button>`; }
-function nextBar(label) {
-  return (SKIPPABLE.includes(state.step) ? skipBtn() : '')
-    + `<button class="btn btn-primary" data-act="next" type="button">${label || t('next')}</button>`;
-}
-function previewHTML() {
-  return `<div class="preview"><button class="preview-btn" data-act="zoom" type="button" aria-label="${esc(t('zoom'))}"><canvas data-preview width="540" height="960"></canvas></button><p class="hint">${t('tapToZoom')}</p></div>`;
-}
-function editLayout(inner, pinned) { return `<div class="edit${pinned ? ' pinned' : ''}">${previewHTML()}<div class="form">${inner}</div></div>`; }
 function toggle(key, label) { return `<label class="check"><input type="checkbox" data-bind="${key}" ${state[key] ? 'checked' : ''}><span>${label}</span></label>`; }
 function fieldHTML(f) {
   return `<div class="field"><label for="f_${f.k}">${f[state.lang]}${f.opt ? ` <span class="opt">${t('optional')}</span>` : ''}</label>
-    <input id="f_${f.k}" data-bind="fields.${f.k}" value="${esc(state.fields[f.k] || '')}" placeholder="${esc(f.ph[state.lang])}" autocomplete="off" enterkeyhint="next"${f.opt ? '' : ' data-def'}></div>`;
+    <input id="f_${f.k}" data-bind="fields.${f.k}" data-k="${f.k}" value="${esc(state.fields[f.k] || '')}" autocomplete="off" enterkeyhint="next"></div>`;
 }
 function choiceHTML(name, o, checked) {
   return `<label class="choice"><input type="radio" name="${name}" data-bind="${name}" value="${esc(o.text)}" ${checked ? 'checked' : ''}><span>${esc(o.text || o.label)}${o.tag ? `<span class="tag">${esc(o.tag)}</span>` : ''}</span></label>`;
@@ -4212,7 +4168,7 @@ function nameSample() {
 }
 // Font files download only when a sample scrolls into view
 function observeFonts() {
-  const apply = el => { const f = el.dataset.family; el.style.fontFamily = `"${f}", "Tajawal", serif`; el.style.fontWeight = fontWeight(f, 700); };
+  const apply = el => { const f = el.dataset.family; el.style.fontFamily = `"${f}", "Tajawal", serif`; el.style.fontWeight = fontWeight(f, +el.dataset.weight || 700); };
   const els = document.querySelectorAll('#screen [data-family]');
   if (!('IntersectionObserver' in window)) { els.forEach(apply); return; }
   const io = new IntersectionObserver(entries => entries.forEach(en => { if (en.isIntersecting) { apply(en.target); io.unobserve(en.target); } }), { rootMargin: '150px' });
@@ -4220,7 +4176,7 @@ function observeFonts() {
 }
 function hijriHint() {
   const d = dateInfo(state); if (!d) return '';
-  return state.lang === 'ar' ? `${d.wd} · يوافق ${d.hijri}` : `${d.wd} · ${d.hijri}`;
+  return state.lang === 'ar' ? arNum(`${d.wd} ${d.gLong} · يوافق ${d.hijri}`) : `${d.wd} · ${d.hijri}`;
 }
 function styleOrder() {
   const allowed = allowedFor(state.occasion);
@@ -4228,21 +4184,206 @@ function styleOrder() {
   const first = state.matched && allowed.includes(state.matched) ? [state.matched] : [];
   return [...new Set([...first, ...rec, ...allowed])];
 }
-function facts() {
-  const L = state.lang, out = [];
-  FIELDS[state.occasion].forEach(f => {
-    const v = (state.fields[f.k] || '').trim();
-    if (v || !f.opt) out.push({ label: f[L], value: fieldVal(state, f.k), step: 'names', def: !v });
-  });
-  const whenDef = isDefault('when');
-  const d = dateInfo(state);
-  if (d) out.push({ label: t('factDate'), value: `${d.wd} ${d.gLong}${d.hijri ? ' · ' + d.hijri : ''}`, step: 'when', def: whenDef });
-  const tt = timeText(state); if (tt) out.push({ label: t('factTime'), value: `${tt.lead} ${tt.main}`.trim(), step: 'when', def: whenDef });
-  out.push({ label: t('factPlace'), value: venueVal(state) + (state.venueDetail.trim() ? ' · ' + state.venueDetail.trim() : ''), step: 'where', def: isDefault('where') });
-  out.push({ label: t('factStyle'), value: TEMPLATES[state.template].name[L], step: 'style', def: isDefault('style') });
-  out.push({ label: t('factFont'), value: [state.nameFont || t('designFont'), state.bodyFont].filter(Boolean).join(' · '), step: 'fonts', def: isDefault('fonts') });
+// Required pieces still empty: the name fields, the date and the venue
+function missing() {
+  const out = [], L = state.lang;
+  if (!state.occasion) return out;
+  FIELDS[state.occasion].forEach(f => { if (!f.opt && !(state.fields[f.k] || '').trim()) out.push({ label: f[L], slot: 'names', k: f.k }); });
+  if (!parseDate(state.date)) out.push({ label: t('factDate'), slot: 'when', k: 'date' });
+  if (!state.venue.trim()) out.push({ label: t('factPlace'), slot: 'where', k: 'venue' });
   return out;
 }
+function reviewRows() {
+  const L = state.lang, tpl = TEMPLATES[state.template], dg = x => toDigits(x, tpl, L), out = [];
+  FIELDS[state.occasion].forEach(f => {
+    const v = fieldVal(state, f.k);
+    if (v || !f.opt) out.push({ label: f[L], value: v, missing: !v, slot: 'names', k: f.k });
+  });
+  const d = dateInfo(state);
+  out.push({ label: t('factDate'), value: d ? dg(`${d.wd} ${d.gLong}${state.showHijri && d.hijri ? ' · ' + d.hijri : ''}`) : '', missing: !d, slot: 'when', k: 'date' });
+  const tt = timeText(state); if (tt) out.push({ label: t('factTime'), value: dg(`${tt.lead} ${tt.main}`.trim()), slot: 'when', k: 'timeFrom' });
+  const ven = venueVal(state);
+  out.push({ label: t('factPlace'), value: ven ? ven + (state.venueDetail.trim() ? ' · ' + state.venueDetail.trim() : '') : '', missing: !ven, slot: 'where', k: 'venue' });
+  out.push({ label: t('factWording'), value: `${currentOpening(state)} … ${currentClosing(state) || t('noClosing')}`, slot: 'wording', k: 'opening' });
+  if (state.note > 0 && NOTES[L][state.note]) out.push({ label: t('factNote'), value: NOTES[L][state.note], slot: 'where', k: 'note' });
+  out.push({ label: t('factStyle'), value: tpl.name[L], sheet: 'design' });
+  const nf = state.nameFont || famOf(L === 'ar' ? tpl.styles.name.f : (tpl.styles.name.fe || tpl.styles.name.f));
+  out.push({ label: t('factFont'), html: `<span data-family="${esc(nf)}">${esc(nameSample())}</span> <span class="hint">${state.nameFont || state.bodyFont ? t('fontCustom') : t('designFont')}</span>`, sheet: 'fonts' });
+  return out;
+}
+
+/* ---- edit step: one big card; tap a part to edit it in a sheet; design and fonts from the dock ---- */
+const ui = { sheet: null, k: null, fontMode: 'name', fontGroup: -1 };
+const FIELD_SHEETS = ['names', 'when', 'where', 'wording'];
+const TIP_KEY = 'krootnow-tip-v1';
+// the call-out shown on the next empty slot, by field key
+const PIN = { main: 'pinName', main2: 'pinName', host1: 'pinName', host2: 'pinName', partner: 'pinName', parent: 'pinParent', date: 'pinDate', venue: 'pinVenue' };
+const ED_ICON = {
+  hand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V4.5a1.5 1.5 0 0 1 3 0V11m0-5a1.5 1.5 0 0 1 3 0v5m0-3a1.5 1.5 0 0 1 3 0v7.5a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-5.1-2.8L3 14.5a1.6 1.6 0 0 1 2.6-1.8L9 15.5"/></svg>',
+  design: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.6-.3-1-.6-1.4-.3-.4-.5-.8-.5-1.3 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-7.7-9-7.7z"/><circle cx="7.5" cy="11.5" r="1.1" fill="currentColor"/><circle cx="10" cy="7.5" r="1.1" fill="currentColor"/><circle cx="14.5" cy="7.5" r="1.1" fill="currentColor"/></svg>',
+  font: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19l5.5-14h1L16 19M6.3 14h7.4"/><path d="M17 12.5c1.2-1 3-1 3 1v5.5M20 15.5c-2.5-.3-4 .4-4 1.9s2.3 1.9 4-.3"/></svg>'
+};
+let HITS = [];
+function tipSeen() {
+  try { localStorage.setItem(TIP_KEY, '1'); } catch (e) { /* storage unavailable */ }
+  const el = $('#tip'); if (el) el.remove();
+}
+function cardHTML() {
+  return `<div class="card-wrap" id="cardWrap"><div class="card-xf" id="cardXf"><canvas id="card" data-preview width="${W}" height="${H}" aria-label="${esc(t('previewAlt'))}"></canvas><div class="hits" id="hits"></div></div><div class="focus-label" id="focusLabel" hidden><span>${t('cropNote')}</span></div></div>`;
+}
+function hitLabel(h) {
+  if (h.slot === 'names') { const d = fieldDef(state.occasion, h.k); return h.missing ? t('fill', d ? d[state.lang] : '') : t('editName', d ? d[state.lang] : ''); }
+  if (h.slot === 'when') return h.missing ? t('pickDate') : t('editWhen');
+  if (h.slot === 'where') return h.missing ? t('fillVenue') : t('editWhere');
+  return t('editWording');
+}
+function activeHit() {
+  if (!ui.sheet) return null;
+  return HITS.find(h => h.k === ui.k) || HITS.find(h => h.slot === ui.sheet) || null;
+}
+// Tap boxes are at least 44 CSS px tall; neighbours in the same column split the gap instead of overlapping.
+// One pin at a time: the top-most empty slot gets the call-out, the rest show as dashed slots on the card.
+function placeHits() {
+  const box = $('#hits'); if (!box) return;
+  const cssW = (($('#cardXf') || {}).clientWidth) || 360, minH = 44 * W / cssW;
+  const boxes = HITS.map(h => { const b = { ...h, y0: h.y, y1: h.y + h.h }; if (b.h < minH) { const c = b.y + b.h / 2; b.y0 = c - minH / 2; b.y1 = c + minH / 2; } return b; });
+  for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+    const a = boxes[i], b = boxes[j];
+    if (!(a.x < b.x + b.w && b.x < a.x + a.w)) continue;
+    const [up, down] = a.y <= b.y ? [a, b] : [b, a];
+    if (down.y0 < up.y1) { const mid = (up.y + up.h + down.y) / 2; up.y1 = Math.min(up.y1, mid); down.y0 = Math.max(down.y0, mid); }
+  }
+  const pin = boxes.filter(b => b.missing && PIN[b.k]).sort((a, b) => a.y - b.y)[0];
+  box.innerHTML = boxes.map(h => {
+    const active = ui.sheet && (h.k === ui.k || (!HITS.some(x => x.k === ui.k) && h.slot === ui.sheet));
+    const call = h === pin ? `<span class="pin">${t(PIN[h.k])}</span>` : '';
+    return `<button class="hit${active ? ' is-active' : ''}" type="button" data-act="hit" data-slot="${h.slot}" data-k="${esc(h.k || '')}" style="left:${h.x / W * 100}%;top:${h.y0 / H * 100}%;width:${h.w / W * 100}%;height:${(h.y1 - h.y0) / H * 100}%" aria-label="${esc(hitLabel(h))}">${call}</button>`;
+  }).join('');
+}
+// The card takes whatever the stage leaves it. With the keyboard up there is little left, so the preview
+// becomes a crop at full width, slid so the block being edited sits in the middle.
+function fit() {
+  const stage = $('#edStage'), wrap = $('#cardWrap'), xf = $('#cardXf'), label = $('#focusLabel');
+  if (!stage || !wrap) return;
+  const r = stage.getBoundingClientRect(), sw = Math.max(120, r.width - 24), sh = Math.max(120, r.height - 14);
+  const full = Math.min(sh, sw * 16 / 9), cw = full * 9 / 16;
+  const h = activeHit(), crop = h && full < 330 && FIELD_SHEETS.includes(ui.sheet);
+  if (crop) {
+    const scale = sw / W, fullH = sw * 16 / 9;
+    wrap.classList.add('focus'); wrap.style.width = sw + 'px'; wrap.style.height = sh + 'px';
+    xf.style.width = sw + 'px'; xf.style.height = fullH + 'px';
+    xf.style.transform = `translateY(${Math.min(0, Math.max(sh - fullH, sh / 2 - (h.y + h.h / 2) * scale))}px)`;
+    label.hidden = false;
+  } else {
+    wrap.classList.remove('focus'); wrap.style.width = cw + 'px'; wrap.style.height = full + 'px';
+    xf.style.width = cw + 'px'; xf.style.height = full + 'px'; xf.style.transform = '';
+    label.hidden = true;
+  }
+}
+// The edit screen follows the visual viewport, so the keyboard shrinks it instead of covering it
+function viewport() {
+  const vv = window.visualViewport, root = document.documentElement.style;
+  root.setProperty('--vvh', (vv ? vv.height : window.innerHeight) + 'px');
+  root.setProperty('--vvt', (vv ? vv.offsetTop : 0) + 'px');
+  if (document.body.classList.contains('editing') && window.scrollY) window.scrollTo(0, 0);
+  fit();
+}
+if (window.visualViewport) { visualViewport.addEventListener('resize', viewport); visualViewport.addEventListener('scroll', viewport); }
+window.addEventListener('resize', viewport);
+const stageRO = 'ResizeObserver' in window ? new ResizeObserver(() => fit()) : null;
+// the crop follows the field she is typing in
+document.addEventListener('focusin', e => { const el = e.target.closest('#edSheet [data-k]'); if (!el) return; ui.k = el.dataset.k; placeHits(); fit(); });
+function openSlot(kind, k) {
+  ui.sheet = kind; ui.k = k || null;
+  if (state.step !== 'edit') go('edit'); else renderSheet();
+  placeHits(); fit();
+  if (k && FIELD_SHEETS.includes(kind)) { const el = $(`#edSheet [data-k="${k}"]`); if (el) el.focus({ preventScroll: true }); }
+}
+function closeSheet() { ui.sheet = null; ui.k = null; renderSheet(); placeHits(); fit(); }
+function sheetTitle() {
+  const k = ui.sheet;
+  if (k === 'names') return t('namesTitle')[state.occasion];
+  if (k === 'when') return t('whenTitle');
+  if (k === 'where') return t('whereTitle');
+  if (k === 'wording') return t('wordTitle');
+  if (k === 'design') return state.designPicked ? t('designTitle') : t('pickDesignTitle');
+  return t('fontTitle');
+}
+function renderSheet() {
+  const sheet = $('#edSheet'); if (!sheet) return;
+  document.body.classList.toggle('sheet-open', !!ui.sheet);
+  // while she types, the dock gives its height to the card
+  $('#bar').hidden = FIELD_SHEETS.includes(ui.sheet);
+  document.querySelectorAll('#bar .dock .tool').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.val === ui.sheet)));
+  if (!ui.sheet) { sheet.hidden = true; return; }
+  const sub = ui.sheet === 'design' && !state.designPicked ? `<span class="sub">${t('designSub')}</span>` : '';
+  sheet.className = 'ed-sheet' + (ui.sheet === 'fonts' || ui.sheet === 'wording' ? ' tall' : '');
+  sheet.innerHTML = `<div class="ed-head"><h2>${sheetTitle()}${sub}</h2><button class="btn btn-primary btn-done" type="button" data-act="closeSheet">${t('done')}</button></div><div class="ed-body">${SHEETS[ui.sheet]()}</div>`;
+  sheet.hidden = false;
+  refreshAI(); observeFonts();
+  if (ui.sheet === 'design') renderThumbs();
+}
+function dockHTML() {
+  const m = missing();
+  const sub = m.length ? (m.length === 1 ? t('leftOne', m[0].label) : t('leftN', m.length)) : t('allSet');
+  return `<div class="dock"><button class="tool" type="button" data-act="sheet" data-val="design" aria-pressed="${ui.sheet === 'design'}">${ED_ICON.design}<span>${t('dockDesign')}</span></button><button class="tool" type="button" data-act="sheet" data-val="fonts" aria-pressed="${ui.sheet === 'fonts'}">${ED_ICON.font}<span>${t('dockFont')}</span></button><button class="btn btn-primary go" type="button" data-act="next">${t('reviewBtn')}<small>${esc(sub)}</small></button></div>`;
+}
+function refreshDock() { const d = $('#bar .dock'); if (d) d.outerHTML = dockHTML(); }
+const SHEETS = {
+  names() {
+    return FIELDS[state.occasion].map(fieldHTML).join('') + toggle('tashkeel', t('tashkeelToggle'))
+      + `<button class="link" type="button" data-act="quick" data-ai hidden>${ICON.sparkle}${t('quickLink')}</button>`;
+  },
+  when() {
+    return `<div class="field"><label for="f_date">${t('date')}</label>
+        <input type="date" id="f_date" data-bind="date" data-k="date" value="${esc(state.date)}" min="${todayISO()}">
+        <p class="hint" id="hijriHint">${esc(hijriHint() || t('hijriAuto'))}</p></div>
+      <div class="row2">
+        <div class="field"><label for="f_from">${t('from')}</label><input type="time" id="f_from" data-bind="timeFrom" data-k="timeFrom" value="${esc(state.timeFrom)}" step="900"></div>
+        <div class="field"><label for="f_to">${t('to')} <span class="opt">${t('optional')}</span></label><input type="time" id="f_to" data-bind="timeTo" data-k="timeTo" value="${esc(state.timeTo)}" step="900"></div>
+      </div>
+      ${toggle('showHijri', t('showHijri'))}`;
+  },
+  where() {
+    return `<div class="field"><label for="f_venue">${t('venue')}</label><input id="f_venue" data-bind="venue" data-k="venue" value="${esc(state.venue)}" placeholder="${esc(t('venuePh'))}" autocomplete="off"></div>
+      <div class="field"><label for="f_vd">${t('venueDetail')} <span class="opt">${t('optional')}</span></label><input id="f_vd" data-bind="venueDetail" data-k="venueDetail" value="${esc(state.venueDetail)}" placeholder="${esc(t('venueDetailPh'))}" autocomplete="off"></div>
+      <div class="field"><label for="f_map">${t('mapLink')} <span class="opt">${t('optional')}</span></label><input id="f_map" type="url" inputmode="url" dir="ltr" data-bind="mapLink" data-k="mapLink" value="${esc(state.mapLink)}" placeholder="https://maps.app.goo.gl/…" autocomplete="off"><p class="hint">${t('mapHint')}</p></div>
+      <div id="qrRow" ${mapUrl(state) ? '' : 'hidden'}>${toggle('showQR', t('showQR'))}</div>
+      <fieldset class="field"><legend>${t('noteTitle')}</legend><div class="chips">${NOTES[state.lang].map((n, i) => `<button type="button" class="chip" data-act="note" data-val="${i}" aria-pressed="${state.note === i}">${n}</button>`).join('')}</div></fieldset>`;
+  },
+  wording() {
+    const curO = currentOpening(state), curC = currentClosing(state), curD = currentDua(state);
+    const duas = (WORDING[state.occasion][state.lang].duas || []).map(text => ({ text }));
+    return (isWedding(state.occasion) ? toggle('dua', t('dua')) + (state.dua ? choiceGroup('duaText', t('duaPick'), duas, curD) : '') : '')
+      + choiceGroup('openingText', t('opening'), openingsList(state), curO)
+      + choiceGroup('closingText', t('closing'), closingsList(state), curC)
+      + `<div class="stack" data-ai hidden><button class="btn btn-ghost" data-act="aiWord" type="button">${ICON.sparkle}${t('aiSuggest')}</button><p class="hint status" id="aiWordStatus" aria-live="polite"></p></div>`;
+  },
+  // this card drawn in every design that suits the occasion; a tap swaps the big card and the strip stays open to compare
+  design() {
+    const L = state.lang;
+    return `<div class="strip">${styleOrder().map(id => `<button class="d-tile" type="button" data-act="tpl" data-val="${id}" aria-pressed="${state.template === id}" aria-label="${esc(TEMPLATES[id].name[L])}">
+      <canvas data-thumb="${id}" width="208" height="370"></canvas><span class="d-name">${esc(TEMPLATES[id].name[L])}</span>
+      ${state.template === id ? '<span class="d-tick">✓</span>' : ''}${state.matched === id ? `<span class="badge">${t('matched')}</span>` : ''}</button>`).join('')}</div>`;
+  },
+  // the typed name in every font; no Latin font names, the sample is the label
+  fonts() {
+    const L = state.lang, tpl = TEMPLATES[state.template], sample = nameSample();
+    const defName = famOf(L === 'ar' ? tpl.styles.name.f : (tpl.styles.name.fe || tpl.styles.name.f));
+    const defBody = famOf(L === 'ar' ? tpl.styles.opening.f : (tpl.styles.opening.fe || tpl.styles.opening.f));
+    const seg = `<div class="seg"><button type="button" data-act="fontMode" data-val="name" aria-pressed="${ui.fontMode === 'name'}">${t('nameFont')}</button><button type="button" data-act="fontMode" data-val="body" aria-pressed="${ui.fontMode === 'body'}">${t('bodyFont')}</button></div>`;
+    if (ui.fontMode === 'body') {
+      const tile = (fam, label, val) => `<button class="ftile small" type="button" data-act="bodyFont" data-val="${esc(val)}" aria-pressed="${(state.bodyFont || '') === val}" aria-label="${esc(label)}"><span data-family="${esc(fam)}" data-weight="400">${esc(t('bodySample'))}</span></button>`;
+      return seg + `<div class="fgrid body">${tile(defBody, t('designFont'), '')}${BODY_FONTS[L].map(f => tile(f, f, f)).join('')}</div>`;
+    }
+    const groups = FONT_GROUPS[L], gi = ui.fontGroup;
+    const tabs = [['-1', t('fontAll')], ...groups.map((g, i) => [String(i), g[L].replace(/^خطوط\s*/, '')])];
+    const list = gi < 0 ? groups.flatMap(g => g.fonts) : (groups[gi] || groups[0]).fonts;
+    const tile = (fam, label, val) => `<button class="ftile" type="button" data-act="nameFont" data-val="${esc(val)}" aria-pressed="${(state.nameFont || '') === val}" aria-label="${esc(label)}"><span data-family="${esc(fam)}">${esc(sample)}</span></button>`;
+    return seg + `<div class="ftabs">${tabs.map(([v, l]) => `<button type="button" class="chip" data-act="fontGroup" data-val="${v}" aria-pressed="${String(gi) === v}">${esc(l)}</button>`).join('')}</div>
+      <div class="fgrid">${tile(defName, t('designFont'), '')}${list.map(f => tile(f, f, f)).join('')}</div>`;
+  }
+};
 
 /* ---- occasion deck: build, slide and swipe ---- */
 function occTileHTML(id, i) {
@@ -4484,118 +4625,24 @@ const SCREENS = {
       bar: ''
     };
   },
-  style() {
-    const rec = REC[state.occasion] || [];
-    const L = state.lang, sample = nameSample();
-    const comboChip = (val, nameFam, bodyFam, label, pressed) => `<button class="font-tile combo-tile" type="button" data-act="fontCombo" data-val="${val}" aria-pressed="${pressed}" aria-label="${esc(label)}">
-      <span class="font-sample"${nameFam ? ` data-family="${esc(nameFam)}"` : ''}>${esc(sample)}</span>
-      <span class="font-sample combo-body"${bodyFam ? ` data-family="${esc(bodyFam)}"` : ''}>${esc(t('bodySample'))}</span>
-      <span class="font-name">${esc(label)}</span></button>`;
-    const tpl0 = TEMPLATES[state.template];
-    const defName = tpl0 ? famOf(L === 'ar' ? tpl0.styles.name.f : (tpl0.styles.name.fe || tpl0.styles.name.f)) : '';
-    const defBody = tpl0 ? famOf(L === 'ar' ? tpl0.styles.opening.f : (tpl0.styles.opening.fe || tpl0.styles.opening.f)) : '';
-    return {
-      html: `<h1>${t('styleTitle')}</h1><p class="lead">${t('styleSub')}</p>
-        <section class="font-sec combo-sec" aria-label="${esc(t('comboTitle'))}">
-          <h2>${t('comboTitle')}</h2><p class="hint">${t('comboSub')}</p>
-          <div class="font-row">
-            ${comboChip('def', defName, defBody, t('comboDefault'), !state.nameFont && !state.bodyFont)}
-            ${FONT_COMBOS[L].map((c, i) => comboChip(i, c.name, c.body, c[L], state.nameFont === c.name && state.bodyFont === c.body)).join('')}
-          </div>
-        </section>
-        <div class="grid-style">${styleOrder().map((id, i) => {
-          const badge = state.matched === id ? t('matched') : rec.includes(id) ? t('recommended') : '';
-          return `<button class="style-tile" type="button" style="--i:${i}" data-act="tpl" data-val="${id}" aria-pressed="${state.template === id}">
-            <canvas data-thumb="${id}" width="270" height="480"></canvas>
-            <span class="style-name">${TEMPLATES[id].name[state.lang]}</span>${badge ? `<span class="badge">${badge}</span>` : ''}</button>`;
-        }).join('')}</div>`,
-      bar: state.template && !state.styleAuto ? '' : skipBtn()
-    };
-  },
-  names() {
-    return {
-      html: editLayout(`<h1>${t('namesTitle')[state.occasion]}</h1><p class="lead">${t('namesSub')}</p>
-        <div class="ai-box" data-ai hidden>
-          <h2>${ICON.sparkle}${t('quickTitle')}</h2>
-          <p class="hint">${t('quickSub')}</p>
-          <div class="field"><textarea id="quickText" aria-label="${esc(t('quickTitle'))}" placeholder="${esc(t('quickPh'))}"></textarea></div>
-          <button class="btn btn-secondary" data-act="aiFill" type="button">${t('quickBtn')}</button>
-          <p class="hint status" id="aiFillStatus" aria-live="polite"></p>
-        </div>
-        ${FIELDS[state.occasion].map(fieldHTML).join('')}
-        <p class="def-hint">${t('defHint')}</p>
-        ${toggle('tashkeel', t('tashkeelToggle'))}`),
-      bar: nextBar()
-    };
-  },
-  when() {
-    return {
-      html: editLayout(`<h1>${t('whenTitle')}</h1>
-        <div class="field"><label for="f_date">${t('date')}</label>
-          <input type="date" id="f_date" data-bind="date" value="${esc(state.date)}" min="${todayISO()}">
-          <p class="hint" id="hijriHint">${esc(hijriHint())}</p></div>
-        <div class="row2">
-          <div class="field"><label for="f_from">${t('from')}</label><input type="time" id="f_from" data-bind="timeFrom" value="${esc(state.timeFrom)}" step="900"></div>
-          <div class="field"><label for="f_to">${t('to')} <span class="opt">${t('optional')}</span></label><input type="time" id="f_to" data-bind="timeTo" value="${esc(state.timeTo)}" step="900"></div>
-        </div>
-        ${toggle('showHijri', t('showHijri'))}`),
-      bar: nextBar()
-    };
-  },
-  where() {
-    return {
-      html: editLayout(`<h1>${t('whereTitle')}</h1>
-        <div class="field"><label for="f_venue">${t('venue')}</label><input id="f_venue" data-bind="venue" value="${esc(state.venue)}" placeholder="${esc(t('venuePh'))}" autocomplete="off" data-def></div>
-        <p class="def-hint">${t('defHint')}</p>
-        <div class="field"><label for="f_vd">${t('venueDetail')} <span class="opt">${t('optional')}</span></label><input id="f_vd" data-bind="venueDetail" value="${esc(state.venueDetail)}" placeholder="${esc(t('venueDetailPh'))}" autocomplete="off"></div>
-        <div class="field"><label for="f_map">${t('mapLink')} <span class="opt">${t('optional')}</span></label><input id="f_map" type="url" inputmode="url" dir="ltr" data-bind="mapLink" value="${esc(state.mapLink)}" placeholder="https://maps.app.goo.gl/…" autocomplete="off"><p class="hint">${t('mapHint')}</p></div>
-        ${toggle('showQR', t('showQR'))}
-        <fieldset class="field"><legend>${t('noteTitle')}</legend><div class="chips">${NOTES[state.lang].map((n, i) => `<button type="button" class="chip" data-act="note" data-val="${i}" aria-pressed="${state.note === i}">${n}</button>`).join('')}</div></fieldset>`),
-      bar: nextBar()
-    };
-  },
-  wording() {
-    const curO = currentOpening(state), curC = currentClosing(state), curD = currentDua(state);
-    const duas = (WORDING[state.occasion][state.lang].duas || []).map(text => ({ text }));
-    return {
-      html: editLayout(`<h1>${t('wordTitle')}</h1>
-        <div class="stack" data-ai hidden><button class="btn btn-ghost" data-act="aiWord" type="button">${ICON.sparkle}${t('aiSuggest')}</button><p class="hint status" id="aiWordStatus" aria-live="polite"></p></div>
-        ${isWedding(state.occasion) ? toggle('dua', t('dua')) : ''}
-        ${isWedding(state.occasion) && state.dua ? choiceGroup('duaText', t('duaPick'), duas, curD) : ''}
-        ${choiceGroup('openingText', t('opening'), openingsList(state), curO)}
-        ${choiceGroup('closingText', t('closing'), closingsList(state), curC)}`, true),
-      bar: nextBar()
-    };
-  },
-  fonts() {
-    const L = state.lang, sample = nameSample(), tpl = TEMPLATES[state.template];
-    const designName = famOf(L === 'ar' ? tpl.styles.name.f : (tpl.styles.name.fe || tpl.styles.name.f));
-    const designBody = famOf(L === 'ar' ? tpl.styles.opening.f : (tpl.styles.opening.fe || tpl.styles.opening.f));
-    const tile = (fam, preview, label) => `<button class="font-tile" type="button" data-act="nameFont" data-val="${esc(fam)}" aria-pressed="${(state.nameFont || '') === fam}" aria-label="${esc(label)}">
-      <span class="font-sample" data-family="${esc(preview)}">${esc(sample)}</span><span class="font-name">${esc(label)}</span></button>`;
-    const chip = (fam, preview, label) => `<button class="font-tile font-tile-sm" type="button" data-act="bodyFont" data-val="${esc(fam)}" aria-pressed="${(state.bodyFont || '') === fam}" aria-label="${esc(label)}">
-      <span class="font-sample" data-family="${esc(preview)}">${esc(t('bodySample'))}</span><span class="font-name">${esc(label)}</span></button>`;
-    return {
-      html: editLayout(`<h1>${t('fontTitle')}</h1><p class="lead">${t('fontSub')}</p>
-        <section class="font-sec" aria-label="${esc(t('nameFont'))}"><h2>${t('nameFont')}</h2>
-          <div class="font-row">${tile('', designName, t('designFont'))}</div>
-          ${FONT_GROUPS[L].map(g => `<h3>${g[L]}</h3><div class="font-row">${g.fonts.map(f => tile(f, f, f)).join('')}</div>`).join('')}
-        </section>
-        <section class="font-sec" aria-label="${esc(t('bodyFont'))}"><h2>${t('bodyFont')}</h2>
-          <div class="font-row">${chip('', designBody, t('designFont'))}${BODY_FONTS[L].map(f => chip(f, f, f)).join('')}</div>
-        </section>
-        <p class="hint">${t('fontLicense')}</p>`, true),
-      bar: nextBar()
-    };
+  // the one edit screen: the card fills the stage, the sheet and the dock come from renderSheet / dockHTML
+  edit() {
+    let tip = '';
+    try { if (!localStorage.getItem(TIP_KEY)) tip = `<div class="tip" id="tip">${ED_ICON.hand}<span>${t('tip')}</span><button type="button" data-act="tipOk">${t('tipOk')}</button></div>`; } catch (e) { /* storage unavailable */ }
+    return { html: `<div class="editor" id="editor"><div class="ed-stage" id="edStage">${cardHTML()}${tip}</div><section class="ed-sheet" id="edSheet" hidden></section></div>`, bar: dockHTML() };
   },
   review() {
-    const rows = facts();
+    const rows = reviewRows(), m = missing();
+    const row = r => `<div class="fact${r.missing ? ' is-missing' : ''}"><dt>${esc(r.label)}</dt><dd>${r.missing ? t('missingVal') : (r.html || esc(r.value))}</dd>
+      <button class="link" type="button" data-act="${r.sheet ? 'sheet' : 'hit'}" ${r.sheet ? `data-val="${r.sheet}"` : `data-slot="${r.slot}" data-k="${esc(r.k || '')}"`}>${r.missing ? t('complete') : t('edit')}</button></div>`;
     return {
-      html: `<div class="edit">${previewHTML()}<div class="form"><h1>${t('reviewTitle')}</h1><p class="lead">${t('reviewSub')}</p>
-        ${rows.some(f => f.def) ? `<p class="def-note">${t('defNote')}</p>` : ''}
-        <dl class="facts">${rows.map(f => `<div class="fact${f.def ? ' is-default' : ''}"><dt>${esc(f.label)}${f.def ? ` <span class="def-tag">${t('defTag')}</span>` : ''}</dt><dd>${esc(f.value)}</dd><button class="link" type="button" data-act="goto" data-val="${f.step}">${t('edit')}</button></div>`).join('')}</dl>
-        <label class="check"><input type="checkbox" id="f_confirm" data-bind="confirmed" ${state.confirmed ? 'checked' : ''}><span>${t('confirm')}</span></label></div></div>`,
-      bar: `<button class="btn btn-primary" id="toPay" data-act="next" type="button" ${state.confirmed ? '' : 'disabled'}>${t('toPay')}</button>`
+      html: `<h1>${t('reviewTitle')}</h1><p class="lead">${t('reviewSub')}</p>
+        <div class="review-card">${cardHTML()}</div>
+        ${m.length ? `<div class="missing-box"><b>${t('missingBefore', m.length)}</b><span>${m.map(x => `<button class="link" type="button" data-act="hit" data-slot="${x.slot}" data-k="${x.k}">${esc(x.label)}</button>`).join(' · ')}</span></div>` : ''}
+        <dl class="facts">${rows.map(row).join('')}</dl>
+        <p class="hint wm-note">${t('wmNote')}</p>`,
+      // the confirmation sits right above the pay button, which stays enabled and points at it when untouched
+      bar: `<div class="pay-row"><label class="check"><input type="checkbox" id="f_confirm" data-bind="confirmed" ${state.confirmed ? 'checked' : ''}><span>${t('confirm')}</span></label><button class="btn btn-primary" id="toPay" data-act="next" type="button">${t('toPay')}</button></div>`
     };
   },
   pay() {
@@ -4647,8 +4694,12 @@ const AFTER = {
     slideDeck(occNav.level, true);
     setupDeckSwipe();
   },
-  style() { renderThumbs(); observeFonts(); },
-  fonts() { observeFonts(); },
+  edit() {
+    const st = $('#edStage');
+    if (stageRO && st) { stageRO.disconnect(); stageRO.observe(st); }
+    renderSheet(); viewport();
+  },
+  review() { observeFonts(); },
   pay() { if (inPagePay()) mountPayUI(); },
   done() {
     cardFile = null;
@@ -4690,6 +4741,7 @@ function scheduleRender() {
       document.querySelectorAll('canvas[data-preview]').forEach(c => {
         const x = c.getContext('2d'); x.clearRect(0, 0, c.width, c.height); x.drawImage(master, 0, 0, c.width, c.height);
       });
+      HITS = LAST_HITS.slice(); placeHits(); fit();
     });
   });
 }
@@ -4725,12 +4777,14 @@ function renderScreen() {
   $('#back span').textContent = t('back');
   $('#back').hidden = state.step === 'welcome' || state.step === 'done';
   document.body.classList.toggle('in-flow', state.step !== 'welcome');
+  document.body.classList.toggle('editing', state.step === 'edit');
+  if (state.step !== 'edit') { ui.sheet = null; ui.k = null; document.body.classList.remove('sheet-open'); }
   renderProgress(true);
   if (homeCleanup) { homeCleanup(); homeCleanup = null; }
   const nav = $('#navCta'); nav.textContent = t('navCta'); nav.hidden = state.step !== 'welcome';
   const view = SCREENS[state.step]();
   const scr = $('#screen');
-  scr.innerHTML = state.step === 'welcome' ? view.html : `<div class="wrap step">${view.html}</div>`;
+  scr.innerHTML = state.step === 'welcome' || state.step === 'edit' ? view.html : `<div class="wrap step">${view.html}</div>`;
   scr.classList.remove('enter', 'rev'); void scr.offsetWidth;
   scr.classList.add('enter'); scr.classList.toggle('rev', navDir === 'back');
   navDir = 'fwd';
@@ -4739,23 +4793,20 @@ function renderScreen() {
   if (AFTER[state.step]) AFTER[state.step]();
   scheduleRender();
 }
-// Progress capsule: a check for finished steps, purple for steps still showing sample content.
-// Once an occasion is picked every step is open, so any step can be skipped.
+// Progress capsule: the three stages the home page promises; a stage gets a tick once its part is complete
 function renderProgress(recenter) {
   const fi = FLOW.indexOf(state.step), prog = $('#prog');
   prog.hidden = fi < 0;
   if (fi < 0) return;
-  state.reached = Math.max(state.reached || 0, fi);
   const bar = $('.pbar', prog);
   bar.setAttribute('aria-label', `${t('stepsAria')} · ${t('stepOf', fi + 1, FLOW.length)}`);
+  const done = [!!state.occasion, !!(state.occasion && state.template) && !missing().length, false];
+  const open = [true, !!state.occasion, !!(state.occasion && state.template)];
   bar.innerHTML = FLOW.map((s, i) => {
-    const passed = i <= state.reached && i !== fi;
-    const def = passed && isDefault(s);
-    const open = i === 0 || !!state.occasion;
-    const cls = `pstep${passed && !def ? ' is-done' : ''}${def ? ' is-default' : ''}${i === fi ? ' is-cur' : ''}`;
+    const cur = i === fi, tick = done[i] && !cur;
     const digit = state.lang === 'ar' ? '٠١٢٣٤٥٦٧٨٩'[i + 1] : i + 1;
-    return `<button type="button" class="${cls}" data-act="goStep" data-val="${s}" ${open ? '' : 'disabled'} aria-current="${i === fi ? 'step' : 'false'}"${def ? ` title="${esc(t('defTag'))}"` : ''}>
-      <span class="pstep-dot">${passed && !def ? '✓' : digit}</span><span class="pstep-name">${t('stepNames')[i]}</span></button>`;
+    return `<button type="button" class="pstep${tick ? ' is-done' : ''}${cur ? ' is-cur' : ''}" data-act="goStep" data-val="${s}" ${open[i] ? '' : 'disabled'} aria-current="${cur ? 'step' : 'false'}">
+      <span class="pstep-dot">${tick ? '✓' : digit}</span><span class="pstep-name">${t('stepNames')[i]}</span></button>`;
   }).join('');
   const cur = $('.pstep.is-cur', bar);
   if (recenter && cur) bar.scrollLeft = cur.offsetLeft - (bar.clientWidth - cur.offsetWidth) / 2;
@@ -4763,61 +4814,39 @@ function renderProgress(recenter) {
 let navDir = 'fwd';
 function go(step, dir) {
   navDir = dir || 'fwd';
+  $('#toast').hidden = true;
   state.step = step; save(); renderScreen();
   window.scrollTo(0, 0);
   const s = $('#screen'); if (s) s.focus({ preventScroll: true });
 }
 
 /* ================= navigation ================= */
-// Steps the customer may skip; the card then shows sample content there, marked in purple
-const SKIPPABLE = ['style', 'names', 'when', 'where', 'wording', 'fonts'];
-function isDefault(step) {
-  if (!state.occasion) return false;
-  const skipped = (state.skipped || []).includes(step);
-  if (step === 'style') return !!state.styleAuto;
-  if (step === 'names') return FIELDS[state.occasion].some(f => !f.opt && !(state.fields[f.k] || '').trim());
-  if (step === 'where') return !state.venue.trim();
-  return skipped;
-}
-function unskip(step) {
-  if (!(state.skipped || []).includes(step)) return;
-  state.skipped = state.skipped.filter(s => s !== step);
-  renderProgress();
-}
-// Leaving a step without finishing it: pick a design if none, and remember it was skipped
-function skipStep(step) {
-  if (step === 'style' && !state.template) { state.template = styleOrder()[0]; state.styleAuto = true; }
-  if (step === 'when' && !parseDate(state.date)) state.date = isoPlus(14);
-  if (['when', 'wording', 'fonts'].includes(step) && !(state.skipped || []).includes(step)) state.skipped = [...(state.skipped || []), step];
-}
-const BIND_STEP = { date: 'when', timeFrom: 'when', timeTo: 'when', showHijri: 'when', openingText: 'wording', closingText: 'wording', duaText: 'wording', dua: 'wording' };
+// Nothing can be skipped any more: the card shows what is still empty, and review and payment wait for it
 function validate() {
   const s = state.step;
   if (s === 'occasion' && !state.occasion) return { msg: t('pickOcc') };
-  if (s === 'style' && !state.template) return { msg: t('pickStyle') };
-  if (s === 'names') {
-    const miss = FIELDS[state.occasion].find(f => !f.opt && !(state.fields[f.k] || '').trim());
-    if (miss) return { msg: t('fill', miss[state.lang]), el: '#f_' + miss.k };
+  if (s === 'edit' || s === 'review') {
+    const m = missing();
+    if (m.length) return { msg: t('left', m.map(x => x.label).join(t('listSep'))), slot: m[0].slot, k: m[0].k };
   }
-  if (s === 'when' && !parseDate(state.date)) return { msg: t('pickDate'), el: '#f_date' };
-  if (s === 'where' && !state.venue.trim()) return { msg: t('fillVenue'), el: '#f_venue' };
   if (s === 'review' && !state.confirmed) return { msg: t('confirmFirst'), el: '#f_confirm' };
   return null;
 }
 function next() {
   const err = validate();
   if (err) {
+    if (err.slot) { openSlot(err.slot, err.k); toast(err.msg); return; }
     toast(err.msg);
     const el = err.el && $(err.el);
-    if (el) { el.classList.add('invalid'); el.focus(); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    if (el) { el.focus(); const c = el.closest('.check'); if (c) { c.classList.remove('nudge'); void c.offsetWidth; c.classList.add('nudge'); } }
     return;
   }
   if (state.step === 'review') return go('pay');
-  const i = FLOW.indexOf(state.step);
-  go(FLOW[i + 1]);
+  go(FLOW[FLOW.indexOf(state.step) + 1]);
 }
 function back() {
   const s = state.step;
+  if (s === 'edit' && ui.sheet) { closeSheet(); return; }
   if (s === 'occasion' && occNav.level > 0) { slideDeck(occNav.level - 1); return; }
   if (s === 'upload') return go('welcome', 'back');
   if (s === 'occasion') return go(state.fromUpload ? 'upload' : 'welcome', 'back');
@@ -5139,7 +5168,7 @@ const ACTIONS = {
     openModal(`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><h2 id="helpTitle">${t('helpTitle')}</h2><p>${t('helpBody')}</p>${link}<button class="btn btn-secondary" data-close type="button">${t('close')}</button></div>`);
   },
   start() { const L = state.lang; state = freshState(L); draft = null; save(); go('occasion'); },
-  resume() { state = Object.assign(freshState(), draft, { paid: false }); if (!CONFIG.english) state.lang = 'ar'; if (!FLOW.includes(state.step)) state.step = 'review'; draft = null; go(state.step); },
+  resume() { state = Object.assign(freshState(), draft, { paid: false }); if (!CONFIG.english) state.lang = 'ar'; if (!FLOW.includes(state.step)) state.step = 'review'; if (state.occasion && !state.template) state.template = styleOrder()[0]; draft = null; go(state.step); },
   upload() { const L = state.lang; state = freshState(L); state.fromUpload = true; draft = null; go('upload'); },
   afterUpload() {
     const r = state.read;
@@ -5148,7 +5177,10 @@ const ACTIONS = {
       if (r.style && (!state.occasion || allowedFor(state.occasion).includes(r.style))) { state.matched = r.style; state.template = r.style; }
       if (r.opening && isArabic(r.opening) === (state.lang === 'ar')) { state.cardOpening = r.opening; state.openingText = r.opening; }
       if (r.closing && isArabic(r.closing) === (state.lang === 'ar')) { state.cardClosing = r.closing; state.closingText = r.closing; }
-      return go(r.occasion ? 'style' : 'occasion');
+      if (!r.occasion) return go('occasion');
+      if (!state.template) state.template = styleOrder()[0];
+      state.designPicked = !!r.style; ui.sheet = r.style ? null : 'design';
+      return go('edit');
     }
     go('occasion');
   },
@@ -5163,67 +5195,54 @@ const ACTIONS = {
   occ(id, el) {
     setOccasion(id);
     document.querySelectorAll('.occ').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
-    // a design picked from the home page gallery skips the design step (if it suits the occasion)
-    const nextStep = state.fromGallery && state.template && allowedFor(id).includes(state.template) ? 'names' : 'style';
+    // a design picked from the home page gallery (or matched from an upload) is kept; otherwise the design strip opens first
     state.fromGallery = false;
-    save(); setTimeout(() => go(nextStep), 220);
+    if (!state.template) { state.template = styleOrder()[0]; state.designPicked = false; }
+    ui.sheet = state.designPicked ? null : 'design'; ui.k = null;
+    save(); setTimeout(() => go('edit'), 220);
   },
   tpl(id, el) {
-    state.template = id; state.styleAuto = false;
-    document.querySelectorAll('.style-tile').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
-    save(); setTimeout(() => go('names'), 220);
+    state.template = id; state.designPicked = true;
+    document.querySelectorAll('.d-tile').forEach(b => {
+      const on = b === el; b.setAttribute('aria-pressed', String(on));
+      const tick = b.querySelector('.d-tick');
+      if (on && !tick) b.insertAdjacentHTML('beforeend', '<span class="d-tick">✓</span>');
+      if (!on && tick) tick.remove();
+    });
+    const h = $('#edSheet h2'); if (h) h.textContent = t('designTitle');
+    save(); renderProgress(); scheduleRender();
   },
   next() { next(); },
-  goto(step) { go(step, 'back'); },
   goStep(step) {
-    const i = FLOW.indexOf(step), c = FLOW.indexOf(state.step);
-    if (i < 0 || i === c) return;
-    if (i > 0 && !state.occasion) { toast(t('pickOcc')); return; }
-    // jumping ahead skips the steps on the way that were never opened; a card always needs a design
-    for (let k = Math.max(c, 1); k < i; k++) {
-      if (k > (state.reached || 0)) skipStep(FLOW[k]);
-      else if (FLOW[k] === 'style' && !state.template) skipStep('style');
-    }
-    go(step, i < c ? 'back' : 'fwd');
+    if (step === state.step || !FLOW.includes(step)) return;
+    if (step !== 'occasion' && !state.occasion) { toast(t('pickOcc')); return; }
+    if (step === 'review' && !state.template) { toast(t('pickStyle')); return; }
+    ui.sheet = null; ui.k = null;
+    go(step, FLOW.indexOf(step) < FLOW.indexOf(state.step) ? 'back' : 'fwd');
   },
-  skip() {
-    const i = FLOW.indexOf(state.step);
-    if (!SKIPPABLE.includes(state.step)) return;
-    skipStep(state.step);
-    go(FLOW[i + 1]);
-  },
+  sheet(kind) { if (state.step === 'edit' && ui.sheet === kind) closeSheet(); else openSlot(kind); },
+  closeSheet() { closeSheet(); },
+  hit(_, el) { tipSeen(); openSlot(el.dataset.slot, el.dataset.k || null); },
+  tipOk() { tipSeen(); },
+  fontMode(mode) { ui.fontMode = mode; renderSheet(); },
+  fontGroup(i) { ui.fontGroup = +i; renderSheet(); },
+  quick() { openAsst(); },
   note(i, el) {
     state.note = +i;
-    document.querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
+    document.querySelectorAll('[data-act="note"]').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
     saveSoon(); scheduleRender();
-  },
-  fontCombo(val, el) {
-    const c = val === 'def' ? null : FONT_COMBOS[state.lang][+val];
-    state.nameFont = c ? c.name : null;
-    state.bodyFont = c ? c.body : null;
-    unskip('fonts');
-    document.querySelectorAll('[data-act="fontCombo"]').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
-    save(); renderThumbs();
   },
   nameFont(fam, el) {
     state.nameFont = fam || null;
-    unskip('fonts');
     document.querySelectorAll('[data-act="nameFont"]').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
     saveSoon(); scheduleRender();
   },
   bodyFont(fam, el) {
     state.bodyFont = fam || null;
-    unskip('fonts');
     document.querySelectorAll('[data-act="bodyFont"]').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
     saveSoon(); scheduleRender();
   },
-  zoom() {
-    serial(async () => {
-      await drawCard(master, state, { watermark: !state.paid });
-      openModal(`<div class="zoom-wrap" data-close role="dialog" aria-modal="true" aria-label="${esc(t('zoom'))}"><img src="${master.toDataURL('image/jpeg', 0.9)}" alt=""><p>${t('closeZoom')}</p></div>`);
-    });
-  },
-  quickOcc(id) { const L = state.lang; state = freshState(L); draft = null; setOccasion(id); save(); go('style'); },
+  quickOcc(id) { const L = state.lang; state = freshState(L); draft = null; setOccasion(id); state.template = styleOrder()[0]; ui.sheet = 'design'; ui.k = null; save(); go('edit'); },
   galFilter(occ, el) {
     document.querySelectorAll('.gal-pill').forEach(b => b.setAttribute('aria-pressed', String(b === el)));
     document.querySelectorAll('#galRow .g-tile').forEach(tile => { tile.hidden = occ !== 'all' && !tile.dataset.occs.split(' ').includes(occ); });
@@ -5234,8 +5253,7 @@ const ACTIONS = {
     const rtl = document.documentElement.dir === 'rtl';
     row.scrollBy({ left: (rtl ? -1 : 1) * Number(dir) * row.clientWidth * 0.8, behavior: reducedMotion() ? 'auto' : 'smooth' });
   },
-  pickDesign(tp) { const L = state.lang; state = freshState(L); state.template = tp; state.fromGallery = true; draft = null; save(); go('occasion'); },
-  aiFill(_, el) { aiFill(el); },
+  pickDesign(tp) { const L = state.lang; state = freshState(L); state.template = tp; state.designPicked = true; state.fromGallery = true; draft = null; save(); go('occasion'); },
   aiWord(_, el) { aiWording(el); },
   pay(_, el) {
     if (CONFIG.payUrl) { if (el.dataset.val === 'card') payCard(el); else payTap(el); return; }
@@ -5266,12 +5284,12 @@ document.addEventListener('input', e => {
   el.classList.remove('invalid');
   const val = el.type === 'checkbox' ? el.checked : el.value;
   if (key.startsWith('fields.')) state.fields[key.slice(7)] = val; else state[key] = val;
-  if (BIND_STEP[key]) unskip(BIND_STEP[key]);
-  if (key.startsWith('fields.') || key === 'venue') renderProgress();
-  if (key === 'date') { const h = $('#hijriHint'); if (h) h.textContent = hijriHint(); }
-  if (key === 'confirmed') { const b = $('#toPay'); if (b) b.disabled = !val; }
+  if (key === 'date') { const h = $('#hijriHint'); if (h) h.textContent = hijriHint() || t('hijriAuto'); }
+  // the QR option appears, switched on, once a map link is in
+  if (key === 'mapLink') { const ok = !!mapUrl(state); state.showQR = ok; const r = $('#qrRow'); if (r) { r.hidden = !ok; const c = r.querySelector('input'); if (c) c.checked = ok; } }
   if (key === 'buyerName' || key === 'buyerContact') { clearTimeout(tapUI.appleTimer); tapUI.appleTimer = setTimeout(applePayGateCheck, 700); }
-  if (key === 'dua') { save(); renderScreen(); return; }
+  if (key === 'dua') { save(); renderSheet(); scheduleRender(); return; }
+  if (key.startsWith('fields.') || key === 'venue' || key === 'date') { renderProgress(); refreshDock(); }
   saveSoon(); scheduleRender();
 });
 document.addEventListener('change', e => {
@@ -5283,14 +5301,19 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && !$('#modal').hidden) closeModal();
-  if (e.key === 'Enter' && e.target.matches && e.target.matches('.form input:not([type="checkbox"]):not([type="radio"])')) { e.preventDefault(); next(); }
+  // Enter in a sheet moves to the next field, and closes the keyboard after the last one
+  if (e.key === 'Enter' && e.target.matches && e.target.matches('#edSheet input:not([type="checkbox"]):not([type="radio"])')) {
+    e.preventDefault();
+    const inputs = [...document.querySelectorAll('#edSheet input:not([type="checkbox"]):not([type="radio"])')], i = inputs.indexOf(e.target);
+    if (inputs[i + 1]) inputs[i + 1].focus(); else e.target.blur();
+  }
 });
 // Swiping sideways moves through the flow: towards the reading direction goes forward, away goes back.
 // Gestures that start on inputs or on things that scroll sideways themselves are left alone.
 let stepSwipe = null;
 document.addEventListener('touchstart', e => {
   if (e.touches.length !== 1) { stepSwipe = null; return; }
-  const skip = e.target.closest('input,textarea,select,#tapCard,.apple-box,#deck,.font-row,.gal-row,.gal-filters,.chips,.modal,.preview,.hero-stage');
+  const skip = e.target.closest('input,textarea,select,#tapCard,.apple-box,#deck,.strip,.ftabs,.gal-row,.gal-filters,.chips,.modal,.editor,.hero-stage');
   stepSwipe = skip ? null : { x: e.touches[0].clientX, y: e.touches[0].clientY };
 }, { passive: true });
 document.addEventListener('touchend', e => {
@@ -5298,13 +5321,14 @@ document.addEventListener('touchend', e => {
   const p = e.changedTouches[0], dx = p.clientX - stepSwipe.x, dy = p.clientY - stepSwipe.y;
   stepSwipe = null;
   if (Math.abs(dx) < 90 || Math.abs(dx) < Math.abs(dy) * 2) return;
-  if (!$('#modal').hidden || state.step === 'welcome' || state.step === 'done') return;
+  // the edit screen is all taps and sheets, so a sideways swipe there does nothing
+  if (!$('#modal').hidden || state.step === 'welcome' || state.step === 'done' || state.step === 'edit') return;
   const f = dx * (document.documentElement.dir === 'rtl' ? 1 : -1);
   if (f < 0) back();
   else if (FLOW.includes(state.step) && state.step !== 'occasion') next();
 });
 if (document.fonts && document.fonts.addEventListener) {
-  document.fonts.addEventListener('loadingdone', () => { scheduleRender(); if (state.step === 'style') renderThumbs(); });
+  document.fonts.addEventListener('loadingdone', () => { scheduleRender(); if (ui.sheet === 'design') renderThumbs(); });
 }
 
 /* ================= boot ================= */
