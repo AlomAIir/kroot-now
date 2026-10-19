@@ -486,6 +486,8 @@ html[lang="ar"] .big { line-height: 1.3; }
 .pay-or { display: flex; align-items: center; gap: 12px; margin: 0; color: var(--muted); font-size: 14px; }
 .pay-or::before, .pay-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .tap-card { min-height: 64px; }
+/* Tap's card form is a light page in a frame: matching its colour scheme keeps the browser from painting it a white backdrop on the dark theme */
+.tap-card iframe { color-scheme: light; }
 .apple-box { display: grid; }
 .apple-box #apple-pay-button:empty { display: none; }
 .order { display: flex; gap: 16px; align-items: center; background: var(--band); border-radius: 20px; padding: 14px; }
@@ -4978,8 +4980,9 @@ async function mountPayUI() {
         edges: sdkVal(S.Edges, 'CURVED', 'curved'),
         direction: ar ? sdkVal(S.Direction, 'RTL', 'rtl') : sdkVal(S.Direction, 'LTR', 'ltr')
       },
-      onValidInput: () => { tapUI.cardValid = true; },
-      onInvalidInput: () => { tapUI.cardValid = false; },
+      // Tap calls both on every change with a flag: onValidInput(isValid), onInvalidInput(!isValid)
+      onValidInput: v => { tapUI.cardValid = typeof v === 'boolean' ? v : true; },
+      onInvalidInput: v => { if (typeof v !== 'boolean' || v) tapUI.cardValid = false; },
       onError: e => { console.warn('Kroot card:', e); if (tapUI.busy) payDone('payFail'); },
       onSuccess: d => { const tok = findTok(d); if (tok) chargeToken(tok); else payDone('payFail'); }
     }) || {};
