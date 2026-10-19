@@ -753,10 +753,10 @@ const CONFIG = {
   payUrl: (window.KROOT_LOCAL && window.KROOT_LOCAL.payUrl) || 'https://fslixkzqmkqezdactxxg.supabase.co/functions/v1/tap-checkout',
   // Paying on this page: Tap's card form, plus Tap's Apple Pay button on Apple devices. The public key and
   // merchant id are publishable (they sit in the page); the secret key stays in Supabase. A blank public key
-  // sends customers to Tap's hosted page instead. Turn applePay on once Tap has registered krotnow.com for it.
-  tapPublicKey: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapPublicKey) || '',
-  tapMerchantId: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapMerchantId) || '',
-  applePay: !!(window.KROOT_LOCAL && window.KROOT_LOCAL.applePay) || false,
+  // sends customers to Tap's hosted page instead. Test keys for now: switch to the pk_live_ key together with sk_live_.
+  tapPublicKey: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapPublicKey) || 'pk_test_GNUaSuKpc8TS45tRjNqlwoFQ0MdYf',
+  tapMerchantId: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapMerchantId) || '68066245',
+  applePay: !(window.KROOT_LOCAL && window.KROOT_LOCAL.applePay === false),
   tapCardSdk: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapCardSdk) || 'https://tap-sdks.b-cdn.net/card/1.0.2/index.js',
   tapApplePaySdk: (window.KROOT_LOCAL && window.KROOT_LOCAL.tapApplePaySdk) || 'https://tap-sdks.b-cdn.net/apple-pay/build-1.0.19/main',
   supportWhatsApp: '',       // e.g. '9665XXXXXXXX' to show a WhatsApp help link
